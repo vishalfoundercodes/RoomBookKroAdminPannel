@@ -28,6 +28,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
     // { icon: BarChart, label: "Analytics", to: "analytics" },
     // { icon: FileText, label: "Reports", to: "reports" },
   
+    { icon: CreditCard, label: "coupon ", to: "coupon" },
     // { icon: CreditCard, label: "Subscription Plans", to: "subscription" },
     // // { icon: Star, label: "Tarot Reading", to: "#" },
     // // { icon: Heart, label: "Love Compatibility", to: "#" },
@@ -63,12 +64,13 @@ export const Sidebar = ({ isOpen, onClose }) => {
       >
         {/* Sidebar Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-700">
-          <h2 className="text-xl font-bold">Admin Panel</h2>
-          <img
+          {/* <h2 className="text-xl font-bold">Admin Panel</h2> */}
+          <h2 className="text-xl font-bold"> Room Book Karo </h2>
+          {/* <img
             src="/logo.png"
             className="w-12 h-12 border-2 border-green-600 rounded-full"
             alt="Logo"
-          />
+          /> */}
           <button onClick={onClose} className="lg:hidden">
             <X size={20} />
           </button>

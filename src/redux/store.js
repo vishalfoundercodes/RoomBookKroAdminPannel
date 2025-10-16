@@ -4,6 +4,7 @@ import propertyReducer from "./slices/propertySlice";
 import bannerReducer from "./slices/bannerSlice";
 import authReducer from "./slices/authSlice";
 import profileReducer from "./slices/profileSlice";
+import couponReducer from "./slices/couponSlice";
 
 const store = configureStore({
   reducer: {
@@ -11,7 +12,9 @@ const store = configureStore({
     property: propertyReducer,
     banner: bannerReducer,
     auth: authReducer,
-    profile:profileReducer
+    profile:profileReducer,
+    coupon: couponReducer,
+     
   },
 });
 

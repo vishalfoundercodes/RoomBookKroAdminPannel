@@ -23,6 +23,7 @@ import { FcCallTransfer } from "react-icons/fc";
 import { fetchUsers } from "../../redux/slices/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
+import Loader from "../Loader/Loader";
 const Home = () => {
 const dispatch = useDispatch();
     const { data: users, loading: usersLoading } = useSelector(

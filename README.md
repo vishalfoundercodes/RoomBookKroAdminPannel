@@ -1,6 +1,6 @@
-# 🔮 Astrology Admin Panel
+# 🔮 ROOM BOOK KRO  Admin Panel
 
-A modern, responsive **Admin Panel** built with **React + Vite**, designed to manage astrology-related data and operations efficiently. This template offers a fast development experience with Hot Module Replacement (HMR), ESLint integration, and a scalable project structure.
+A modern, responsive **Admin Panel** built with **React + Vite**, designed to manage room book -related data and operations efficiently. This template offers a fast development experience with Hot Module Replacement (HMR), ESLint integration, and a scalable project structure.
 
 ## 🚀 Features
 

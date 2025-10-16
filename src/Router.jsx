@@ -8,6 +8,8 @@ import PropertyPage from "./pages/Property/Property";
 import Settings from "./pages/Settings/Settings";
 import Reports from "./pages/Reports/Reports";
 import Subscription from "./pages/Subscription/Subscription";
+import CouponManagement from "./pages/coupons/Coupen";
+import Login from "./pages/home/Login";
 // import SingleProductPage from "./reusable_components/SingleProductPage";
 // import PrivacyPolicy from "./pages/privacy/privacy";
 // import Wishlist from "./pages/Wishlist/Wishlist";
@@ -26,9 +28,14 @@ import Subscription from "./pages/Subscription/Subscription";
 
 
 export const Router = createBrowserRouter([
+   {
+          path: "/login",
+          element: <Login />
+      },
   {
     path: "/",
     element: <Layout />,
+    
     children: [
       {
         path: "/",
@@ -62,6 +69,12 @@ export const Router = createBrowserRouter([
         path: "/subscription",
         element: <Subscription />,
       },
+      {
+        path: "/coupon",
+        element: <CouponManagement />,
+      },
+
+     
       //   {
       //     path: "/wishlist",
       //     element:<ProtectedRoutes> <Wishlist /></ProtectedRoutes>
