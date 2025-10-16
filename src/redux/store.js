@@ -5,6 +5,8 @@ import bannerReducer from "./slices/bannerSlice";
 import authReducer from "./slices/authSlice";
 import profileReducer from "./slices/profileSlice";
 import couponReducer from "./slices/couponSlice";
+import notificationReducer from "./slices/notificationSlice";
+import historyReducer from "./slices/historySlice";
 
 const store = configureStore({
   reducer: {
@@ -14,6 +16,8 @@ const store = configureStore({
     auth: authReducer,
     profile:profileReducer,
     coupon: couponReducer,
+    notification: notificationReducer,
+     history: historyReducer,
      
   },
 });

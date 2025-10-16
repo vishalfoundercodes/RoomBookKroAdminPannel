@@ -15,6 +15,8 @@ import {
   CreditCard,
   Bell,
   Building,
+  icons,
+  HistoryIcon,
 } from "lucide-react";
 import { Link, NavLink } from "react-router-dom";
 
@@ -29,13 +31,14 @@ export const Sidebar = ({ isOpen, onClose }) => {
     // { icon: FileText, label: "Reports", to: "reports" },
   
     { icon: CreditCard, label: "coupon ", to: "coupon" },
-    // { icon: CreditCard, label: "Subscription Plans", to: "subscription" },
+    { icon: HistoryIcon, label: "History ", to: "history" },
+    // { icon: icons, label: "Subscription Plans", to: "subscription" },
     // // { icon: Star, label: "Tarot Reading", to: "#" },
     // // { icon: Heart, label: "Love Compatibility", to: "#" },
     // // { icon: Gem, label: "Crystal Reading", to: "#" },
     // // { icon: Leaf, label: "Palm Reading", to: "#" },
     // // Add more to test scroll
-    // { icon: Bell, label: "Notifications", to: "/Notification" },
+    { icon: Bell, label: "Notifications", to: "/Notification" },
     // // { icon: Star, label: "Extra Item 2", to: "#" },
     // // { icon: Star, label: "Extra Item 3", to: "#" },
     // // { icon: Star, label: "Extra Item 4", to: "#" },

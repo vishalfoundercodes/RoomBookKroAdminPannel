@@ -10,6 +10,7 @@ import Reports from "./pages/Reports/Reports";
 import Subscription from "./pages/Subscription/Subscription";
 import CouponManagement from "./pages/coupons/Coupen";
 import Login from "./pages/home/Login";
+import History from "./pages/History/History";
 // import SingleProductPage from "./reusable_components/SingleProductPage";
 // import PrivacyPolicy from "./pages/privacy/privacy";
 // import Wishlist from "./pages/Wishlist/Wishlist";
@@ -72,6 +73,10 @@ export const Router = createBrowserRouter([
       {
         path: "/coupon",
         element: <CouponManagement />,
+      },
+      {
+        path: "/history",
+        element: <History />,
       },
 
      

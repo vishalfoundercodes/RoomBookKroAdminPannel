@@ -416,9 +416,13 @@ export default function CouponManagement() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Used By:</span>
-                      <span className="font-medium text-gray-900">
+                      {/* <span className="font-medium text-gray-900">
                         {coupon.usedBy}
-                      </span>
+                      </span> */}
+                      <span className="font-medium text-gray-900">
+                        {coupon.usedBy.join(', ')}
+                        </span>
+
                     </div>
                     {coupon.couponType === "limited" && (
                       <div className="flex justify-between">
