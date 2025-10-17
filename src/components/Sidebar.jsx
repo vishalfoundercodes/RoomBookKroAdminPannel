@@ -19,6 +19,7 @@ import {
   HistoryIcon,
 } from "lucide-react";
 import { Link, NavLink } from "react-router-dom";
+import { BiPhotoAlbum } from "react-icons/bi";
 
 // Sidebar Component
 export const Sidebar = ({ isOpen, onClose }) => {
@@ -39,6 +40,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
     // // { icon: Leaf, label: "Palm Reading", to: "#" },
     // // Add more to test scroll
     { icon: Bell, label: "Notifications", to: "/Notification" },
+    { icon: BiPhotoAlbum, label: "Add Images Page", to: "/addimagepage" },
     // // { icon: Star, label: "Extra Item 2", to: "#" },
     // // { icon: Star, label: "Extra Item 3", to: "#" },
     // // { icon: Star, label: "Extra Item 4", to: "#" },

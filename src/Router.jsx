@@ -11,6 +11,8 @@ import Subscription from "./pages/Subscription/Subscription";
 import CouponManagement from "./pages/coupons/Coupen";
 import Login from "./pages/home/Login";
 import History from "./pages/History/History";
+import ProtectedRoute from "./pages/home/ProtectedRoute";
+import AddImagePage from "./pages/AddImagePage/AddImagePage";
 // import SingleProductPage from "./reusable_components/SingleProductPage";
 // import PrivacyPolicy from "./pages/privacy/privacy";
 // import Wishlist from "./pages/Wishlist/Wishlist";
@@ -28,146 +30,176 @@ import History from "./pages/History/History";
 
 
 
+// export const Router = createBrowserRouter([
+//    {
+//           path: "/login",
+//           element: <Login />
+//       },
+//   {
+//     path: "/",
+//     element: <Layout />,
+    
+//     children: [
+//       {
+//         path: "/",
+//         element: <Home />,
+//       },
+//       {
+//         path: "/notification",
+//         element: <Notifications />,
+//       },
+//       {
+//         path: "/users",
+//         element: <UsersPage />,
+//       },
+//       {
+//         path: "/property",
+//         element: <PropertyPage />,
+//       },
+//       {
+//         path: "/analytics",
+//         element: <Analytics />,
+//       },
+//       {
+//         path: "/settings",
+//         element: <Settings />,
+//       },
+//       {
+//         path: "/reports",
+//         element: <Reports />,
+//       },
+//       {
+//         path: "/subscription",
+//         element: <Subscription />,
+//       },
+//       {
+//         path: "/coupon",
+//         element: <CouponManagement />,
+//       },
+//       {
+//         path: "/history",
+//         element: <History />,
+//       },
+
+     
+//       //   {
+//       //     path: "/wishlist",
+//       //     element:<ProtectedRoutes> <Wishlist /></ProtectedRoutes>
+//       // },
+//       //  {
+//       //     path: "/register",
+//       //     element:<GuestRoute><MyAccount /></GuestRoute>
+//       // },
+//       // {
+//       //     path: "/profile",
+//       //     element:<ProtectedRoutes> <Profile /></ProtectedRoutes>
+//       // },
+//       //  {
+//       //     path: "/orders",
+//       //     element:<ProtectedRoutes><Orders /> </ProtectedRoutes>
+//       // },
+//       // {
+//       //     path: "/cart",
+//       //     element:<ProtectedRoutes><Cart /> </ProtectedRoutes>
+//       // },
+//       // {
+//       //     path: "/checkout",
+//       //     element: <ProtectedRoutes><CheckoutPage /></ProtectedRoutes>
+//       // },
+//       //  {
+//       //     path: "/allproduct",
+//       //     element: <Category />
+//       // },
+//       //  {
+//       //     path: "/allproduct",
+//       //     element: <Category />
+//       // },
+//       // {
+//       //     path: "/therapists/:title",
+//       //     element: <SelectedTherapists />
+//       // },
+//       // {
+//       //     path: "/notifications",
+//       //     element: <ComingSoon />
+//       // },
+//       // {
+//       //     path: "/contact",
+//       //     element: <ComingSoon />
+//       // },
+//       // {
+//       //     path: "/help",
+//       //     element: <ComingSoon />
+//       // },
+//       // {
+//       //     path: "/aboutus",
+//       //     element: <ComingSoon />
+//       // },
+//       // {
+//       //     path: "/terms",
+//       //     element: <ComingSoon />
+//       // },
+//       // {
+//       //     path: "/check",
+//       //     element: <AddBilling />
+//       // },
+//       // {
+//       //     path: "/check2",
+//       //     element: <AddressSection />
+//       // },
+//       // {
+//       //     path: "/faqs",
+//       //     element: <Faqs />
+//       // },
+//       // {
+//       //     path: "/pricing",
+//       //     element: <Pricing />
+//       // },
+//       // {
+//       //     path: "/privacypolicy",
+//       //     element: <Privacy_Policy />
+//       // },
+//       // {
+//       //     path: "/refundpolicy",
+//       //     element: <Refund_policy />
+//       // },
+//       // {
+//       //     path: "/login",
+//       //     element: <Login />
+//       // },
+//       // {
+//       //     path: "/register",
+//       //     element: <Register />
+//       // },
+//     ],
+//   },
+// ]);
+
 export const Router = createBrowserRouter([
-   {
-          path: "/login",
-          element: <Login />
-      },
+  {
+    path: "/login",
+    element: <Login />,
+  },
   {
     path: "/",
-    element: <Layout />,
-    
+    element: <ProtectedRoute />, // ✅ Protected Wrapper
     children: [
       {
         path: "/",
-        element: <Home />,
+        element: <Layout />,
+        children: [
+          { path: "/", element: <Home /> },
+          { path: "/notification", element: <Notifications /> },
+          { path: "/users", element: <UsersPage /> },
+          { path: "/property", element: <PropertyPage /> },
+          { path: "/analytics", element: <Analytics /> },
+          { path: "/settings", element: <Settings /> },
+          { path: "/reports", element: <Reports /> },
+          { path: "/subscription", element: <Subscription /> },
+          { path: "/coupon", element: <CouponManagement /> },
+          { path: "/history", element: <History /> },
+          { path: "/addimagepage", element: <AddImagePage /> },
+        ],
       },
-      {
-        path: "/notification",
-        element: <Notifications />,
-      },
-      {
-        path: "/users",
-        element: <UsersPage />,
-      },
-      {
-        path: "/property",
-        element: <PropertyPage />,
-      },
-      {
-        path: "/analytics",
-        element: <Analytics />,
-      },
-      {
-        path: "/settings",
-        element: <Settings />,
-      },
-      {
-        path: "/reports",
-        element: <Reports />,
-      },
-      {
-        path: "/subscription",
-        element: <Subscription />,
-      },
-      {
-        path: "/coupon",
-        element: <CouponManagement />,
-      },
-      {
-        path: "/history",
-        element: <History />,
-      },
-
-     
-      //   {
-      //     path: "/wishlist",
-      //     element:<ProtectedRoutes> <Wishlist /></ProtectedRoutes>
-      // },
-      //  {
-      //     path: "/register",
-      //     element:<GuestRoute><MyAccount /></GuestRoute>
-      // },
-      // {
-      //     path: "/profile",
-      //     element:<ProtectedRoutes> <Profile /></ProtectedRoutes>
-      // },
-      //  {
-      //     path: "/orders",
-      //     element:<ProtectedRoutes><Orders /> </ProtectedRoutes>
-      // },
-      // {
-      //     path: "/cart",
-      //     element:<ProtectedRoutes><Cart /> </ProtectedRoutes>
-      // },
-      // {
-      //     path: "/checkout",
-      //     element: <ProtectedRoutes><CheckoutPage /></ProtectedRoutes>
-      // },
-      //  {
-      //     path: "/allproduct",
-      //     element: <Category />
-      // },
-      //  {
-      //     path: "/allproduct",
-      //     element: <Category />
-      // },
-      // {
-      //     path: "/therapists/:title",
-      //     element: <SelectedTherapists />
-      // },
-      // {
-      //     path: "/notifications",
-      //     element: <ComingSoon />
-      // },
-      // {
-      //     path: "/contact",
-      //     element: <ComingSoon />
-      // },
-      // {
-      //     path: "/help",
-      //     element: <ComingSoon />
-      // },
-      // {
-      //     path: "/aboutus",
-      //     element: <ComingSoon />
-      // },
-      // {
-      //     path: "/terms",
-      //     element: <ComingSoon />
-      // },
-      // {
-      //     path: "/check",
-      //     element: <AddBilling />
-      // },
-      // {
-      //     path: "/check2",
-      //     element: <AddressSection />
-      // },
-      // {
-      //     path: "/faqs",
-      //     element: <Faqs />
-      // },
-      // {
-      //     path: "/pricing",
-      //     element: <Pricing />
-      // },
-      // {
-      //     path: "/privacypolicy",
-      //     element: <Privacy_Policy />
-      // },
-      // {
-      //     path: "/refundpolicy",
-      //     element: <Refund_policy />
-      // },
-      // {
-      //     path: "/login",
-      //     element: <Login />
-      // },
-      // {
-      //     path: "/register",
-      //     element: <Register />
-      // },
     ],
   },
 ]);

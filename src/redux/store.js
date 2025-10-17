@@ -7,6 +7,7 @@ import profileReducer from "./slices/profileSlice";
 import couponReducer from "./slices/couponSlice";
 import notificationReducer from "./slices/notificationSlice";
 import historyReducer from "./slices/historySlice";
+import addImageReducer from "./slices/addImageSlice";
 
 const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ const store = configureStore({
     coupon: couponReducer,
     notification: notificationReducer,
      history: historyReducer,
+     images: addImageReducer,
      
   },
 });

@@ -1,10 +1,37 @@
 import { Bell, Mail, Menu, Search, User } from "lucide-react";
 import { useState } from "react";
 import { FaUser, FaCogs, FaSignOutAlt } from 'react-icons/fa';
+import { useDispatch } from "react-redux";
+import { logout,checkProfile } from "../redux/slices/authSlice";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
+// import { checkProfile } from "../../redux/slices/authenticationSlice";
 
 // Header Component
  export const Header = ({ isScrolled, onToggleSidebar }) => {
+   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Dispatch logout action
+    dispatch(logout());
+
+    // Redirect to login page
+    navigate("/login");
+  };
+
+  useEffect(() => {
+  dispatch(checkProfile())
+    .unwrap()
+    .then(user => {
+      // console.log("Profile check successful, user:", user);
+    })
+    .catch(err => {
+      console.log("Profile check failed:", err);
+    });
+}, [dispatch]);
+
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   return (
@@ -70,7 +97,7 @@ import { FaUser, FaCogs, FaSignOutAlt } from 'react-icons/fa';
         Settings
       </a>
       <hr className="my-1 border-gray-200 dark:border-gray-600" />
-      <button className="flex items-center block w-full text-left text-gray-800 dark:text-gray-200 py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+      <button onClick={handleLogout}  className="flex items-center block w-full text-left text-gray-800 dark:text-gray-200 py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
         <FaSignOutAlt className="mr-2" size={18} /> {/* Icon for "Logout" */}
         Logout
       </button>
