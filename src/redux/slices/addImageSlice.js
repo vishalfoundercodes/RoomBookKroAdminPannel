@@ -10,12 +10,27 @@ const API_URL = "https://admin.roombookkro.com/api";
 // ---------------
 
 // POST /addbanner
+// export const addBanner = createAsyncThunk(
+//   "images/addBanner",
+//   async (payload, { rejectWithValue }) => {
+//     try {
+//       const res = await axios.post(`${API_URL}/addbanner`, payload);
+//       console.log("resadd banenr :",res)
+//       return res.data;
+//     } catch (err) {
+//       return rejectWithValue(err.response?.data || err.message);
+//     }
+//   }
+// );
+
 export const addBanner = createAsyncThunk(
   "images/addBanner",
   async (payload, { rejectWithValue }) => {
     try {
-      const res = await axios.post(`${API_URL}/addbanner`, payload);
-      console.log("resadd banenr :",res)
+      const res = await axios.post(`${API_URL}/addbanner`, payload, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      console.log("res add banner :", res);
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || err.message);
@@ -101,6 +116,7 @@ const addImageSlice = createSlice({
   initialState: {
     banners: [],
     onboardPages: [],
+     homeBanners: [],
     loading: false,
     error: null,
     success: false,
@@ -164,10 +180,15 @@ const addImageSlice = createSlice({
       .addCase(getHomeBanners.pending, (state) => {
         state.loading = true;
       })
+    //   .addCase(getHomeBanners.fulfilled, (state, action) => {
+    //     state.loading = false;
+    //     state.banners = action.payload;
+    //   })
       .addCase(getHomeBanners.fulfilled, (state, action) => {
-        state.loading = false;
-        state.banners = action.payload;
-      })
+  state.loading = false;
+  state.homeBanners = action.payload?.data || [];
+})
+
       .addCase(getHomeBanners.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;

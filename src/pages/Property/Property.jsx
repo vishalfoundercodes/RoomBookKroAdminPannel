@@ -30,8 +30,8 @@ import   DataTable from '../../reusable_components/DataTable';
 import BarChartComponent from '../../reusable_components/BarChart';
 import PieChartComponent from '../../reusable_components/PieChart';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProperty ,addProperty } from '../../redux/slices/propertySlice';
-
+import { fetchProperty ,addProperty, editProperty } from '../../redux/slices/propertySlice';
+import EditPropertyModal from "./EditPropertyModal";
 const PropertyPage = () => {
    const dispatch = useDispatch();
 
@@ -44,7 +44,15 @@ const PropertyPage = () => {
     dispatch(fetchProperty());
   }, [dispatch]);
 
-  
+  // Utility: Convert file to Base64
+const toBase64 = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+  });
+
   // if (loading) return <p>Loading properties...</p>;
   // if (error) return <p>Error: {error}</p>;
 
@@ -69,6 +77,22 @@ const PropertyPage = () => {
     
    
   ]);
+
+    const handleEdit = () => {
+    const formData = new FormData();
+    formData.append("name", "Updated Hotel Name");
+    formData.append("location", "Mumbai");
+    formData.append("image", selectedFile); // if file input present
+
+    dispatch(editProperty({ id: 4, payload: formData }))
+      .unwrap()
+      .then((res) => {
+        console.log("✅ Property updated successfully:", res);
+      })
+      .catch((err) => {
+        console.error("❌ Error updating property:", err);
+      });
+  };
 
   // State management
   const [searchTerm, setSearchTerm] = useState("");
@@ -95,6 +119,20 @@ const PropertyPage = () => {
   images: [],
   pricePerNight: 0,
   rooms: [],
+    //    rooms: [
+    // {
+    //   "roomType": "suite",
+    //   "furnished": "furnished",
+    //   "occupancy": 4,
+    //     "pricePerMonth":11000,
+    //   "depositAmount":22000,
+    //   "amenities": ["AC", "TV", "Attached Bathroom","Kitechen","Grocery"],
+    //   "availableUnits": 3,
+    //   "images": [
+    //     "https://q-xx.bstatic.com/xdata/images/hotel/max1024x768/579890916.jpg?k=d1b853e1d1cc0d54793a75e6b9c45dff50e70954d385a79db6790744c3398383&o=&s=1024",
+    //     "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA2A"
+    //   ]}]
+    // ,
   amenities: [],
   rules: [],
   contactNumber: "",
@@ -144,6 +182,7 @@ const handleAddProperty = () => {
     
     .catch((err) => console.error("Add property error:", err));
 };
+
   // New user form state
   // const [newUser, setNewUser] = useState({
   //   name: "",
@@ -153,7 +192,46 @@ const handleAddProperty = () => {
   //   location: ""
   // });
 
+//   const handleAddProperty = () => {
+//   console.log("Payload to send:", newProperty); // Check payload in console
+
+//   dispatch(addProperty(newProperty))
+//     .unwrap()
+//     .then(() => {
+//       setShowAddModal(false);
+//       // Reset form
+//       setNewProperty({
+//         userId: "1",
+//         userType: "1",
+//         name: "",
+//         type: "",
+//         address: "",
+//         city: "",
+//         state: "",
+//         pincode: "",
+//         coordinates: { lat: 0, lng: 0 },
+//         mainImage: "",
+//         images: [],
+//         pricePerNight: 0,
+//         rooms: [],
+//         amenities: [],
+//         rules: [],
+//         contactNumber: "",
+//         email: "",
+//         website: "",
+//         owner: "",
+//         description: "",
+//         rating: 0,
+//         availableRooms: 0,
+//         isAvailable: true,
+//       });
+//     })
+//     .catch((err) => console.error("Add property error:", err));
+// };
+
   // Filter and search logic
+  
+  
   const filteredProperty = properties?.filter(user => {
     const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          user.email.toLowerCase().includes(searchTerm.toLowerCase());
@@ -249,6 +327,8 @@ const handleAddProperty = () => {
     }
   };
 
+
+
   return (
     <div className="min-h-screen bg-gray-50 p-4">
       {/* Header */}
@@ -289,7 +369,7 @@ const handleAddProperty = () => {
           color="blue"
         />
         <StatCard
-          title="Active Property"
+          title="Available Property"
           value={activeProperty.toString()}
           change={`${((activeProperty / totalProperty) * 100).toFixed(1)}%`}
           changeType="positive"
@@ -304,7 +384,7 @@ const handleAddProperty = () => {
           color="yellow"
         /> */}
         <StatCard
-          title="Inactive Property"
+          title="Not Available Property"
           value={inactiveProperty.toString()}
           change="Need attention"
           changeType="negative"
@@ -460,6 +540,7 @@ const handleAddProperty = () => {
                       </div>
                     </div>
                   </td>
+            
                   {/* <td className="py-3 px-4">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(user.role)}`}>
                       {user.role}
@@ -501,7 +582,7 @@ const handleAddProperty = () => {
                       >
                         <Eye className="w-4 h-4" />
                       </button>
-                      <button
+                      {/* <button
                         onClick={() => {
                           setSelectedUser(user);
                           setShowEditModal(true);
@@ -510,7 +591,12 @@ const handleAddProperty = () => {
                         title="Edit User"
                       >
                         <Edit className="w-4 h-4" />
-                      </button>
+                      </button> */}
+                               <EditPropertyModal
+                              show={showEditModal}
+                              onClose={() => setShowEditModal(false)}
+                              propertyId={user.id}
+                            />
                       <button
                         onClick={() => handleDeleteUser(user.id)}
                         className="p-1 text-red-600 hover:bg-red-100 rounded"
@@ -658,7 +744,7 @@ const handleAddProperty = () => {
           </div>
 
                       {/* Main Image */}
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Main Image</label>
                 <input
                   type="file"
@@ -680,10 +766,10 @@ const handleAddProperty = () => {
                     className="mt-2 w-32 h-32 object-cover rounded-md"
                   />
                 )}
-              </div>
+              </div> */}
 
               {/* Other Images */}
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Other Images</label>
                 <input
                   type="file"
@@ -706,7 +792,66 @@ const handleAddProperty = () => {
                     />
                   ))}
                 </div>
-              </div>
+              </div> */}
+
+
+
+{/* Main Image */}
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-1">
+    Main Image
+  </label>
+  <input
+    type="file"
+    accept="image/*"
+    onChange={async (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const base64 = await toBase64(file);
+        setNewProperty({ ...newProperty, mainImage: base64 });
+      }
+    }}
+    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+  />
+  {newProperty.mainImage && (
+    <img
+      src={newProperty.mainImage}
+      alt="Main"
+      className="mt-2 w-32 h-32 object-cover rounded-md"
+    />
+  )}
+</div>
+
+{/* Other Images */}
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-1">
+    Other Images
+  </label>
+  <input
+    type="file"
+    accept="image/*"
+    multiple
+    onChange={async (e) => {
+      const files = Array.from(e.target.files);
+      const base64Images = await Promise.all(
+        files.map((file) => toBase64(file))
+      );
+      setNewProperty({ ...newProperty, images: base64Images });
+    }}
+    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+  />
+  <div className="flex flex-wrap gap-2 mt-2">
+    {newProperty.images.map((img, i) => (
+      <img
+        key={i}
+        src={img}
+        alt={`img-${i}`}
+        className="w-20 h-20 object-cover rounded-md"
+      />
+    ))}
+  </div>
+</div>
+
 
 
           {/* Price */}
@@ -1090,6 +1235,12 @@ const handleAddProperty = () => {
     </div>
   </div>
 )}
+
+      {/* <EditPropertyModal
+        show={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        propertyId={property.id}
+      /> */}
 
     </div>
   );

@@ -17,7 +17,7 @@ export const signupUser = createAsyncThunk(
       } else {
         toast.error("User not created");
       }
-      return res.data;
+      return res?.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: error.message });
     }
@@ -31,7 +31,7 @@ export const loginUser = createAsyncThunk(
     try {
       const res = await axios.post(`${baseUrl}/login`, payload);
       console.log("resss data ", res.data);
-      return res.data; // { user, loginToken, message }
+      return res?.data; // { user, loginToken, message }
     } catch (error) {
       return rejectWithValue(error.response?.data || { message: error.message });
     }

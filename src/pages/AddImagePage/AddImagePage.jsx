@@ -34,55 +34,58 @@ export default function AddImagePage() {
   }, [dispatch]);
 
   // 🔹 Add Image Handler
-  const handleAddImage = async () => {
-    setError("");
+const handleAddImage = async () => {
+  setError("");
 
-    if (!newImage.url) {
-      setError("Image URL is required");
-      return;
+  if (!newImage.file && !newImage.url) {
+    setError("Please upload an image or enter an image URL");
+    return;
+  }
+
+  try {
+    let formData = new FormData();
+
+    if (activeTab === "banners") {
+      formData.append("title", "Promotion Banners");
+      if (newImage.file) formData.append("images", newImage.file);
+      if (newImage.alt) formData.append("alt", newImage.alt);
+
+      await dispatch(addBanner(formData)).unwrap();
+    } 
+    else if (activeTab === "home") {
+      formData.append("title", "Home Banners");
+      if (newImage.file) formData.append("images", newImage.file);
+      formData.append("alt", "Homepage Banner");
+
+      await dispatch(addBanner(formData)).unwrap();
+    } 
+    else if (activeTab === "onboarding") {
+      formData.append("title", newImage.title);
+      formData.append("description", newImage.description);
+      if (newImage.file) formData.append("image", newImage.file);
+      if (newImage.pageId) formData.append("pageId", newImage.pageId);
+
+      await dispatch(addOnboardPage(formData)).unwrap();
     }
 
-    if (activeTab === "banners" && !newImage.alt) {
-      setError("Alt text is required for banners");
-      return;
-    }
+    setNewImage({
+      url: "",
+      alt: "",
+      title: "",
+      description: "",
+      pageId: "",
+      file: null,
+      previewUrl: "",
+    });
 
-    if (activeTab === "onboarding") {
-      if (!newImage.title || !newImage.description || !newImage.pageId) {
-        setError("Title, description, and page type are required");
-        return;
-      }
-    }
+    dispatch(getBanners());
+    dispatch(getOnboardPages());
+  } catch (err) {
+    console.error(err);
+    setError("Failed to upload image. Please try again.");
+  }
+};
 
-    try {
-      if (activeTab === "banners") {
-        const payload = {
-          title: "Promotion Banners",
-          images: [{ url: newImage.url, alt: newImage.alt }],
-        };
-        await dispatch(addBanner(payload)).unwrap();
-      } else if (activeTab === "home") {
-        const payload = {
-          title: "Home Banners",
-          images: [{ url: newImage.url, alt: "Homepage Banner" }],
-        };
-        await dispatch(addBanner(payload)).unwrap();
-      } else if (activeTab === "onboarding") {
-        const payload = {
-          title: newImage.title,
-          description: newImage.description,
-          imageUrl: newImage.url,
-        };
-        await dispatch(addOnboardPage(payload)).unwrap();
-      }
-
-      setNewImage({ url: "", alt: "", title: "", description: "", pageId: "" });
-      dispatch(getBanners());
-      dispatch(getOnboardPages());
-    } catch (err) {
-      setError("Failed to add image. Please try again.");
-    }
-  };
 
   // 🔹 Delete Image Handler
   const handleDeleteImage = async (id, type) => {
@@ -99,15 +102,21 @@ export default function AddImagePage() {
     }
   };
 
+
   const pageTypeOptions = [
     { value: 2, label: "Appartment" },
     { value: 3, label: "PG" },
     { value: 4, label: "Hotel" },
   ];
+// 🧠 Local derived data
+const bannerImages = banners || [];          // All banners
+const onboardImages = onboardPages || [];    // Onboarding pages
+const homeBannerImages = banners || [];      // Home banners (from getHomeBanners)
 
-  // 🟡 Combine Redux data into UI
-  const bannerImages = banners || [];
-  const onboardImages = onboardPages || [];
+// 🧾 Debugging logs
+console.log("🏠 All Banners:", bannerImages);
+console.log("🚀 Onboard Page Images:", onboardImages);
+console.log("🎯 Home Banners:", homeBannerImages);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
@@ -259,119 +268,144 @@ export default function AddImagePage() {
           {/* Right Side: Add Image Form */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-md p-6 sticky top-6">
-              <h2 className="text-xl font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                <Plus size={20} /> Add Image
-              </h2>
+  <h2 className="text-xl font-semibold text-slate-900 mb-4 flex items-center gap-2">
+    <Plus size={20} /> Add Image
+  </h2>
 
-              {error && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
-                  <AlertCircle
-                    size={18}
-                    className="text-red-600 flex-shrink-0 mt-0.5"
-                  />
-                  <p className="text-sm text-red-700">{error}</p>
-                </div>
-              )}
+  {error && (
+    <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
+      <AlertCircle size={18} className="text-red-600 flex-shrink-0 mt-0.5" />
+      <p className="text-sm text-red-700">{error}</p>
+    </div>
+  )}
 
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Image URL
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="https://..."
-                    value={newImage.url}
-                    onChange={(e) =>
-                      setNewImage({ ...newImage, url: e.target.value })
-                    }
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                  />
-                </div>
+  <div className="space-y-4">
+    {/* ✅ Image Upload Input */}
+    <div>
+      <label className="block text-sm font-medium text-slate-700 mb-2">
+        Upload Image
+      </label>
+      <input
+        type="file"
+        accept="image/*"
+        onChange={(e) => {
+          const file = e.target.files[0];
+          if (file) {
+            setNewImage({ ...newImage, file }); // store file object
+            const previewUrl = URL.createObjectURL(file);
+            setNewImage((prev) => ({ ...prev, previewUrl }));
+          }
+        }}
+        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+      />
+      {newImage.previewUrl && (
+        <div className="mt-3">
+          <img
+            src={newImage.previewUrl}
+            alt="Preview"
+            className="w-full h-48 object-cover rounded-lg border"
+          />
+        </div>
+      )}
+    </div>
 
-                {activeTab === "banners" && (
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Alt Text
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g., Hotel Banner"
-                      value={newImage.alt}
-                      onChange={(e) =>
-                        setNewImage({ ...newImage, alt: e.target.value })
-                      }
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                    />
-                  </div>
-                )}
+    {/* OR keep Image URL input as optional */}
+    <div>
+      <label className="block text-sm font-medium text-slate-700 mb-2">
+        Image URL (optional)
+      </label>
+      <input
+        type="text"
+        placeholder="https://..."
+        value={newImage.url}
+        onChange={(e) =>
+          setNewImage({ ...newImage, url: e.target.value })
+        }
+        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+      />
+    </div>
 
-                {activeTab === "onboarding" && (
-                  <>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">
-                        Title
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="e.g., Apartment"
-                        value={newImage.title}
-                        onChange={(e) =>
-                          setNewImage({ ...newImage, title: e.target.value })
-                        }
-                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                      />
-                    </div>
+    {activeTab === "banners" && (
+      <div>
+        <label className="block text-sm font-medium text-slate-700 mb-2">
+          Alt Text
+        </label>
+        <input
+          type="text"
+          placeholder="e.g., Hotel Banner"
+          value={newImage.alt}
+          onChange={(e) =>
+            setNewImage({ ...newImage, alt: e.target.value })
+          }
+          className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+        />
+      </div>
+    )}
 
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">
-                        Description
-                      </label>
-                      <textarea
-                        placeholder="e.g., it is an apartment"
-                        value={newImage.description}
-                        onChange={(e) =>
-                          setNewImage({
-                            ...newImage,
-                            description: e.target.value,
-                          })
-                        }
-                        rows="3"
-                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 resize-none"
-                      />
-                    </div>
+    {activeTab === "onboarding" && (
+      <>
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-2">
+            Title
+          </label>
+          <input
+            type="text"
+            placeholder="e.g., Apartment"
+            value={newImage.title}
+            onChange={(e) =>
+              setNewImage({ ...newImage, title: e.target.value })
+            }
+            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          />
+        </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">
-                        Page Type
-                      </label>
-                      <select
-                        value={newImage.pageId}
-                        onChange={(e) =>
-                          setNewImage({ ...newImage, pageId: e.target.value })
-                        }
-                        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                      >
-                        <option value="">Select page type</option>
-                        {pageTypeOptions.map((opt) => (
-                          <option key={opt.value} value={opt.value}>
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </>
-                )}
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-2">
+            Description
+          </label>
+          <textarea
+            placeholder="e.g., it is an apartment"
+            value={newImage.description}
+            onChange={(e) =>
+              setNewImage({ ...newImage, description: e.target.value })
+            }
+            rows="3"
+            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 resize-none"
+          />
+        </div>
 
-                <button
-                  onClick={handleAddImage}
-                  disabled={loading}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
-                >
-                  <Upload size={18} /> {loading ? "Saving..." : "Add Image"}
-                </button>
-              </div>
-            </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-2">
+            Page Type
+          </label>
+          <select
+            value={newImage.pageId}
+            onChange={(e) =>
+              setNewImage({ ...newImage, pageId: e.target.value })
+            }
+            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+          >
+            <option value="">Select page type</option>
+            {pageTypeOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      </>
+    )}
+
+    <button
+      onClick={handleAddImage}
+      disabled={loading}
+      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+    >
+      <Upload size={18} /> {loading ? "Saving..." : "Add Image"}
+    </button>
+  </div>
+</div>
+
           </div>
         </div>
       </div>

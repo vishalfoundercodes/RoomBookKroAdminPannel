@@ -289,6 +289,7 @@ const UsersPage = () => {
   // />
 
   return (
+    <div className="flex-1 p-4 overflow-x-hidden">
     <div className="min-h-screen bg-gray-50 p-4">
       {/* Header */}
       <div className="mb-8">
@@ -1029,6 +1030,7 @@ const UsersPage = () => {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 };
