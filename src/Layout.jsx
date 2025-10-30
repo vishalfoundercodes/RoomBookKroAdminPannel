@@ -1,4 +1,3 @@
-// import { Sidebar } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { Header } from "./components/Header";
@@ -11,49 +10,49 @@ const Layout = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Handle scroll event for changing header style when scrolled
+  // Handle scroll event for header shadow & button visibility
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Scroll to the top function
+  // Scroll to the top smoothly
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
-      <ScrollToTop />
-      {/* SIDEBAR: Fixed on the left side */}
+    // ✅ UPDATED — Used flexbox for full-page layout
+    <div className="flex flex-col lg:flex-row min-h-screen bg-gray-100 dark:bg-gray-900">
+      {/* ✅ SIDEBAR (Fixed on large screens, overlay on mobile) */}
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* HEADER: Fixed at top, adjusts for sidebar */}
-      <div className="lg:ml-64">
-        <Header
-          isScrolled={isScrolled}
-          onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-        />
-      </div>
+      {/* ✅ MAIN CONTENT AREA — now flex container for column layout */}
+      <div className="flex flex-col flex-1 min-h-screen lg:ml-64 transition-all duration-300">
+        {/* ✅ HEADER — fixed top, adjusts for sidebar width */}
+        <header className="fixed top-0 right-0 left-0 lg:left-64 z-20 bg-white dark:bg-gray-800 shadow-sm">
+          <Header
+            isScrolled={isScrolled}
+            onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+          />
+        </header>
 
-      {/* MAIN CONTENT: Responsive layout */}
-      <main className="lg:ml-64 pt-16 min-h-screen flex flex-col w-full">
-        <div className="w-full px-2 sm:px-6 lg:px-8 py-6">
-          {/* <div className="flex-1 px-4 sm:px-6 lg:px-8 py-6"> */}
-          {/* <DashboardContent /> */}
+        {/* ✅ MAIN SECTION — flex-1 ensures content grows, footer stays bottom */}
+        <main className="flex-1 flex flex-col pt-16 px-4 sm:px-6 lg:px-8 py-6 overflow-y-auto">
+          <ScrollToTop />
           <Outlet />
-        </div>
+        </main>
 
-        {/* FOOTER: At the bottom of content */}
-      </main>
-      <div className="w-full flex lg:ml-64">
-        <Footer />
+        {/* ✅ FOOTER — mt-auto pushes it to the bottom of flex column */}
+        <footer className="w-full mt-auto">
+          <Footer />
+        </footer>
       </div>
 
-      {/* SCROLL TO TOP BUTTON */}
+      {/* ✅ SCROLL TO TOP BUTTON — positioned fixed */}
       {isScrolled && (
         <button
           onClick={scrollToTop}

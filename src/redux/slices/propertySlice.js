@@ -9,7 +9,7 @@ export const fetchProperty = createAsyncThunk(
   "property/fetchProperty",
   async (userId = null) => {
     const res = await axios.post(`${baseUrl}/getproperty?userId=${userId}`);
-    console.log("API proo response:", res.data); 
+    // console.log("API proo response:", res.data); 
     return res.data;
   }
 );
@@ -54,6 +54,26 @@ export const editProperty = createAsyncThunk(
     } catch (err) {
       console.error("❌ Edit Property Error:", err);
       toast.error("Failed to update property!");
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
+/* =====================================================
+   ✅ DELETE PROPERTY
+===================================================== */
+export const deleteProperty = createAsyncThunk(
+  "property/deleteProperty",
+  async (residencyId, { rejectWithValue }) => {
+    try {
+      const res = await axios.delete(`${baseUrl}/deleteproperty/${residencyId}`);
+      console.log("🗑️ Delete Property Response:", res.data);
+
+      // toast.success("Property deleted successfully!");
+      return residencyId; // Return deleted ID to update local state
+    } catch (err) {
+      console.error("❌ Delete Property Error:", err);
+      toast.error("Failed to delete property!");
       return rejectWithValue(err.response?.data || err.message);
     }
   }
@@ -136,6 +156,20 @@ const propertySlice = createSlice({
       .addCase(editProperty.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to update property.";
+      })
+       /* === DELETE === */
+      .addCase(deleteProperty.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteProperty.fulfilled, (state, action) => {
+        state.loading = false;
+        state.successMessage = "Property deleted successfully!";
+        state.data = state.data.filter((prop) => prop.id !== action.payload);
+      })
+      .addCase(deleteProperty.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to delete property.";
       });
   },
 });

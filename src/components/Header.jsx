@@ -65,12 +65,12 @@ import { useEffect } from "react";
         {/* Right side: Notifications, Mail, Profile */}
         <div className="flex items-center ">
           {/* Notification Icon */}
-          <button className="relative p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+          {/* <button className="relative p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
             <Bell className="text-gray-600 dark:text-gray-400" size={18} />
             <span className="absolute -top-1 -right-1 bg-red1 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
               3
             </span>
-          </button>
+          </button> */}
 
           {/* Mail Icon */}
           <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">

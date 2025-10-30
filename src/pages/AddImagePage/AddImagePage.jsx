@@ -9,10 +9,11 @@ import {
   getOnboardPages,
   deleteBannerImage,
 } from "../../redux/slices/addImageSlice";
+import { toast } from "react-toastify";
 
 export default function AddImagePage() {
   const dispatch = useDispatch();
-  const { banners, onboardPages, loading, error: apiError } = useSelector(
+  const { banners, onboardPages,homeBanners, loading, error: apiError } = useSelector(
     (state) => state.images
   );
 
@@ -22,7 +23,7 @@ export default function AddImagePage() {
     alt: "",
     title: "",
     description: "",
-    pageId: "",
+    // pageId: "",
   });
   const [error, setError] = useState("");
 
@@ -32,75 +33,126 @@ export default function AddImagePage() {
     dispatch(getOnboardPages());
     dispatch(getHomeBanners());
   }, [dispatch]);
-
-  // 🔹 Add Image Handler
+// 🔹 Add Image Handler
 const handleAddImage = async () => {
   setError("");
 
-  if (!newImage.file && !newImage.url) {
-    setError("Please upload an image or enter an image URL");
+  // ✅ Validation: Ensure files are selected
+  if (!newImage.files || newImage.files.length === 0) {
+    setError("Please upload at least one image file.");
     return;
   }
 
   try {
-    let formData = new FormData();
+    // Helper function to convert image to Base64
+    const toBase64 = (file) =>
+      new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => reject(error);
+      });
 
-    if (activeTab === "banners") {
-      formData.append("title", "Promotion Banners");
-      if (newImage.file) formData.append("images", newImage.file);
-      if (newImage.alt) formData.append("alt", newImage.alt);
+    // =====================================================
+    // 🔹 BANNERS / HOME
+    // =====================================================
+    if (activeTab === "banners" || activeTab === "home") {
+      const payload = {
+        title: activeTab === "banners" ? "Promotion Banners" : "Home Banners",
+        images: [],
+      };
 
-      await dispatch(addBanner(formData)).unwrap();
-    } 
-    else if (activeTab === "home") {
-      formData.append("title", "Home Banners");
-      if (newImage.file) formData.append("images", newImage.file);
-      formData.append("alt", "Homepage Banner");
+      // Convert each file to base64
+      for (const file of newImage.files) {
+        const base64String = await toBase64(file);
+        payload.images.push({
+          url: base64String, // ✅ field name is imageUrl
+          // alt: file.name || "Banner Image",
+        });
+      }
 
-      await dispatch(addBanner(formData)).unwrap();
-    } 
-    else if (activeTab === "onboarding") {
-      formData.append("title", newImage.title);
-      formData.append("description", newImage.description);
-      if (newImage.file) formData.append("image", newImage.file);
-      if (newImage.pageId) formData.append("pageId", newImage.pageId);
+      console.log("🧾 Final Banner/Home Payload:", payload);
+    const res=  await dispatch(addBanner(payload)).unwrap();
+    if(res.status===200){
+ toast.success(res?.message ||
+  res?.data?.message ||
+  "Banner added successfully!");
+    }
+  
 
-      await dispatch(addOnboardPage(formData)).unwrap();
     }
 
+    // =====================================================
+    // 🔹 ONBOARDING
+    // =====================================================
+else if (activeTab === "onboarding") {
+  let base64String = "";
+  if (newImage.files?.length > 0) {
+    base64String = await toBase64(newImage.files[0]);
+  }
+
+  const payload = {
+    title: newImage.title,
+    description: newImage.description,
+    imageUrl: base64String,
+  };
+
+  console.log("🧾 Final Onboarding Payload:", payload);
+ const res= await dispatch(addOnboardPage(payload)).unwrap();
+    if(res.status===200){
+ toast.success(res?.message ||
+  res?.data?.message ||
+  "Banner added successfully!");
+    }
+}
+
+
+    // =====================================================
+    // ✅ Reset Form + Refresh Data
+    // =====================================================
     setNewImage({
       url: "",
       alt: "",
       title: "",
       description: "",
-      pageId: "",
-      file: null,
-      previewUrl: "",
+      // pageId: "",
+      files: [],
+      previews: [],
     });
 
     dispatch(getBanners());
+    dispatch(getHomeBanners());
     dispatch(getOnboardPages());
   } catch (err) {
-    console.error(err);
+    console.error("❌ Upload Failed:", err);
     setError("Failed to upload image. Please try again.");
   }
 };
 
 
-  // 🔹 Delete Image Handler
-  const handleDeleteImage = async (id, type) => {
-    try {
-      if (type === "banners") {
-        await dispatch(deleteBannerImage(id)).unwrap();
-        dispatch(getBanners());
-      } else if (type === "onboarding") {
-        // For onboarding, backend delete endpoint would differ
-        console.warn("Implement /deleteOnboardPage API for onboarding");
-      }
-    } catch (err) {
-      setError("Failed to delete image");
+
+
+const handleDeleteImage = async (id, type) => {
+  console.log(" Deleting image id:", id);
+
+  try {
+    if (activeTab === "banners" || activeTab === "home") {
+      await dispatch(deleteBannerImage(id)).unwrap();
+      toast.success("Image deleted successfully! ");
+      // Refresh data after delete
+      dispatch(getBanners());
+      dispatch(getHomeBanners());
+    } 
+    else if (activeTab === "onboarding") {
+      console.warn("⚠️ Implement /deleteOnboardPage API for onboarding");
+      toast.error("Onboarding image delete not yet implemented.");
     }
-  };
+  } catch (err) {
+    console.error("❌ Delete failed:", err);
+    toast.error("Failed to delete image. Please try again.");
+  }
+};
+
 
 
   const pageTypeOptions = [
@@ -110,13 +162,14 @@ const handleAddImage = async () => {
   ];
 // 🧠 Local derived data
 const bannerImages = banners || [];          // All banners
-const onboardImages = onboardPages || [];    // Onboarding pages
-const homeBannerImages = banners || [];      // Home banners (from getHomeBanners)
+// const onboardImages = onboardPages || [];
+const onboardImages = onboardPages?.data || [];    // Onboarding pages
+const homeBannerImages = homeBanners || [];      // Home banners (from getHomeBanners)
 
 // 🧾 Debugging logs
-console.log("🏠 All Banners:", bannerImages);
-console.log("🚀 Onboard Page Images:", onboardImages);
-console.log("🎯 Home Banners:", homeBannerImages);
+// console.log("🏠 All Banners:", bannerImages);
+// console.log("🚀 Onboard Page Images:", onboardImages);
+// console.log("🎯 Home Banners:", homeBannerImages);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
@@ -170,20 +223,18 @@ console.log("🎯 Home Banners:", homeBannerImages);
 
               <div className="space-y-3 max-h-96 overflow-y-auto">
                 {/* --- Banners --- */}
-             {activeTab === "banners" &&
+  {activeTab === "banners" &&
   Array.isArray(bannerImages) &&
-  bannerImages.map((banner) => (
-    <div key={banner.titleId} className="mb-6">
-      {/* Banner Title */}
+  bannerImages.map((banner, idx) => (
+    <div key={banner.titleId || `banner-${idx}`} className="mb-6">
       <h2 className="text-lg font-semibold text-gray-800 mb-3">
         {banner.title}
       </h2>
 
-      {/* Individual Images */}
       {Array.isArray(banner.images) && banner.images.length > 0 ? (
         banner.images.map((img, i) => (
           <div
-            key={img.imageId || i}
+            key={`${banner.titleId || idx}-img-${img.imageId || i}`}
             className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200 mb-2"
           >
             <div className="flex items-center gap-4 flex-1 min-w-0">
@@ -202,7 +253,6 @@ console.log("🎯 Home Banners:", homeBannerImages);
               </div>
             </div>
 
-            {/* Delete Button */}
             <button
               onClick={() => handleDeleteImage(banner.titleId, img.imageId)}
               className="ml-2 p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
@@ -214,6 +264,37 @@ console.log("🎯 Home Banners:", homeBannerImages);
       ) : (
         <p className="text-sm text-gray-500">No images found for this banner.</p>
       )}
+    </div>
+  ))}
+
+{activeTab === "home" &&
+  homeBanners.map((banner) => (
+    <div
+      key={banner._id}
+      className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border border-slate-200 mb-2"
+    >
+      {/* Banner Left Section */}
+      <div className="flex items-center gap-4 flex-1 min-w-0">
+        <img
+          src={banner.imageUrl || banner.url}
+          alt={banner.title}
+          className="w-16 h-16 object-cover rounded"
+        />
+        <div className="min-w-0 flex-1">
+          <p className="font-medium text-slate-900">{banner.title}</p>
+          <p className="text-sm text-slate-500 truncate">
+            {banner.description}
+          </p>
+        </div>
+      </div>
+
+      {/* Delete Button */}
+      <button
+        onClick={() => handleDeleteImage(banner._id, "home")}
+        className="ml-2 p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
+      >
+        <Trash2 size={18} />
+      </button>
     </div>
   ))}
 
@@ -267,11 +348,12 @@ console.log("🎯 Home Banners:", homeBannerImages);
 
           {/* Right Side: Add Image Form */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-md p-6 sticky top-6">
+    <div className="bg-white rounded-lg shadow-md p-6 sticky top-6">
   <h2 className="text-xl font-semibold text-slate-900 mb-4 flex items-center gap-2">
     <Plus size={20} /> Add Image
   </h2>
 
+  {/* ⚠️ Error Message */}
   {error && (
     <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
       <AlertCircle size={18} className="text-red-600 flex-shrink-0 mt-0.5" />
@@ -280,68 +362,102 @@ console.log("🎯 Home Banners:", homeBannerImages);
   )}
 
   <div className="space-y-4">
-    {/* ✅ Image Upload Input */}
+    {/* 🖼️ Upload Multiple Images */}
     <div>
       <label className="block text-sm font-medium text-slate-700 mb-2">
-        Upload Image
+        Upload Images
       </label>
       <input
         type="file"
         accept="image/*"
+        multiple
         onChange={(e) => {
-          const file = e.target.files[0];
-          if (file) {
-            setNewImage({ ...newImage, file }); // store file object
-            const previewUrl = URL.createObjectURL(file);
-            setNewImage((prev) => ({ ...prev, previewUrl }));
+          const files = Array.from(e.target.files);
+          if (files.length > 0) {
+            const previews = files.map((file) => ({
+              file,
+              previewUrl: URL.createObjectURL(file),
+            }));
+            setNewImage((prev) => ({
+              ...prev,
+              files,
+              previews,
+            }));
           }
         }}
         className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
       />
-      {newImage.previewUrl && (
-        <div className="mt-3">
-          <img
-            src={newImage.previewUrl}
-            alt="Preview"
-            className="w-full h-48 object-cover rounded-lg border"
-          />
+
+      {/* 🖼️ Preview */}
+      {newImage.previews?.length > 0 && (
+        <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          {newImage.previews.map((img, i) => (
+            <div
+              key={i}
+              className="relative border rounded-lg overflow-hidden group"
+            >
+              <img
+                src={img.previewUrl}
+                alt={`Preview ${i + 1}`}
+                className="w-full h-32 object-cover"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  const updated = newImage.previews.filter((_, idx) => idx !== i);
+                  setNewImage((prev) => ({
+                    ...prev,
+                    previews: updated,
+                    files: updated.map((x) => x.file),
+                  }));
+                }}
+                className="absolute top-1 right-1 bg-white/70 hover:bg-red-500 hover:text-white rounded-full p-1 text-xs transition"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
         </div>
       )}
     </div>
 
-    {/* OR keep Image URL input as optional */}
-    <div>
-      <label className="block text-sm font-medium text-slate-700 mb-2">
-        Image URL (optional)
-      </label>
-      <input
-        type="text"
-        placeholder="https://..."
-        value={newImage.url}
-        onChange={(e) =>
-          setNewImage({ ...newImage, url: e.target.value })
-        }
-        className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-      />
-    </div>
-
-    {activeTab === "banners" && (
+    {/* 🏷️ Banner Title (Promotion/Home) */}
+    {(activeTab === "banners" || activeTab === "home") && (
       <div>
         <label className="block text-sm font-medium text-slate-700 mb-2">
-          Alt Text
+          Banner Title
         </label>
         <input
           type="text"
-          placeholder="e.g., Hotel Banner"
-          value={newImage.alt}
+          placeholder="e.g., Promotional Offer, Festive Sale, etc."
+          value={newImage.title}
           onChange={(e) =>
-            setNewImage({ ...newImage, alt: e.target.value })
+            setNewImage((prev) => ({ ...prev, title: e.target.value }))
           }
           className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
         />
       </div>
     )}
 
+    {/* 🖋️ Alt Text */}
+    {(activeTab === "banners" || activeTab === "home") && (
+      <div>
+        <label className="block text-sm font-medium text-slate-700 mb-2">
+          Alt Text
+        </label>
+        <input
+          type="text"
+          placeholder="e.g., Hotel Banner, PG Banner, etc."
+          value={newImage.alt}
+          onChange={(e) =>
+            setNewImage((prev) => ({ ...prev, alt: e.target.value }))
+          }
+          className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+        />
+      </div>
+    )}
+
+    {/* 📄 Onboarding Fields */}
     {activeTab === "onboarding" && (
       <>
         <div>
@@ -353,7 +469,7 @@ console.log("🎯 Home Banners:", homeBannerImages);
             placeholder="e.g., Apartment"
             value={newImage.title}
             onChange={(e) =>
-              setNewImage({ ...newImage, title: e.target.value })
+              setNewImage((prev) => ({ ...prev, title: e.target.value }))
             }
             className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           />
@@ -367,21 +483,21 @@ console.log("🎯 Home Banners:", homeBannerImages);
             placeholder="e.g., it is an apartment"
             value={newImage.description}
             onChange={(e) =>
-              setNewImage({ ...newImage, description: e.target.value })
+              setNewImage((prev) => ({ ...prev, description: e.target.value }))
             }
             rows="3"
             className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 resize-none"
           />
         </div>
 
-        <div>
+        {/* <div>
           <label className="block text-sm font-medium text-slate-700 mb-2">
             Page Type
           </label>
           <select
             value={newImage.pageId}
             onChange={(e) =>
-              setNewImage({ ...newImage, pageId: e.target.value })
+              setNewImage((prev) => ({ ...prev, pageId: e.target.value }))
             }
             className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           >
@@ -392,10 +508,11 @@ console.log("🎯 Home Banners:", homeBannerImages);
               </option>
             ))}
           </select>
-        </div>
+        </div> */}
       </>
     )}
 
+    {/* 📤 Submit */}
     <button
       onClick={handleAddImage}
       disabled={loading}
@@ -405,6 +522,7 @@ console.log("🎯 Home Banners:", homeBannerImages);
     </button>
   </div>
 </div>
+
 
           </div>
         </div>
