@@ -77,7 +77,7 @@ const [selectedCity, setSelectedCity] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
-  console.log("selectdddd",selectedUser);
+  // console.log("selectdddd",selectedUser);
 
 const [newProperty, setNewProperty] = useState({
   userId,
@@ -141,7 +141,7 @@ const handleAddProperty = () => {
       availableUnits: parseInt(room.availableUnits) || 0,
       amenities: room.amenities.map((a) => ({
         name: a.name,
-        icon: a.icon || "",
+        icon: a.icon || "default-icon.png",
       })),
       images: room.images || [],
     })),
@@ -164,7 +164,7 @@ const handleAddProperty = () => {
 
   console.log("✅ Payload to send:", payload);
 
-  dispatch(addProperty(payload))
+  const res= dispatch(addProperty(payload))
     .unwrap()
     .then(() => {
       setShowAddModal(false);
@@ -200,7 +200,12 @@ const handleAddProperty = () => {
         reviews: [],
       });
     })
-    .catch((err) => console.error("❌ Add property error:", err));
+    .catch((err) => toast.error( err?.message));
+
+    console.log("res of property ",res);
+
+       dispatch(fetchProperty());
+
 };
 
   // ✅ Add room inside property
@@ -322,26 +327,60 @@ const handleAreaSearch = async (e) => {
   };
 
   // Filter and search logic
-  const filteredProperty = properties?.filter(user => {
-    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase());
+const filteredProperty = properties?.filter((user) => {
+  const matchesSearch =
+    user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email?.toLowerCase().includes(searchTerm.toLowerCase());
 
-    const matchesStatus = filterStatus === "All" || properties?.isAvailable === filterStatus;
+  const matchesStatus =
+    filterStatus === "All" ||
+    (filterStatus === "Active" && user.isAvailable === true) ||
+    (filterStatus === "Inactive" && user.isAvailable === false);
 
-    const matchesRole = filterRole === "All" || user.role === filterRole;
-    return matchesSearch && matchesStatus && matchesRole;
-  });
+  const matchesRole =
+    filterRole === "All" || user.role === filterRole;
+
+  return matchesSearch && matchesStatus && matchesRole;
+});
+
+// console.log("filteredProperty", filteredProperty);
 
   // Statistics calculations
-  const totalProperty = properties?.length || 0;
-  const activeProperty = properties?.filter(u => u.isAvailable === true).length || 0;
-  const inactiveProperty = properties?.filter(u => u.isAvailable === false).length || 0;
+  // const totalProperty = properties?.length || 0;
+  // const activeProperty = properties?.filter(u => u.isAvailable === true).length || 0;
+  // const inactiveProperty = properties?.filter(u => u.isAvailable === false).length || 0;
 
-  // Chart data
-  const PropertytatusData = [
-    { name: 'Active', value: activeProperty, color: '#10b981' },
-    { name: 'Inactive', value: inactiveProperty, color: '#ef4444' }
-  ];
+  // // Chart data
+  // const PropertytatusData = [
+  //   { name: 'Active', value: activeProperty, color: '#10b981' },
+  //   { name: 'Inactive', value: inactiveProperty, color: '#ef4444' }
+  // ];
+
+  const totalProperty = filteredProperty?.length || 0;
+const activeProperty =
+  filteredProperty?.filter((u) => u.isAvailable === true).length || 0;
+const inactiveProperty =
+  filteredProperty?.filter((u) => u.isAvailable === false).length || 0;
+
+// Chart data
+const PropertytatusData = [
+  { name: "Active", value: activeProperty, color: "#10b981" },
+  { name: "Inactive", value: inactiveProperty, color: "#ef4444" },
+];
+
+const getAvailabilityStatus = (isAvailable) => {
+  const status = {
+    true: { label: "Available", color: "bg-green-100 text-green-800" },
+    false: { label: "Not Available", color: "bg-red-100 text-red-800" },
+  };
+
+  return (
+    status[isAvailable] || {
+      label: "Unknown",
+      color: "bg-gray-100 text-gray-800",
+    }
+  );
+};
 
       // Handle multiple property images
 const handlePropertyImages = (e) => {
@@ -383,7 +422,23 @@ const handlePropertyImages = (e) => {
     };
     return colors[role] || 'bg-gray-100 text-gray-800';
   };
+const handleAmenityChange = (index, field, value) => {
+  const updatedAmenities = [...newProperty.amenities];
+  updatedAmenities[index][field] = value;
+  setNewProperty({ ...newProperty, amenities: updatedAmenities });
+};
 
+  const handleAddAmenity = () => {
+  setNewProperty({
+    ...newProperty,
+    amenities: [...newProperty.amenities, { name: "", icon: "" }]
+  });
+};
+
+const handleRemoveAmenity = (index) => {
+  const updatedAmenities = newProperty.amenities.filter((_, i) => i !== index);
+  setNewProperty({ ...newProperty, amenities: updatedAmenities });
+};
   const handleDeleteUser = (id) => {
     if (!id) {
       toast.error("Invalid property ID!");
@@ -502,16 +557,32 @@ const handlePropertyImages = (e) => {
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="All">All Status</option>
-            <option value="Active">Active</option>
-            <option value="Inactive">Inactive</option>
-          </select>
-          <select
+         <select
+  value={filterStatus}
+  onChange={(e) => setFilterStatus(e.target.value)}
+  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+>
+  <option value="All">All Status</option>
+  <option value="Active">Active</option>
+  <option value="Inactive">Inactive</option>
+</select>
+
+          {/* <td className="py-3 px-4">
+  <select
+    value={filteredProperty.isAvailable ? "Available" : "Not Available"}
+    onChange={(e) =>
+      handleAvailabilityChange(filteredProperty._id, e.target.value === "Available")
+    }
+    className={`px-2 py-1 rounded text-xs font-medium border-0 ${
+      getAvailabilityStatus(filteredProperty.isAvailable).color
+    }`}
+  >
+    <option value="Available">Available</option>
+    <option value="Not Available">Not Available</option>
+  </select>
+</td> */}
+
+          {/* <select
             value={filterRole}
             onChange={(e) => setFilterRole(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -520,7 +591,7 @@ const handlePropertyImages = (e) => {
             <option value="Admin">Admin</option>
             <option value="Manager">Manager</option>
             <option value="User">User</option>
-          </select>
+          </select> */}
         </div>
 
         {selectedProperty.length > 0 && (
@@ -1148,22 +1219,46 @@ const handlePropertyImages = (e) => {
 
           {/* Amenities & Rules */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block font-medium mb-1">Amenities</label>
-              <input
-                type="text"
-                placeholder="e.g. WiFi, Parking, Laundry"
-                value={newProperty.amenities.map((a) => a.name).join(", ")}
-                onChange={(e) => {
-                  const names = e.target.value.split(",").map((name) => ({
-                    name: name.trim(),
-                    icon: "default-icon.png",
-                  }));
-                  setNewProperty({ ...newProperty, amenities: names });
-                }}
-                className="border rounded px-3 py-2 w-full"
-              />
-            </div>
+           <div className="space-y-4">
+  <label className="block text-sm font-semibold text-gray-700">
+    Amenities
+  </label>
+
+  {newProperty.amenities.map((amenity, index) => (
+    <div key={index} className="flex gap-4 items-center">
+      <input
+        type="text"
+        placeholder="Amenity Name"
+        value={amenity.name}
+        onChange={(e) => handleAmenityChange(index, "name", e.target.value)}
+        className="border px-3 py-2 rounded w-1/2"
+      />
+      <input
+        type="text"
+        placeholder="Icon (URL or class)"
+        value={amenity.icon}
+        onChange={(e) => handleAmenityChange(index, "icon", e.target.value)}
+        className="border px-3 py-2 rounded w-1/2"
+      />
+      <button
+        type="button"
+        onClick={() => handleRemoveAmenity(index)}
+        className="text-red-500 hover:text-red-700"
+      >
+        ✕
+      </button>
+    </div>
+  ))}
+
+  <button
+    type="button"
+    onClick={handleAddAmenity}
+    className="text-blue-600 hover:underline text-sm mt-2"
+  >
+    + Add Amenity
+  </button>
+</div>
+
 
             <div>
               <label className="block font-medium mb-1">Rules</label>
@@ -1240,119 +1335,182 @@ const handlePropertyImages = (e) => {
               </button>
             </div>
 
-            {newProperty.rooms.map((room, i) => (
-              <div
-                key={i}
-                className="border rounded-md p-3 mb-3 bg-gray-50 relative"
-              >
-                <button
-                  onClick={() => {
-                    const updated = [...newProperty.rooms];
-                    updated.splice(i, 1);
-                    setNewProperty({ ...newProperty, rooms: updated });
-                  }}
-                  className="absolute top-2 right-2 text-red-500"
-                >
-                  ✕
-                </button>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                 <div>
-  <label className="block font-medium mb-1">Room Type</label>
-  <select
-    value={room.roomType}
-    onChange={(e) => {
-      const updated = [...newProperty.rooms];
-      updated[i].roomType = e.target.value;
-      setNewProperty({ ...newProperty, rooms: updated });
-    }}
-    className="border rounded px-3 py-2 w-full"
+     {newProperty.rooms.map((room, i) => (
+  <div
+    key={i}
+    className="border rounded-md p-3 mb-3 bg-gray-50 relative"
   >
-    <option value="">Select Room Type</option>
-    <option value="suite">Suite</option>
-    <option value="1bhk">1BHK</option>
-    {/* <option value="2bhk">2BHK</option> */}
-    {/* <option value="deluxe">Deluxe</option> */}
-    {/* <option value="single">Single Room</option> */}
-    {/* <option value="double">Double Room</option> */}
-  </select>
-</div>
+    {/* ❌ Remove Room Button */}
+    <button
+      onClick={() => {
+        const updated = [...newProperty.rooms];
+        updated.splice(i, 1);
+        setNewProperty({ ...newProperty, rooms: updated });
+      }}
+      className="absolute top-2 right-2 text-red-500"
+    >
+      ✕
+    </button>
 
+    {/* Room Fields */}
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      {/* Room Type */}
+      <div>
+        <label className="block font-medium mb-1">Room Type</label>
+        <select
+          value={room.roomType}
+          onChange={(e) => {
+            const updated = [...newProperty.rooms];
+            updated[i].roomType = e.target.value;
+            setNewProperty({ ...newProperty, rooms: updated });
+          }}
+          className="border rounded px-3 py-2 w-full"
+        >
+          <option value="">Select Room Type</option>
+          <option value="suite">Suite</option>
+          <option value="1bhk">1BHK</option>
+          <option value="quad">Quad</option>
+          <option value="triple">Triple Room</option>
+          <option value="double">Double Room</option>
+        </select>
+      </div>
 
-                  <div>
-                    <label className="block font-medium mb-1">Furnishing</label>
-                    <select
-                      value={room.furnished}
-                      onChange={(e) => {
-                        const updated = [...newProperty.rooms];
-                        updated[i].furnished = e.target.value;
-                        setNewProperty({ ...newProperty, rooms: updated });
-                      }}
-                      className="border rounded px-3 py-2 w-full"
-                    >
-                      <option value="">Select</option>
-                      <option value="furnished">Furnished</option>
-                      <option value="semi-frunished">Semi-Furnished</option>
-                      <option value="unfurnished">Unfurnished</option>
-                    </select>
-                  </div>
+      {/* Furnishing */}
+      <div>
+        <label className="block font-medium mb-1">Furnishing</label>
+        <select
+          value={room.furnished}
+          onChange={(e) => {
+            const updated = [...newProperty.rooms];
+            updated[i].furnished = e.target.value;
+            setNewProperty({ ...newProperty, rooms: updated });
+          }}
+          className="border rounded px-3 py-2 w-full"
+        >
+          <option value="">Select</option>
+          <option value="furnished">Furnished</option>
+          <option value="semi-furnished">Semi-Furnished</option>
+          <option value="unfurnished">Unfurnished</option>
+        </select>
+      </div>
 
-                  <div>
-                    <label className="block font-medium mb-1">Occupancy</label>
-                    <input
-                      type="number"
-                      placeholder="Enter occupancy limit"
-                      value={room.occupancy || ""}
-                      onChange={(e) => {
-                        const updated = [...newProperty.rooms];
-                        updated[i].occupancy = parseInt(e.target.value);
-                        setNewProperty({ ...newProperty, rooms: updated });
-                      }}
-                      className="border rounded px-3 py-2 w-full"
-                    />
-                  </div>
+      {/* Occupancy */}
+      <div>
+        <label className="block font-medium mb-1">Occupancy</label>
+        <input
+          type="number"
+          placeholder="Enter occupancy limit"
+          value={room.occupancy || ""}
+          onChange={(e) => {
+            const updated = [...newProperty.rooms];
+            updated[i].occupancy = parseInt(e.target.value);
+            setNewProperty({ ...newProperty, rooms: updated });
+          }}
+          className="border rounded px-3 py-2 w-full"
+        />
+      </div>
 
-                  <div>
-                    <label className="block font-medium mb-1">Price (₹)</label>
-                    <input
-                      type="number"
-                      placeholder="Enter room price"
-                      value={room.price || ""}
-                      onChange={(e) => {
-                        const updated = [...newProperty.rooms];
-                        updated[i].price = parseInt(e.target.value);
-                        setNewProperty({ ...newProperty, rooms: updated });
-                      }}
-                      className="border rounded px-3 py-2 w-full"
-                    />
-                  </div>
+      {/* Price */}
+      <div>
+        <label className="block font-medium mb-1">Price (₹)</label>
+        <input
+          type="number"
+          placeholder="Enter room price"
+          value={room.price || ""}
+          onChange={(e) => {
+            const updated = [...newProperty.rooms];
+            updated[i].price = parseInt(e.target.value);
+            setNewProperty({ ...newProperty, rooms: updated });
+          }}
+          className="border rounded px-3 py-2 w-full"
+        />
+      </div>
 
-                  {/* Room Images */}
-                  <div>
-                    <label className="block font-medium mb-1">Room Images</label>
-                    <input
-                      type="file"
-                      multiple
-                      accept="image/*"
-                      onChange={(e) => handleRoomImages(e, i)}
-                      className="border rounded px-3 py-2 w-full"
-                    />
-                    {room.images?.length > 0 && (
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {room.images.map((img, idx) => (
-                          <img
-                            key={idx}
-                            src={img}
-                            alt={`room-${idx}`}
-                            className="h-16 w-16 object-cover rounded"
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
+      {/* Room Images */}
+      <div className="col-span-2">
+        <label className="block font-medium mb-1">Room Images</label>
+        <input
+          type="file"
+          multiple
+          accept="image/*"
+          onChange={(e) => handleRoomImages(e, i)}
+          className="border rounded px-3 py-2 w-full"
+        />
+        {room.images?.length > 0 && (
+          <div className="mt-2 flex flex-wrap gap-2">
+            {room.images.map((img, idx) => (
+              <img
+                key={idx}
+                src={img}
+                alt={`room-${idx}`}
+                className="h-16 w-16 object-cover rounded"
+              />
             ))}
+          </div>
+        )}
+      </div>
+
+      {/* ✅ Room Amenities Section */}
+      <div className="col-span-2 space-y-4 mt-2">
+        <label className="block text-sm font-semibold text-gray-700">
+          Room Amenities
+        </label>
+
+        {room.amenities.map((a, index) => (
+          <div key={index} className="flex gap-3 items-center">
+            <input
+              type="text"
+              placeholder="Amenity Name"
+              value={a.name}
+              onChange={(e) => {
+                const updated = [...newProperty.rooms];
+                updated[i].amenities[index].name = e.target.value;
+                setNewProperty({ ...newProperty, rooms: updated });
+              }}
+              className="border px-3 py-2 rounded w-1/2"
+            />
+            <input
+              type="text"
+              placeholder="Amenity Icon"
+              value={a.icon}
+              onChange={(e) => {
+                const updated = [...newProperty.rooms];
+                updated[i].amenities[index].icon = e.target.value;
+                setNewProperty({ ...newProperty, rooms: updated });
+              }}
+              className="border px-3 py-2 rounded w-1/2"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                const updated = [...newProperty.rooms];
+                updated[i].amenities.splice(index, 1);
+                setNewProperty({ ...newProperty, rooms: updated });
+              }}
+              className="text-red-500 hover:text-red-700"
+            >
+              ✕
+            </button>
+          </div>
+        ))}
+
+        <button
+          type="button"
+          onClick={() => {
+            const updated = [...newProperty.rooms];
+            updated[i].amenities.push({ name: "", icon: "" });
+            setNewProperty({ ...newProperty, rooms: updated });
+          }}
+          className="text-blue-600 hover:underline text-sm"
+        >
+          + Add Amenity
+        </button>
+      </div>
+    </div>
+  </div>
+))}
+
+            
           </div>
         </div>
 
@@ -1429,9 +1587,16 @@ const handlePropertyImages = (e) => {
                     <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-800 font-medium">
                       ⭐ {selectedUser.rating || 0} / 5
                     </span>
-                    <span className="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 font-medium">
+                    {/* <span className="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 font-medium">
                       ₹{selectedUser.pricePerNight} / night
-                    </span>
+                    </span> */}
+                    <span className="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 font-medium">
+  {selectedUser.type === "pg" || selectedUser.type === "apartment" ? (
+    <>₹{selectedUser.pricePerMonth} / month</>
+  ) : (
+    <>₹{selectedUser.pricePerNight} / night</>
+  )}
+</span>
                   </div>
                 </div>
               </div>

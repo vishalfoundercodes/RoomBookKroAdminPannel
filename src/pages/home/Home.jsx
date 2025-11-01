@@ -15,7 +15,7 @@ import ProgressCard from '../../reusable_components/ProgressCard';
 import ReportsCard from '../../reusable_components/ReportsCard';
 import NotificationPanel from '../../reusable_components/NotificationPanel';
 import CalendarWidget from '../../reusable_components/CalendarWidget';
-
+import { fetchProperty } from '../../redux/slices/propertySlice';
 
 import { DollarSign, Users, ShoppingCart, Eye, Target, Award, Phone, CreditCard, User, CardSim, VideoIcon, PhoneCall } from 'lucide-react';
 import { BiMobile, BiMoney, BiMoneyWithdraw } from "react-icons/bi";
@@ -24,19 +24,57 @@ import { fetchUsers } from "../../redux/slices/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import Loader from "../Loader/Loader";
+import { fetchOrderHistory } from "../../redux/slices/historySlice";
 const Home = () => {
 const dispatch = useDispatch();
     const { data: users, loading: usersLoading } = useSelector(
       (state) => state.users
     );
+  const { data: properties } = useSelector(
+    (state) => state.property
+  );
+    const { loading, historyData:historyDataa, error } = useSelector((state) => state.history);
 
     useEffect(() => {
       dispatch(fetchUsers());
+      dispatch(fetchOrderHistory({ userId: "all" }));
+          dispatch(fetchProperty());
     }, [dispatch]);
+
+// console.log("properties home page",properties.length);
+
+
+
+
+
+
+
+
+
+
+    console.log("historyData home page :",historyDataa);
+    // console.log("timeWise home page :",historyDataa?.timeWise);
+    // console.log("timeWise home page :",historyDataa?.timeWise?.canceled.length);
+    // console.log("currentStay home page :",historyDataa?.timeWise?.currentStay?.length);
+    // console.log("past home page :",historyDataa?.timeWise?.past.length);
+    // console.log("upcoming home page :",historyDataa?.timeWise?.upcoming.length);
+
+    const booking =historyDataa?.timeWise;
+
+
+    const totalorder = booking?.canceled.length+ booking?.currentStay?.length + booking?.past?.length + booking?.upcoming?.length;
+    // const totalorder = booking?.canceled.length + booking?.currentStay.length;
+    // console.log("totalorder",totalorder);
 
       if (usersLoading) {
         return <Loader />;
       }
+
+        // useEffect(() => {
+        //   // Fetch all bookings on initial load
+          
+        //   // setHasSearched(true);
+        // }, [dispatch]);
 
     // Console outputs
     // useEffect(() => {
@@ -91,9 +129,9 @@ const pieData = [
         />
         <StatCard
           title="Total Orders"
-          value="1,234"
-          change="-2.1%"
-          changeType="negative"
+          value={totalorder}
+          change="2.1%"
+          changeType="positive"
           icon={ShoppingCart}
           color="purple"
         />
@@ -107,7 +145,7 @@ const pieData = [
         /> */}
         <StatCard
           title="Total Property"
-          value="45,678"
+          value={properties.length}
           change="+8.7%"
           changeType="positive"
           icon={User}

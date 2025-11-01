@@ -4,7 +4,7 @@ import { editProperty, fetchProperty } from "../../redux/slices/propertySlice";
 import { toast } from "react-toastify";
 
 export default function EditPropertyModal({ show, onClose, propertyId }) {
-  console.log("prpperty id",propertyId)
+  // console.log("prpperty id",propertyId)
   const dispatch = useDispatch();
   const { data: properties, loading, error } = useSelector(
     (state) => state.property

@@ -24,7 +24,7 @@ export const addProperty = createAsyncThunk(
       const res = await axios.post(`${baseUrl}/addproperty`, formData, {
         headers: { "Content-Type": "application/json" },
       });
-        console.log("add property :", res); 
+        console.log("add property :", res?.data?.data?.message); 
         if(res.status === 201){
           toast.success(res?.message);
         }

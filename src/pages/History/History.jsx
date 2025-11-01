@@ -1,7 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { Calendar, DollarSign, Users, MapPin, Clock, CheckCircle, XCircle, AlertCircle, Search } from "lucide-react";
+import {
+  Calendar,
+  DollarSign,
+  Users,
+  MapPin,
+  Clock,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Search,
+} from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchOrderHistory } from "../../redux/slices/historySlice";
+import { fetchOrderHistory, updatePaymentStatus } from "../../redux/slices/historySlice";
+import Loader from "../Loader/Loader";
+import { toast } from "react-toastify";
 
 export default function History() {
   const dispatch = useDispatch();
@@ -13,7 +25,6 @@ export default function History() {
   const [hasSearched, setHasSearched] = useState(false);
 
   useEffect(() => {
-    // Fetch all bookings on initial load
     dispatch(fetchOrderHistory({ userId: "all" }));
     setHasSearched(true);
   }, [dispatch]);
@@ -32,6 +43,34 @@ export default function History() {
     dispatch(fetchOrderHistory({ userId: "all" }));
     setHasSearched(true);
   };
+
+const handlePaymentUpdate = async (orderId, userId, newPaymentStatus) => {
+  try {
+    const res = await dispatch(
+      updatePaymentStatus({ orderId, userId, newPaymentStatus })
+    ).unwrap();
+
+    // ✅ Fix: Only show text from API response
+    const message =
+      res?.msg ||
+      res?.message ||
+      (newPaymentStatus === 1
+        ? "Payment Accepted ✅"
+        : "Payment Rejected ❌");
+
+    if (res?.status === 200 || res?.success) {
+      toast.success(message);
+      // Refresh data after successful update
+      dispatch(fetchOrderHistory({ userId }));
+    } else {
+      toast.error(message || "Failed to update payment status");
+    }
+  } catch (err) {
+    console.error("❌ Error in handlePaymentUpdate:", err);
+    toast.error("Something went wrong while updating the transaction");
+  }
+};
+
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -71,13 +110,13 @@ export default function History() {
 
     return (
       <div
-        className={`border rounded-lg p-4 cursor-pointer transition hover:shadow-md ${getStatusColor(
+        className={`border rounded-lg p-4 transition hover:shadow-md ${getStatusColor(
           booking.paymentStatus || booking.status
         )}`}
         onClick={() => setExpandedBooking(isExpanded ? null : booking._id)}
       >
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
+        <div className="flex justify-between items-start">
+          <div>
             <div className="flex items-center gap-2 mb-2">
               {getStatusIcon(booking.paymentStatus || booking.status)}
               <h3 className="font-semibold text-lg">{booking.residencyName}</h3>
@@ -87,6 +126,7 @@ export default function History() {
               Order ID: {booking.orderId}
             </p>
           </div>
+
           <div className="text-right">
             <p className="text-sm font-medium text-gray-700">
               {getStatusLabel(booking.paymentStatus || booking.status)}
@@ -95,6 +135,7 @@ export default function History() {
           </div>
         </div>
 
+        {/* Booking Summary */}
         <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t">
           <div className="flex items-center gap-2 text-sm">
             <Calendar className="w-4 h-4 text-gray-500" />
@@ -114,6 +155,7 @@ export default function History() {
           </div>
         </div>
 
+        {/* Expandable Details */}
         {isExpanded && (
           <div className="mt-4 pt-4 border-t space-y-2 text-sm">
             <div className="flex justify-between">
@@ -129,71 +171,48 @@ export default function History() {
               <span className="font-medium capitalize">{booking.bookingFor}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Coupon Code:</span>
-              <span className="font-medium">{booking.cupponCode}</span>
-            </div>
-            <div className="flex justify-between">
               <span className="text-gray-600">Base Amount:</span>
               <span className="font-medium">₹{booking.totalAmount}</span>
             </div>
-            {booking.isChildren && (
-              <div className="flex justify-between">
-                <span className="text-gray-600">Children:</span>
-                <span className="font-medium">{booking.childrenNumber}</span>
+
+            {/* Accept/Reject Buttons */}
+            {booking.paymentStatus === 0 && (
+              <div className="flex justify-end gap-2 mt-4">
+                <button
+                  onClick={() => handlePaymentUpdate(booking, 1)}
+                  className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                >
+                  Accept
+                </button>
+                <button
+                  onClick={() => handlePaymentUpdate(booking, 2)}
+                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                >
+                  Reject
+                </button>
               </div>
             )}
-            <div className="flex justify-between">
-              <span className="text-gray-600">Check-out:</span>
-              <span className="font-medium">{checkOutDate.toLocaleDateString()}</span>
-            </div>
           </div>
         )}
       </div>
     );
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading booking history...</p>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <Loader />;
 
-  if (error && hasSearched) {
+  if (error && hasSearched)
     return (
       <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <p className="text-red-600 mb-4">Error: {error}</p>
-          <button
-            onClick={handleShowAll}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-          >
-            Back to All Bookings
-          </button>
-        </div>
+        <p className="text-red-600">{error}</p>
       </div>
     );
-  }
 
-  if (!historyData || (!historyData.paymentStatusWise && !historyData.timeWise)) {
+  if (!historyData)
     return (
       <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <p className="text-gray-600 mb-4">No booking history found.</p>
-          <button
-            onClick={handleShowAll}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-          >
-            Show All Bookings
-          </button>
-        </div>
+        <p className="text-gray-600">No booking history found.</p>
       </div>
     );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -204,69 +223,48 @@ export default function History() {
           <p className="text-gray-600">View and manage all your bookings</p>
         </div>
 
-        {/* Search Bar */}
-        <div className="mb-6">
-          <div className="flex gap-2">
-            <div className="flex-1 relative">
-              <input
-                type="text"
-                placeholder="Enter User ID to search..."
-                value={searchUserId}
-                onChange={(e) => setSearchUserId(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <Search className="absolute right-3 top-2.5 w-5 h-5 text-gray-400" />
-            </div>
-            <button
-              onClick={handleSearch}
-              className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-medium"
-            >
-              Search
-            </button>
-            <button
-              onClick={handleShowAll}
-              className="px-6 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition font-medium"
-            >
-              All
-            </button>
+        {/* Search */}
+        <div className="mb-6 flex gap-2">
+          <div className="flex-1 relative">
+            <input
+              type="text"
+              placeholder="Enter User ID to search..."
+              value={searchUserId}
+              onChange={(e) => setSearchUserId(e.target.value)}
+              onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+            />
+            <Search className="absolute right-3 top-2.5 w-5 h-5 text-gray-400" />
           </div>
+          <button onClick={handleSearch} className="px-6 py-2 bg-blue-500 text-white rounded-lg">
+            Search
+          </button>
+          <button onClick={handleShowAll} className="px-6 py-2 bg-gray-300 text-gray-800 rounded-lg">
+            All
+          </button>
         </div>
-
-        {/* User Filter Info */}
-        {userId && (
-          <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-blue-800">
-              <span className="font-semibold">Showing bookings for User ID:</span> {userId}
-            </p>
-          </div>
-        )}
 
         {/* Tabs */}
         <div className="flex gap-4 mb-6 border-b">
           <button
             onClick={() => setActiveTab("paymentStatus")}
-            className={`px-4 py-2 font-medium transition ${
-              activeTab === "paymentStatus"
-                ? "text-blue-600 border-b-2 border-blue-600"
-                : "text-gray-600 hover:text-gray-900"
+            className={`px-4 py-2 font-medium ${
+              activeTab === "paymentStatus" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-600"
             }`}
           >
             Payment Status
           </button>
           <button
             onClick={() => setActiveTab("timeWise")}
-            className={`px-4 py-2 font-medium transition ${
-              activeTab === "timeWise"
-                ? "text-blue-600 border-b-2 border-blue-600"
-                : "text-gray-600 hover:text-gray-900"
+            className={`px-4 py-2 font-medium ${
+              activeTab === "timeWise" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-600"
             }`}
           >
             Booking Status
           </button>
         </div>
 
-        {/* Conditional Views */}
+        {/* Data Lists */}
         {activeTab === "paymentStatus" && (
           <div className="space-y-8">
             {["pending", "completed", "rejected"].map((key) => (

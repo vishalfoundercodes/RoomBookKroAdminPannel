@@ -34,8 +34,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchUsers } from "../../redux/slices/userSlice";
 import { signupUser } from "../../redux/slices/authSlice";
 import { profileUpdate, profileDelete } from "../../redux/slices/profileSlice";
+import { useNavigate } from "react-router-dom";
 const UsersPage = () => {
-  
+    const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user, loading, error, success } = useSelector(
     (state) => state.profile
@@ -287,6 +288,12 @@ const UsersPage = () => {
   //   alt={formData.name}
   //   className="w-20 h-20 rounded-full object-cover"
   // />
+const handleSendNotification = (user) => {
+    // Navigate to Notification page with userId as param or state
+    navigate(`/notification/${user}`); // Option 1: via URL param
+    // OR
+    // navigate("/notification", { state: { user } }); // Option 2: via state
+  };
 
   return (
     <div className="flex-1 p-4 overflow-x-hidden">
@@ -460,6 +467,9 @@ const UsersPage = () => {
                   Role
                 </th>
                 <th className="text-left py-3 px-4 font-medium text-gray-700">
+                  notification
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-700">
                   Status
                 </th>
                 <th className="text-left py-3 px-4 font-medium text-gray-700">
@@ -536,6 +546,14 @@ const UsersPage = () => {
                       {getRoleData(user.user_type).label}
                     </span>
                   </td>
+                      <td>
+              <button
+                onClick={() => handleSendNotification(user.userId)}
+                className="bg-blue-500 text-white px-3 py-1 rounded"
+              >
+                Send Notification
+              </button>
+            </td>
                   <td className="py-3 px-4">
                     <select
                       value={user.userStatus}

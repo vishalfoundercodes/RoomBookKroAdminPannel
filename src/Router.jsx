@@ -189,6 +189,7 @@ export const Router = createBrowserRouter([
         children: [
           { path: "/", element: <Home /> },
           { path: "/notification", element: <Notifications /> },
+          { path: "/notification/:id", element: <Notifications /> },
           { path: "/users", element: <UsersPage /> },
           { path: "/property", element: <PropertyPage /> },
           { path: "/analytics", element: <Analytics /> },

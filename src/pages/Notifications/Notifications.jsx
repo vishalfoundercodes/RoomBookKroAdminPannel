@@ -5,8 +5,10 @@ import {
   getNotifications,
   sendNotification,
 } from "../../redux/slices/notificationSlice";
-
+import { useParams } from "react-router-dom";
+import Loader from "../Loader/Loader";
 export default function Notifications() {
+   const { id } = useParams();
   const dispatch = useDispatch();
   const { notifications, loading } = useSelector((state) => state.notification);
 
@@ -23,6 +25,13 @@ export default function Notifications() {
     expiresAt: "",
   });
 
+    useEffect(() => {
+    if (id) {
+      setUserId(id);
+    } else {
+      setUserId("all"); // default if no ID in params
+    }
+  }, [id]);
   // ✅ Fetch notifications based on userId, only when viewing
   useEffect(() => {
     if (activeTab !== "view") return;
@@ -69,6 +78,10 @@ export default function Notifications() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+if (loading) {
+        return <Loader />;
+      }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
       <div className="max-w-6xl mx-auto">
@@ -110,19 +123,19 @@ export default function Notifications() {
             <form onSubmit={handleSendNotification} className="space-y-6">
               {/* Send To */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">
-                  Send To User ID (leave empty for all users)
-                </label>
-                <input
-                  type="text"
-                  value={userId === "all" ? "" : userId}
-                  onChange={(e) =>
-                    setUserId(e.target.value.trim() === "" ? "all" : e.target.value)
-                  }
-                  placeholder="Enter User ID or leave blank for all"
-                  className="w-full px-4 py-2 border rounded-lg"
-                />
-              </div>
+        <label className="block text-sm font-semibold text-gray-700 mb-3">
+          Send To User ID (leave empty for all users)
+        </label>
+        <input
+          type="text"
+          value={userId === "all" ? "" : userId}
+          onChange={(e) =>
+            setUserId(e.target.value.trim() === "" ? "all" : e.target.value)
+          }
+          placeholder="Enter User ID or leave blank for all"
+          className="w-full px-4 py-2 border rounded-lg"
+        />
+      </div>
 
               {/* Label and Type */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
