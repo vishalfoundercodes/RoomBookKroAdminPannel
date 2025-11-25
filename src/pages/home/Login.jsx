@@ -49,7 +49,7 @@ const handleSubmit = async () => {
   const payload = {
     email: formData.email,
     password: formData.password,
-    user_type: formData.user_type,
+    user_type: "0",
   };
 
   try {
@@ -160,7 +160,7 @@ const handleSubmit = async () => {
           </div>
 
           {/* User Type */}
-          <div>
+          {/* <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               User Type *
             </label>
@@ -190,7 +190,7 @@ const handleSubmit = async () => {
                 );
               })}
             </div>
-          </div>
+          </div> */}
 
           {/* Login Button */}
           <button

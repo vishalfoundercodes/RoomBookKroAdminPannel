@@ -4,12 +4,21 @@ import { toast } from "react-toastify";
 
 const baseUrl = "https://admin.roombookkro.com/api";
 
+// Create axios instance with default timeout
+const axiosInstance = axios.create({
+  baseURL: baseUrl,
+  timeout: 180000, // 2 minutes timeout for file uploads
+  headers: {
+    'Content-Type': 'multipart/form-data'
+  }
+});
+
 // Async thunk to fetch property
 export const fetchProperty = createAsyncThunk(
   "property/fetchProperty",
   async (userId = null) => {
     const res = await axios.post(`${baseUrl}/getproperty?userId=${userId}`);
-    // console.log("API proo response:", res.data); 
+    console.log("API proo response:", res.data); 
     return res.data;
   }
 );
@@ -17,20 +26,88 @@ export const fetchProperty = createAsyncThunk(
 /* =====================================================
    ✅ ADD PROPERTY
 ===================================================== */
+// export const addProperty = createAsyncThunk(
+//   "property/addProperty",
+//   async (formData, { rejectWithValue }) => {
+//     try {
+//       const res = await axios.post(`${baseUrl}/addproperty`, formData, {
+//         headers: { "Content-Type": "application/json" },
+//       });
+//         console.log("add property :", res?.data?.data?.message); 
+//         if(res.status === 201){
+//           toast.success(res?.message);
+//         }
+//       return res.data;
+//     } catch (err) {
+//       return rejectWithValue(err.response?.data || err.message);
+//     }
+//   }
+// );
+
 export const addProperty = createAsyncThunk(
   "property/addProperty",
   async (formData, { rejectWithValue }) => {
     try {
-      const res = await axios.post(`${baseUrl}/addproperty`, formData, {
-        headers: { "Content-Type": "application/json" },
-      });
-        console.log("add property :", res?.data?.data?.message); 
-        if(res.status === 201){
-          toast.success(res?.message);
+      console.log("🚀 Starting property upload...");
+
+      // Log FormData contents for debugging
+      for (const [key, value] of formData.entries()) {
+        if (value instanceof File) {
+          console.log(`${key}: File -> ${value.name} (${value.size} bytes)`);
+        } else {
+          console.log(`${key}: ${value}`);
         }
+      }
+
+      const res = await axiosInstance.post("/addproperty", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        // Add upload progress tracking
+        onUploadProgress: (progressEvent) => {
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          console.log(`Upload Progress: ${percentCompleted}%`);
+        },
+        // Increase timeout for this specific request if needed
+        timeout: 180000, // 3 minutes
+      });
+
+      console.log("✅ Property added successfully:", res.data);
+
+      if (res.status === 201 || res.status === 200) {
+        toast.success(res.data?.message || "Property added successfully!");
+      }
+
       return res.data;
     } catch (err) {
-      return rejectWithValue(err.response?.data || err.message);
+      console.error("❌ Add Property Error:", err);
+
+      // Handle different error types
+      if (err.code === "ECONNABORTED") {
+        toast.error(
+          "Request timeout! Please check your internet connection and try again."
+        );
+        return rejectWithValue("Request timeout - please try again");
+      }
+
+      if (err.response) {
+        // Server responded with error
+        console.error("Server Error Response:", err.response.data);
+        toast.error(err.response.data?.message || "Failed to add property!");
+        return rejectWithValue(err.response.data);
+      } else if (err.request) {
+        // Request made but no response
+        console.error("No response received:", err.request);
+        toast.error("No response from server. Please check your connection.");
+        return rejectWithValue("No response from server");
+      } else {
+        // Error setting up request
+        console.error("Error setting up request:", err.message);
+        toast.error("Failed to send request!");
+        return rejectWithValue(err.message);
+      }
     }
   }
 );
@@ -44,9 +121,13 @@ export const editProperty = createAsyncThunk(
     try {
       console.log("📝 Edit Payload:", payload);
 
-      const res = await axios.post(`${baseUrl}/property/${id}`, payload, {
-        headers: { "Content-Type": "application/json" },
-      });
+      const res = await axiosInstance.put(
+        `${baseUrl}/property/${id}`,
+        payload,
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
       console.log("✅ Edit Property Response:", res.data);
 
       toast.success("Property updated successfully!");
@@ -59,6 +140,52 @@ export const editProperty = createAsyncThunk(
   }
 );
 
+// export const editPropertyFormData = createAsyncThunk(
+//   "property/editProperty",
+//   async ({ id, payload }, { rejectWithValue }) => {
+//     try {
+//       console.log("📝 Edit Payload 2:", payload);
+//       console.log("📝 Edit id:", id);
+//       if(!payload || !(payload instanceof FormData)){
+//         throw new Error("Payload must be a FormData instance");
+//       }
+//       const res = await axios.patch(`${baseUrl}/propertyEdit/${id}`, payload, {
+//         headers: { "Content-Type": "application/json" },
+//       });
+//       console.log("✅ Edit Property Response:", res.data);
+
+//       toast.success("Property updated successfully!");
+//       return res.data;
+//     } catch (err) {
+//       console.error("❌ Edit Property Error:", err);
+//       toast.error(err.response.data.message||"Failed to update property!");
+//       return rejectWithValue(err.response?.data || err.message);
+//     }
+//   }
+// );
+
+
+// In your propertySlice.js
+export const editPropertyFormData = createAsyncThunk(
+  "property/editPropertyFormData",
+  async ({ id, payload }, { rejectWithValue }) => {
+    try {
+      const response = await axios.patch(
+        `${baseUrl}/updateproperty/${id}`,
+        payload,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log("edit data:",response.data)
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
 /* =====================================================
    ✅ DELETE PROPERTY
 ===================================================== */
@@ -85,8 +212,18 @@ const propertySlice = createSlice({
     data: [],
     loading: false,
     error: null,
+    successMessage: null,
+    uploadProgress: 0,
   },
-  reducers: {},
+  reducers: {
+    clearMessages: (state) => {
+      state.error = null;
+      state.successMessage = null;
+    },
+    setUploadProgress: (state, action) => {
+      state.uploadProgress = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchProperty.pending, (state) => {
@@ -102,42 +239,30 @@ const propertySlice = createSlice({
         state.error = action.error.message;
       })
 
-          /* === ADD PROPERTY === */
+      /* === ADD PROPERTY === */
       .addCase(addProperty.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.successMessage = null;
+        state.uploadProgress = 0;
       })
       .addCase(addProperty.fulfilled, (state, action) => {
         state.loading = false;
         state.successMessage = "Property added successfully!";
+        state.uploadProgress = 100;
         // Optionally push new property into existing data
         if (action.payload?.property) {
           state.data.push(action.payload.property);
+        } else if (action.payload?.data) {
+          state.data.push(action.payload.data);
         }
       })
       .addCase(addProperty.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to add property.";
+        state.uploadProgress = 0;
       })
-      // edit property 
-//       // --- Edit Property ---
-// .addCase(editProperty.pending, (state) => {
-//   state.loading = true;
-// })
-// .addCase(editProperty.fulfilled, (state, action) => {
-//   state.loading = false;
-//   state.success = true;
-//   // Optional: update in local state if you have properties stored
-//   const updated = action.payload;
-//   state.banners = state.banners.map((b) =>
-//     b.id === updated.id ? updated : b
-//   );
-// })
-// .addCase(editProperty.rejected, (state, action) => {
-//   state.loading = false;
-//   state.error = action.payload;
-// });
+
       /* === EDIT PROPERTY === */
       .addCase(editProperty.pending, (state) => {
         state.loading = true;
@@ -157,7 +282,8 @@ const propertySlice = createSlice({
         state.loading = false;
         state.error = action.payload || "Failed to update property.";
       })
-       /* === DELETE === */
+
+      /* === DELETE === */
       .addCase(deleteProperty.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -165,7 +291,9 @@ const propertySlice = createSlice({
       .addCase(deleteProperty.fulfilled, (state, action) => {
         state.loading = false;
         state.successMessage = "Property deleted successfully!";
-        state.data = state.data.filter((prop) => prop.id !== action.payload);
+        state.data = state.data.filter(
+          (prop) => prop.residencyId !== action.payload
+        );
       })
       .addCase(deleteProperty.rejected, (state, action) => {
         state.loading = false;
@@ -174,4 +302,6 @@ const propertySlice = createSlice({
   },
 });
 
+// export default propertySlice.reducer;
+export const { clearMessages, setUploadProgress } = propertySlice.actions;
 export default propertySlice.reducer;
