@@ -30,6 +30,7 @@ export const profileUpdate = createAsyncThunk(
 
       return res.data;
     } catch (error) {
+      console.error("error",error)
       return rejectWithValue(error.response?.data || error.message);
     }
   }

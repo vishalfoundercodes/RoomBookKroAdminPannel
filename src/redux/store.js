@@ -8,6 +8,7 @@ import couponReducer from "./slices/couponSlice";
 import notificationReducer from "./slices/notificationSlice";
 import historyReducer from "./slices/historySlice";
 import addImageReducer from "./slices/addImageSlice";
+import  revenueReducer   from "./slices/revenueSlice";
 
 const store = configureStore({
   reducer: {
@@ -15,12 +16,12 @@ const store = configureStore({
     property: propertyReducer,
     banner: bannerReducer,
     auth: authReducer,
-    profile:profileReducer,
+    profile: profileReducer,
     coupon: couponReducer,
     notification: notificationReducer,
-     history: historyReducer,
-     images: addImageReducer,
-     
+    history: historyReducer,
+    images: addImageReducer,
+    revenue: revenueReducer,
   },
 });
 

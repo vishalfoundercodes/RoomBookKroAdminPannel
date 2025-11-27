@@ -1,11 +1,11 @@
 // Users.jsx - Comprehensive user management page
-import React, { useEffect, useState } from 'react';
-import { 
-  Users, 
-  Search, 
-  Filter, 
-  Plus, 
-  Download, 
+import React, { useEffect, useState } from "react";
+import {
+  Users,
+  Search,
+  Filter,
+  Plus,
+  Download,
   Upload,
   MoreVertical,
   Edit,
@@ -27,29 +27,28 @@ import {
   Store,
   UserMinus,
   Send,
-  Bell
-} from 'lucide-react';
-import  Card from '../../reusable_components/Card';
-import  StatCard  from '../../reusable_components/StatCard';
-import   DataTable from '../../reusable_components/DataTable';
+  Bell,
+} from "lucide-react";
+import Card from "../../reusable_components/Card";
+import StatCard from "../../reusable_components/StatCard";
+import DataTable from "../../reusable_components/DataTable";
 
-import BarChartComponent from '../../reusable_components/BarChart';
-import PieChartComponent from '../../reusable_components/PieChart';
-import {apis} from '../../../utilities/apis';
-import axios from 'axios';
+import BarChartComponent from "../../reusable_components/BarChart";
+import PieChartComponent from "../../reusable_components/PieChart";
+import { apis } from "../../../utilities/apis";
+import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUsers } from "../../redux/slices/userSlice";
 import { signupUser } from "../../redux/slices/authSlice";
 import { profileUpdate, profileDelete } from "../../redux/slices/profileSlice";
 import { useNavigate } from "react-router-dom";
-import { SiAutoprefixer } from 'react-icons/si';
-import CustomDropdown from './CustomDropDown';
-import StatusDropdown from './StatusDropdown';
-import Loader from '../Loader/Loader';
-import DOBDatePicker from './DOBDatePicker';
-const UsersPage = () => {
-    const navigate = useNavigate();
-    const [dob, setDob] = useState("");
+import { SiAutoprefixer } from "react-icons/si";
+import CustomDropdown from "./CustomDropDown";
+import StatusDropdown from "./StatusDropdown";
+import Loader from "../Loader/Loader";
+import DOBDatePicker from "./DOBDatePicker";
+const VendorPage = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user, loading, error, success } = useSelector(
     (state) => state.profile
@@ -71,84 +70,83 @@ const UsersPage = () => {
   const [showViewModal, setShowViewModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [dob, setDob] = useState("");
 
   // New user form state
   const [newUser, setNewUser] = useState({
     name: "",
     email: "",
     phone: "",
-    role: "2",
+    role: "1",
     location: "",
   });
 
-  const formatDOB = (dob) => {
-    if (!dob) return "";
+  const onlyTypeOneUsers = users?.filter((u) => u.user_type == 1) || [];
 
-    // Format 1 -> YYYY-MM-DD (valid)
-    if (/^\d{4}-\d{2}-\d{2}$/.test(dob)) {
-      return dob;
-    }
+   const formatDOB = (dob) => {
+     if (!dob) return "";
 
-    // Format 2 -> DD/MM/YYYY (convert to YYYY-MM-DD)
-    if (/^\d{2}\/\d{2}\/\d{4}$/.test(dob)) {
-      const [dd, mm, yyyy] = dob.split("/");
-      return `${yyyy}-${mm}-${dd}`;
-    }
+     // Format 1 -> YYYY-MM-DD (valid)
+     if (/^\d{4}-\d{2}-\d{2}$/.test(dob)) {
+       return dob;
+     }
 
-    // Last fallback → avoid crash
-    const d = new Date(dob);
-    return isNaN(d.getTime()) ? "" : d.toISOString().split("T")[0];
-  };
+     // Format 2 -> DD/MM/YYYY (convert to YYYY-MM-DD)
+     if (/^\d{2}\/\d{2}\/\d{4}$/.test(dob)) {
+       const [dd, mm, yyyy] = dob.split("/");
+       return `${yyyy}-${mm}-${dd}`;
+     }
 
-
-    const onlyTypeOneUsers = users?.filter((u) => u.user_type == 2) || [];
+     // Last fallback → avoid crash
+     const d = new Date(dob);
+     return isNaN(d.getTime()) ? "" : d.toISOString().split("T")[0];
+   };
   // Filter and search logic
- const filteredUsers = onlyTypeOneUsers.filter((user) => {
-   const userDOB = formatDOB(user.DOB); // safe parsing
+  // Filter and search logic
+  const filteredUsers = onlyTypeOneUsers.filter((user) => {
+    const userDOB = formatDOB(user.DOB); // safe parsing
 
-   const matchesDOB = dob === "" || userDOB === dob;
+    const matchesDOB = dob === "" || userDOB === dob;
 
-   const matchesSearch =
-     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-     user.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch =
+      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase());
 
-   const matchesStatus =
-     filterStatus === "All" || user.userStatus == filterStatus;
+    const matchesStatus =
+      filterStatus === "All" || user.userStatus == filterStatus;
 
-   const matchesRole = filterRole === "All" || user.user_type == filterRole;
+    const matchesRole = filterRole === "All" || user.user_type == filterRole;
 
-   return matchesSearch && matchesStatus && matchesRole && matchesDOB;
- });
-
+    return matchesSearch && matchesStatus && matchesRole && matchesDOB;
+  });
 
   // Statistics calculations
   // const totalUsers = users.length;
   const totalUsers = users.filter(
     (u) => u.user_type == "1" || u.user_type == "2"
   ).length;
-  const activeUsers = users.filter((u) =>u.user_type == "2" && u.userStatus == "1").length;
+  const activeUsers = users.filter(
+    (u) => u.user_type == "2" && u.userStatus == "1"
+  ).length;
   const pendingUsers = users.filter((u) => u.userStatus === "Pending").length;
   const inactiveUsers = users.filter(
     (u) => u.user_type == "2" && u.userStatus == "0"
   ).length;
-const veryfiedVendor = users.filter(
-  (u) => u.user_type === "1" && u.isVerified == "1"
-).length;
+  const veryfiedVendor = users.filter(
+    (u) => u.user_type === "1" && u.isVerified == "1"
+  ).length;
 
-const notVeryfiedVendor = users.filter(
-  (u) => u.user_type === "1" && u.isVerified == "0"
-).length;
-const totalCustomer = users.filter(
-  (u) => u.user_type === "2").length;
-const totalVendor = users.filter(
-  (u) => u.user_type === "1").length;
-const activeVendor = users.filter(
-  (u) => u.user_type == "1" && u.userStatus == "1"
-).length;
-const inActiveVendor = users.filter(
-  (u) => u.user_type == "1" && u.userStatus == "0"
-).length;
-
+  const notVeryfiedVendor = users.filter(
+    (u) => u.user_type === "1" && u.isVerified == "0"
+  ).length;
+  const totalCustomer = users.filter((u) => u.user_type === "2").length;
+  const totalVendor = users.filter((u) => u.user_type === "1").length;
+  const activeVendor = users.filter(
+    (u) => u.user_type == "1" && u.userStatus == "1"
+  ).length;
+  const inActiveVendor = users.filter(
+    (u) => u.user_type == "1" && u.userStatus == "0"
+  ).length;
 
   // Chart data
   const userStatusData = [
@@ -157,9 +155,9 @@ const inActiveVendor = users.filter(
     { name: "Inactive", value: inactiveUsers, color: "#ef4444" },
   ];
 
-  const Admin =users.filter((u)=>u.user_type==="0").length
-  const vendor =users.filter((u)=>u.user_type==="1").length
-  const Customer =users.filter((u)=>u.user_type==="2").length
+  const Admin = users.filter((u) => u.user_type === "0").length;
+  const vendor = users.filter((u) => u.user_type === "1").length;
+  const Customer = users.filter((u) => u.user_type === "2").length;
 
   const userTypeData = [
     { name: "Admin", value: Admin, color: "#10b981" },
@@ -262,7 +260,7 @@ const inActiveVendor = users.filter(
   };
 
   const handleDeleteUser = (userId) => {
-    console.log(userId)
+    console.log(userId);
     dispatch(profileDelete(userId));
   };
 
@@ -279,7 +277,7 @@ const inActiveVendor = users.filter(
     const payload = {
       isVerified: newStatus,
     };
-    console.log("payload:",payload)
+    console.log("payload:", payload);
     dispatch(profileUpdate({ userId, payload }));
   };
 
@@ -314,13 +312,13 @@ const inActiveVendor = users.filter(
 
       // Convert file to Base64 for backend
       const reader = new FileReader();
-     reader.onloadend = () => {
-       setFormData((prev) => ({
-         ...prev,
-         userImage: reader.result, // ✅ Base64 string
-         userImagePreview: previewUrl, // For display
-       }));
-     };
+      reader.onloadend = () => {
+        setFormData((prev) => ({
+          ...prev,
+          userImage: reader.result, // ✅ Base64 string
+          userImagePreview: previewUrl, // For display
+        }));
+      };
       reader.readAsDataURL(file);
     }
   };
@@ -364,16 +362,16 @@ const inActiveVendor = users.filter(
   //   alt={formData.name}
   //   className="w-20 h-20 rounded-full object-cover"
   // />
-const handleSendNotification = (user) => {
+  const handleSendNotification = (user) => {
     // Navigate to Notification page with userId as param or state
     navigate(`/notification/${user}`); // Option 1: via URL param
     // OR
     // navigate("/notification", { state: { user } }); // Option 2: via state
   };
 
-    if (usersLoading || loading) {
-      return <Loader />;
-    }
+  if (usersLoading || loading) {
+    return <Loader />;
+  }
 
   return (
     <div className="flex-1 p-2 overflow-x-hidden">
@@ -383,7 +381,7 @@ const handleSendNotification = (user) => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-xl md:text-3xl font-bold text-gray-900">
-                Customer Management
+                Vendor Management
               </h1>
               <p className="text-gray-600 mt-1 text-sm">
                 Manage and monitor all users in your system
@@ -395,7 +393,7 @@ const handleSendNotification = (user) => {
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 whitespace-nowrap"
               >
                 <Plus className="w-4 h-4" />
-                Add Customer
+                Add Vendor
               </button>
             </div>
           </div>
@@ -403,45 +401,53 @@ const handleSendNotification = (user) => {
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-          {/* Total Users */}
-          {/* <StatCard
-            title="Total Users"
-            value={totalUsers.toString()}
-            change="+12 this month"
-            changeType="positive"
-            icon={Users}
-            color="blue"
-          /> */}
-
-          {/* Total Customers */}
+          {/* Total Vendors */}
           <StatCard
-            title="Total Customers"
-            value={totalCustomer.toString()}
-            change="Customer base growing steadily"
+            title="Total Vendors"
+            value={totalVendor.toString()}
+            change="Vendor network expanding"
             changeType="positive"
-            icon={UserRound}
+            icon={Store}
+            color="purple"
+          />
+
+          {/* Verified Vendors */}
+          <StatCard
+            title="Verified Vendors"
+            value={veryfiedVendor.toString()}
+            change="Trusted & verified vendors"
+            changeType="positive"
+            icon={ShieldCheck}
             color="green"
           />
 
-          {/* Active Customers */}
+          {/* Unverified Vendors */}
           <StatCard
-            title="Active Customers"
-            value={activeUsers.toString()}
-            change={`${((activeUsers / totalUsers) * 100).toFixed(
-              1
-            )}% active users`}
-            changeType="positive"
-            icon={UserCheck}
-            color="green"
-          />
-
-          {/* Inactive Customers */}
-          <StatCard
-            title="Inactive Customers"
-            value={inactiveUsers.toString()}
-            change="Re-engagement recommended"
+            title="Unverified Vendors"
+            value={notVeryfiedVendor.toString()}
+            change="Verification required"
             changeType="negative"
-            icon={UserMinus}
+            icon={ShieldAlert}
+            color="red"
+          />
+
+          {/* Active Vendors */}
+          <StatCard
+            title="Active Vendors"
+            value={activeVendor.toString()}
+            change="Vendors actively serving"
+            changeType="positive"
+            icon={Store}
+            color="green"
+          />
+
+          {/* Inactive Vendors */}
+          <StatCard
+            title="Inactive Vendors"
+            value={inActiveVendor.toString()}
+            change="Vendor not active currently"
+            changeType="negative"
+            icon={SiAutoprefixer}
             color="red"
           />
         </div>
@@ -480,19 +486,15 @@ const handleSendNotification = (user) => {
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-
-            <div className="flex gap-2">
-              <StatusDropdown
-                filterStatus={filterStatus}
-                setFilterStatus={setFilterStatus}
-              />
-              {/* <CustomDropdown
+            <StatusDropdown
+              filterStatus={filterStatus}
+              setFilterStatus={setFilterStatus}
+            />
+            <CustomDropdown
               value={filterRole}
               onChange={(val) => setFilterRole(val)}
-            /> */}
-
-              <DOBDatePicker value={dob} onChange={setDob} />
-            </div>
+            />
+            <DOBDatePicker value={dob} onChange={setDob} />
           </div>
 
           {selectedUsers.length > 0 && (
@@ -538,10 +540,10 @@ const handleSendNotification = (user) => {
                     />
                   </th>
                   <th className="text-left py-3 px-4 font-medium text-gray-700">
-                    Customer Id
+                    Vendor Id
                   </th>
                   <th className="text-left py-3 px-4 font-medium text-gray-700">
-                    Customer
+                    Vendor
                   </th>
                   <th className="text-left py-3 px-4 font-medium text-gray-700">
                     Contact
@@ -550,7 +552,16 @@ const handleSendNotification = (user) => {
                     notification
                   </th>
                   <th className="text-left py-3 px-4 font-medium text-gray-700">
+                    Adhar Number
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700">
+                    Pan Number
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700">
                     Status
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700">
+                    Verify vendor
                   </th>
                   <th className="text-left py-3 px-4 font-medium text-gray-700">
                     DOB
@@ -639,7 +650,30 @@ const handleSendNotification = (user) => {
                         </button>
                       </div>
                     </td>
-
+                    <td className="py-3 px-4">
+                      <div className="text-sm">
+                        <div className="flex items-center gap-1 text-gray-600">
+                          <Phone className="w-3 h-3" />
+                          {user.adharNumber}
+                        </div>
+                        {/* <div className="flex items-center gap-1 text-gray-500 mt-1">
+                        <MapPin className="w-3 h-3" />
+                        {user.location}
+                      </div> */}
+                      </div>
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="text-sm">
+                        <div className="flex items-center gap-1 text-gray-600">
+                          <Phone className="w-3 h-3" />
+                          {user.panNumber}
+                        </div>
+                        {/* <div className="flex items-center gap-1 text-gray-500 mt-1">
+                        <MapPin className="w-3 h-3" />
+                        {user.location}
+                      </div> */}
+                      </div>
+                    </td>
                     <td className="py-3 px-4">
                       <select
                         value={user.userStatus}
@@ -655,7 +689,7 @@ const handleSendNotification = (user) => {
                         <option value="0">Inactive</option>
                       </select>
                     </td>
-                    {/* <td className="py-3 px-4">
+                    <td className="py-3 px-4">
                       <select
                         disabled={user.user_type !== "1"}
                         value={user.isVerified}
@@ -675,7 +709,7 @@ const handleSendNotification = (user) => {
                         <option value="true">Veryfied</option>
                         <option value="false">Not Veryfied</option>
                       </select>
-                    </td> */}
+                    </td>
                     <td className="py-3 px-4 text-sm text-gray-600">
                       <div className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
@@ -737,7 +771,7 @@ const handleSendNotification = (user) => {
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-semibold text-gray-900">
-                    Add New Customer
+                    Add New Vendor
                   </h2>
                   <button
                     onClick={() => setShowAddModal(false)}
@@ -840,7 +874,7 @@ const handleSendNotification = (user) => {
                     </select>
                   </div>
 
-                  <div>
+                  <div className="hidden">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Location
                     </label>
@@ -868,7 +902,7 @@ const handleSendNotification = (user) => {
                     className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"
                   >
                     <Save className="w-4 h-4" />
-                    Add Customer
+                    Add User
                   </button>
                 </div>
               </div>
@@ -1053,7 +1087,7 @@ const handleSendNotification = (user) => {
                 </div>
 
                 {/* Grid Details */}
-                <div className="grid grid-cols-2 gap-6 mt-6">
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
                   {/* Contact */}
                   <div>
                     <h4 className="font-medium text-gray-900 mb-3">
@@ -1121,6 +1155,78 @@ const handleSendNotification = (user) => {
                       </div>
                     </div>
                   </div>
+                  {/* Documents */}
+                  <div>
+                    <h4 className="font-medium text-gray-900 mb-3">
+                      Important Details
+                    </h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-gray-400" />
+                        {isEditing ? (
+                          <input
+                            type="date"
+                            name="DOB"
+                            value={formData.adharNumber || ""}
+                            onChange={handleChange}
+                            className="border rounded px-2 py-1 w-full"
+                          />
+                        ) : (
+                          <span>
+                            Adhar Number:{" "}
+                            {selectedUser.adharNumber || formData.adharNumber}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-gray-400" />
+                        {isEditing ? (
+                          <input
+                            type="date"
+                            name="DOB"
+                            value={formData.panNumber || ""}
+                            onChange={handleChange}
+                            className="border rounded px-2 py-1 w-full"
+                          />
+                        ) : (
+                          <span>
+                            Pan Number:{" "}
+                            {selectedUser.panNumber || formData.panNumber}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  {/* documents image */}
+                  <div className="flex gap-2">
+                    <img
+                      src={
+                        formData.adharImage?.front ||
+                        formData.adharImage?.front ||
+                        selectedUser.adharImage?.front
+                      }
+                      alt={formData.name}
+                      className="w-20 h-20 rounded-full object-cover"
+                    />
+                    <img
+                      src={
+                        formData.adharImage?.back ||
+                        formData.adharImage?.back ||
+                        selectedUser.adharImage?.back
+                      }
+                      alt={formData.name}
+                      className="w-20 h-20 rounded-full object-cover"
+                    />
+                    <img
+                      src={
+                        formData.panImage ||
+                        formData.panImage ||
+                        selectedUser.panImage
+                      }
+                      alt={formData.name}
+                      className="w-20 h-20 rounded-full object-cover"
+                    />
+                  </div>
                 </div>
 
                 {/* Buttons */}
@@ -1161,4 +1267,4 @@ const handleSendNotification = (user) => {
   );
 };
 
-export default UsersPage;
+export default VendorPage

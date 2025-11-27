@@ -6,6 +6,7 @@ const baseUrl = "https://admin.roombookkro.com/api";
 // Async thunk to fetch users
 export const fetchUsers = createAsyncThunk("users/fetchUsers", async () => {
   const res = await axios.get(`${baseUrl}/getAlluser`);
+  console.log("user details:",res.data)
   return res.data; // response data return
 });
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Users, Search, Plus, Download, Upload, Edit, Trash2, Mail, Phone, MapPin, Calendar, UserCheck, UserX, Eye, X, Globe, Home } from 'lucide-react';
+import { Users, Search, Plus, Download, Upload, Edit, Trash2, Mail, Phone, MapPin, Calendar, UserCheck, UserX, Eye, X, Globe, Home, Building, Building2, Hotel, ShieldCheck } from 'lucide-react';
 import Card from '../../reusable_components/Card';
 import StatCard from '../../reusable_components/StatCard';
 import PieChartComponent from '../../reusable_components/PieChart';
@@ -14,6 +14,9 @@ import verifyIcon from "../../../src/assets/verify.png";
 import ViewProperty from "./viewProperty";
 import AddProperty from './AddProperty';
 import EditPropertyModal from './EditPropertyModal';
+import CustomVerificationDropdown from './CustomVerify';
+import CustomPropertyTypeDropdown from './CustomPropertyDropDown';
+import CustomAvailabilityDropdown from './CustomAvailableDropdown';
 
 const PropertyPage = () => {
   const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -107,7 +110,7 @@ const PropertyPage = () => {
 
     const matchesPropertyType =
       filterPropertyStatus === "All" ||
-      user.type?.toLowerCase() === filterPropertyStatus.toLowerCase();
+      user.type?.toLowerCase() == filterPropertyStatus.toLowerCase();
 
       const matchesPropertyVerification =
         verificationStatus === "All" ||
@@ -123,6 +126,18 @@ const PropertyPage = () => {
     filteredProperty?.filter((u) => u.isAvailable === true).length || 0;
   const inactiveProperty =
     filteredProperty?.filter((u) => u.isAvailable === false).length || 0;
+  const verifyPropertyCount =
+    filteredProperty?.filter((u) => u.verifyProperty === true).length || 0;
+  const notVerifyPropertyCount =
+    filteredProperty?.filter((u) => u.verifyProperty === false).length || 0;
+  const pgCount =
+    filteredProperty?.filter((u) => u.type === "pg").length || 0;
+  const hotelCount =
+    filteredProperty?.filter((u) => u.type == "hotel" || u.type=="Hotel").length || 0;
+  const AppartmentCount =
+    filteredProperty?.filter((u) => u.type == "appartment").length || 0;
+  const dormitaryCount =
+    filteredProperty?.filter((u) => u.type == "dormitary").length || 0;
 
   const PropertytatusData = [
     { name: "Active", value: activeProperty, color: "#10b981" },
@@ -227,12 +242,12 @@ const handleCommissionChange = async(id, value) => {
     return String(item);
   };
 
-  if (isUploading) {
+  if (isUploading || loading) {
     return <Loader />;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
+    <div className="min-h-screen bg-gray-50 p-2">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between">
@@ -257,15 +272,16 @@ const handleCommissionChange = async(id, value) => {
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-8">
         <StatCard
           title="Total Property"
           value={totalProperty.toString()}
           change="+12 this month"
           changeType="positive"
-          icon={Users}
+          icon={Home}
           color="blue"
         />
+
         <StatCard
           title="Available Property"
           value={activeProperty.toString()}
@@ -273,18 +289,73 @@ const handleCommissionChange = async(id, value) => {
             totalProperty > 0
               ? ((activeProperty / totalProperty) * 100).toFixed(1)
               : 0
-          }%`}
+          }% available`}
           changeType="positive"
           icon={UserCheck}
           color="green"
         />
+
         <StatCard
           title="Not Available Property"
           value={inactiveProperty.toString()}
-          change="Need attention"
+          change="Unavailable currently"
           changeType="negative"
           icon={UserX}
           color="red"
+        />
+
+        <StatCard
+          title="Not Verified Property"
+          value={notVerifyPropertyCount.toString()}
+          change="Verification pending"
+          changeType="warning"
+          icon={ShieldCheck}
+          color="yellow"
+        />
+
+        <StatCard
+          title="Verified Property"
+          value={verifyPropertyCount.toString()}
+          change="Verified successfully"
+          changeType="positive"
+          icon={ShieldCheck}
+          color="green"
+        />
+
+        <StatCard
+          title="Hotel Property"
+          value={hotelCount.toString()}
+          change="Hotel listings"
+          changeType="neutral"
+          icon={Hotel}
+          color="purple"
+        />
+
+        <StatCard
+          title="PG Property"
+          value={pgCount.toString()}
+          change="PG listings"
+          changeType="neutral"
+          icon={Building2}
+          color="indigo"
+        />
+
+        <StatCard
+          title="Apartment Property"
+          value={AppartmentCount.toString()}
+          change="Apartment listings"
+          changeType="neutral"
+          icon={Building}
+          color="cyan"
+        />
+
+        <StatCard
+          title="Dormitory Property"
+          value={dormitaryCount.toString()}
+          change="Dorm listings"
+          changeType="neutral"
+          icon={Users}
+          color="teal"
         />
       </div>
 
@@ -310,35 +381,18 @@ const handleCommissionChange = async(id, value) => {
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <select
+          <CustomVerificationDropdown
             value={verificationStatus}
-            onChange={(e) => setFilterVerificationStatus(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="All">Verification</option>
-            <option value="true">Verify</option>
-            <option value="false">Not verified</option>
-          </select>
-          <select
+            onChange={setFilterVerificationStatus}
+          />
+          <CustomPropertyTypeDropdown
             value={filterPropertyStatus}
-            onChange={(e) => setFilterPropertyStatus(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="All">All Property</option>
-            <option value="hotel">Hotel</option>
-            <option value="pg">PG</option>
-            <option value="appartment">Appartment</option>
-            <option value="dormitory">Dormitory</option>
-          </select>
-          <select
+            onChange={setFilterPropertyStatus}
+          />
+          <CustomAvailabilityDropdown
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="All">All Status</option>
-            <option value="Active">Active</option>
-            <option value="Inactive">Inactive</option>
-          </select>
+            onChange={setFilterStatus}
+          />
         </div>
       </Card>
 
@@ -353,6 +407,9 @@ const handleCommissionChange = async(id, value) => {
                 </th>
                 <th className="text-left py-3 px-4 font-medium text-gray-700">
                   Property name
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-700">
+                  Property type
                 </th>
                 <th className="text-left py-3 px-4 font-medium text-gray-700">
                   Contact
@@ -397,6 +454,15 @@ const handleCommissionChange = async(id, value) => {
                         </div>
                         <div className="text-sm text-gray-500">
                           {user.email}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="py-3 px-4">
+                    <div className="flex items-center gap-3">
+                      <div>
+                        <div className="font-medium text-gray-900">
+                          {user.type}
                         </div>
                       </div>
                     </div>
@@ -546,7 +612,7 @@ const handleCommissionChange = async(id, value) => {
                       <button
                         onClick={() => {
                           setSelectedUser(user);
-                          console.log("hotel details:",user)
+                          console.log("hotel details:", user);
                           setShowViewModal(true);
                         }}
                         className="p-1 text-blue-600 hover:bg-blue-100 rounded"

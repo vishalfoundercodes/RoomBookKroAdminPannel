@@ -29,6 +29,7 @@ export const loginUser = createAsyncThunk(
   "auth/login",
   async (payload, { rejectWithValue }) => {
     try {
+      console.log("payload:",payload)
       const res = await axios.post(`${baseUrl}/login`, payload);
       console.log("resss data ", res.data);
       return res?.data; // { user, loginToken, message }

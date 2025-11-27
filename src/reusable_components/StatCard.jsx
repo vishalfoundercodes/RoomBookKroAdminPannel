@@ -17,7 +17,7 @@ const StatCard = ({ title, value, change, changeType = "positive", icon: Icon, c
 
   return (
     <Card>
-      <div className="flex items-center justify-between"
+      <div className="flex items-center justify-between cursor-pointer"
       onClick={()=>navigate(route|| "#")}
       >
         <div>

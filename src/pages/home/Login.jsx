@@ -69,7 +69,7 @@ const handleSubmit = async () => {
     } else {
       // Failed login
       setValidationError(resultAction.payload?.message || "Login failed");
-      console.error("Login failed:", resultAction.payload?.message);
+      console.error("Login failed:", resultAction);
     }
   } catch (err) {
     console.error("Error during login:", err);

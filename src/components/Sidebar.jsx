@@ -17,6 +17,10 @@ import {
   Building,
   icons,
   HistoryIcon,
+  BarChart3,
+  LineChart,
+  PieChart,
+  IndianRupee,
 } from "lucide-react";
 import { Link, NavLink } from "react-router-dom";
 import { BiPhotoAlbum } from "react-icons/bi";
@@ -25,14 +29,16 @@ import { BiPhotoAlbum } from "react-icons/bi";
 export const Sidebar = ({ isOpen, onClose }) => {
   const menuItems = [
     { icon: Home, label: "Dashboard", to: "/" },
-    { icon: Users, label: "Users", to: "/users" },
+    { icon: Users, label: "Customers", to: "/users" },
+    { icon: Users, label: "Vendors", to: "/vendor" },
     { icon: Building, label: "Property", to: "/property" },
     // // { icon: ShoppingCart, label: "Orders", to: "#" },
     // { icon: BarChart, label: "Analytics", to: "analytics" },
     // { icon: FileText, label: "Reports", to: "reports" },
-  
-    { icon: CreditCard, label: "coupon ", to: "coupon" },
+    { icon: BarChart3, label: "Revenue", to: "/revenue" },
     { icon: HistoryIcon, label: "History ", to: "history" },
+    { icon: CreditCard, label: "coupon ", to: "coupon" },
+
     // { icon: icons, label: "Subscription Plans", to: "subscription" },
     // // { icon: Star, label: "Tarot Reading", to: "#" },
     // // { icon: Heart, label: "Love Compatibility", to: "#" },
@@ -40,6 +46,12 @@ export const Sidebar = ({ isOpen, onClose }) => {
     // // { icon: Leaf, label: "Palm Reading", to: "#" },
     // // Add more to test scroll
     { icon: Bell, label: "Notifications", to: "/Notification" },
+    // { icon: Bell, label: "Revenue", to: "/revenue" },
+
+    // { icon: LineChart, label: "Revenue", to: "/revenue" },
+    // { icon: PieChart, label: "Revenue", to: "/revenue" },
+    // { icon: IndianRupee, label: "Revenue", to: "/revenue" },
+
     { icon: BiPhotoAlbum, label: "Add Images Page", to: "/addimagepage" },
     // // { icon: Star, label: "Extra Item 2", to: "#" },
     // // { icon: Star, label: "Extra Item 3", to: "#" },

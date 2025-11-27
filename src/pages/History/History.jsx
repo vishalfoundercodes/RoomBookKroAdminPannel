@@ -9,11 +9,15 @@ import {
   XCircle,
   AlertCircle,
   Search,
+  Home,
+  CalendarDays,
+  Wallet,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchOrderHistory, updatePaymentStatus } from "../../redux/slices/historySlice";
 import Loader from "../Loader/Loader";
 import { toast } from "react-toastify";
+import StatCard from "../../reusable_components/StatCard";
 
 export default function History() {
   const dispatch = useDispatch();
@@ -23,6 +27,11 @@ export default function History() {
   const [userId, setUserId] = useState("");
   const [searchUserId, setSearchUserId] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
+  const [bookingSubTab, setBookingSubTab] = useState("currentStay");
+  const [paymentSubTab, setPaymentSubTab] = useState("pending");
+const [filteredData, setFilteredData] = useState(null);
+
+
 
   useEffect(() => {
     dispatch(fetchOrderHistory({ userId: "all" }));
@@ -198,6 +207,50 @@ const handlePaymentUpdate = async (orderId, userId, newPaymentStatus) => {
     );
   };
 
+  useEffect(() => {
+    if (!historyData) return;
+
+    const search = searchUserId.toLowerCase().trim();
+
+    if (search === "") {
+      setFilteredData(historyData);
+      return;
+    }
+
+    const filterBookings = (arr = []) =>
+      arr.filter((item) =>
+        Object.values(item).some((value) =>
+          String(value).toLowerCase().includes(search)
+        )
+      );
+
+    setFilteredData({
+      paymentStatusWise: {
+        pending: filterBookings(historyData.paymentStatusWise?.pending),
+        completed: filterBookings(historyData.paymentStatusWise?.completed),
+        rejected: filterBookings(historyData.paymentStatusWise?.rejected),
+      },
+      timeWise: {
+        currentStay: filterBookings(historyData.timeWise?.currentStay),
+        upcoming: filterBookings(historyData.timeWise?.upcoming),
+        past: filterBookings(historyData.timeWise?.past),
+        cancelled: filterBookings(historyData.timeWise?.cancelled),
+      },
+    });
+  }, [searchUserId, historyData]);
+
+const totalBookings =
+  (historyData?.timeWise?.upcoming?.length || 0) +
+  (historyData?.timeWise?.currentStay?.length || 0) +
+  (historyData?.timeWise?.past?.length || 0) +
+  (historyData?.timeWise?.cancelled?.length || 0);
+
+const totalPayments =
+  (historyData?.paymentStatusWise?.pending?.length || 0) +
+  (historyData?.paymentStatusWise?.completed?.length || 0) +
+  (historyData?.paymentStatusWise?.rejected?.length || 0);
+
+
   if (loading) return <Loader />;
 
   if (error && hasSearched)
@@ -216,32 +269,96 @@ const handlePaymentUpdate = async (orderId, userId, newPaymentStatus) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className=" px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Booking History</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            Booking History
+          </h1>
           <p className="text-gray-600">View and manage all your bookings</p>
         </div>
 
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+          {/* Payment Status Wise */}
+          
+          <StatCard
+            title="Total Payments"
+            value={totalPayments.toString()}
+            change=""
+            icon={Wallet}
+            color="yellow"
+          />
+          <StatCard
+            title="Total Booking"
+            value={totalBookings.toString()}
+            change=""
+            icon={CalendarDays}
+            color="yellow"
+          />
+          <StatCard
+            title="Pending Payments"
+            value={historyData.paymentStatusWise?.pending?.length || 0}
+            change=""
+            icon={AlertCircle}
+            color="yellow"
+          />
+          <StatCard
+            title="Completed Payments"
+            value={historyData.paymentStatusWise?.completed?.length || 0}
+            change=""
+            icon={CheckCircle}
+            color="green"
+          />
+          <StatCard
+            title="Rejected Payments"
+            value={historyData.paymentStatusWise?.rejected?.length || 0}
+            change=""
+            icon={XCircle}
+            color="red"
+          />
+          {/* Time Wise */}
+          <StatCard
+            title="Current Stay"
+            value={historyData.timeWise?.currentStay?.length || 0}
+            change=""
+            icon={Clock}
+            color="blue"
+          />
+          <StatCard
+            title="Upcoming Bookings"
+            value={historyData.timeWise?.upcoming?.length || 0}
+            change=""
+            icon={Calendar}
+            color="purple"
+          />
+          <StatCard
+            title="Past Bookings"
+            value={historyData.timeWise?.past?.length || 0}
+            change=""
+            icon={Home}
+            color="gray"
+          />
+          <StatCard
+            title="Cancelled Bookings"
+            value={historyData.timeWise?.cancelled?.length || 0}
+            change=""
+            icon={XCircle}
+            color="orange"
+          />
+        </div>
+
         {/* Search */}
-        <div className="mb-6 flex gap-2">
-          <div className="flex-1 relative">
+        <div className="mb-6">
+          <div className="relative">
             <input
               type="text"
-              placeholder="Enter User ID to search..."
+              placeholder="Search by Order ID, User ID, Name..."
               value={searchUserId}
               onChange={(e) => setSearchUserId(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && handleSearch()}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg"
             />
             <Search className="absolute right-3 top-2.5 w-5 h-5 text-gray-400" />
           </div>
-          <button onClick={handleSearch} className="px-6 py-2 bg-blue-500 text-white rounded-lg">
-            Search
-          </button>
-          <button onClick={handleShowAll} className="px-6 py-2 bg-gray-300 text-gray-800 rounded-lg">
-            All
-          </button>
         </div>
 
         {/* Tabs */}
@@ -249,7 +366,9 @@ const handlePaymentUpdate = async (orderId, userId, newPaymentStatus) => {
           <button
             onClick={() => setActiveTab("paymentStatus")}
             className={`px-4 py-2 font-medium ${
-              activeTab === "paymentStatus" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-600"
+              activeTab === "paymentStatus"
+                ? "text-blue-600 border-b-2 border-blue-600"
+                : "text-gray-600"
             }`}
           >
             Payment Status
@@ -257,7 +376,9 @@ const handlePaymentUpdate = async (orderId, userId, newPaymentStatus) => {
           <button
             onClick={() => setActiveTab("timeWise")}
             className={`px-4 py-2 font-medium ${
-              activeTab === "timeWise" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-600"
+              activeTab === "timeWise"
+                ? "text-blue-600 border-b-2 border-blue-600"
+                : "text-gray-600"
             }`}
           >
             Booking Status
@@ -265,29 +386,53 @@ const handlePaymentUpdate = async (orderId, userId, newPaymentStatus) => {
         </div>
 
         {/* Data Lists */}
-        {activeTab === "paymentStatus" && (
-          <div className="space-y-8">
-            {["pending", "completed", "rejected"].map((key) => (
-              <div key={key}>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2 capitalize">
-                  {getStatusIcon(key)}
-                  {key} ({historyData.paymentStatusWise?.[key]?.length || 0})
-                </h2>
-                <div className="space-y-3">
-                  {historyData.paymentStatusWise?.[key]?.length ? (
-                    historyData.paymentStatusWise[key].map((booking) => (
+        {activeTab === "paymentStatus" && historyData?.paymentStatusWise && (
+          <div>
+            {/* Sub Tabs */}
+            <div className="flex gap-3 mb-6 border-b pb-2">
+              {[
+                { key: "pending", label: "Pending" },
+                { key: "completed", label: "Completed" },
+                { key: "rejected", label: "Rejected" },
+              ].map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setPaymentSubTab(tab.key)}
+                  className={`px-4 py-1.5 rounded-md font-medium transition ${
+                    paymentSubTab === tab.key
+                      ? "bg-blue-600 text-white shadow"
+                      : "text-gray-600 hover:bg-gray-200"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Sub Tab Content */}
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2 capitalize">
+                {getStatusIcon(paymentSubTab)}
+                {paymentSubTab} (
+                {historyData?.paymentStatusWise?.[paymentSubTab]?.length || 0})
+              </h2>
+
+              <div className="space-y-3">
+                {historyData?.paymentStatusWise?.[paymentSubTab]?.length ? (
+                  filteredData?.paymentStatusWise?.[paymentSubTab]?.map(
+                    (booking) => (
                       <BookingCard key={booking._id} booking={booking} />
-                    ))
-                  ) : (
-                    <p className="text-gray-500">No {key} bookings</p>
-                  )}
-                </div>
+                    )
+                  )
+                ) : (
+                  <p className="text-gray-500">No {paymentSubTab} bookings</p>
+                )}
               </div>
-            ))}
+            </div>
           </div>
         )}
 
-        {activeTab === "timeWise" && (
+        {/* {activeTab === "timeWise" && (
           <div className="space-y-8">
             {["currentStay", "upcoming", "past"].map((key) => (
               <div key={key}>
@@ -306,6 +451,50 @@ const handlePaymentUpdate = async (orderId, userId, newPaymentStatus) => {
                 </div>
               </div>
             ))}
+          </div>
+        )} */}
+        {activeTab === "timeWise" && (
+          <div>
+            {/* Sub Tabs */}
+            <div className="flex gap-3 mb-6 border-b pb-2">
+              {[
+                { key: "currentStay", label: "Current Stay" },
+                { key: "upcoming", label: "Upcoming" },
+                { key: "past", label: "Past" },
+                { key: "cancelled", label: "Cancelled" },
+              ].map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setBookingSubTab(tab.key)}
+                  className={`px-4 py-1.5 rounded-md font-medium transition ${
+                    bookingSubTab === tab.key
+                      ? "bg-blue-600 text-white shadow"
+                      : "text-gray-600 hover:bg-gray-200"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Sub Tab Content */}
+            <div className="space-y-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2 capitalize">
+                <Clock className="w-6 h-6 text-blue-500" />
+                {bookingSubTab.replace(/([A-Z])/g, " $1").trim()}(
+                {historyData.timeWise?.[bookingSubTab]?.length || 0})
+              </h2>
+
+              <div className="space-y-3">
+                {historyData.timeWise?.[bookingSubTab]?.length ? (
+                  filteredData.timeWise[bookingSubTab].map((booking) => (
+                    <BookingCard key={booking._id} booking={booking} />
+                  ))
+                ) : (
+                  <p className="text-gray-500">No {bookingSubTab} bookings</p>
+                )}
+              </div>
+            </div>
           </div>
         )}
       </div>
