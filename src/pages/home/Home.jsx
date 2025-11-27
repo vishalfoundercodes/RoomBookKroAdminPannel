@@ -292,17 +292,6 @@ const Home = () => {
           route="/users"
         />
 
-        {/* Total Vendors */}
-        <StatCard
-          title="Total Vendors"
-          value={totalVendor.toString()}
-          change="Vendor network expanding"
-          changeType="positive"
-          icon={Store}
-          color="purple"
-          route="/users"
-        />
-
         {/* Active Customers */}
         <StatCard
           title="Active Customers"
@@ -327,6 +316,17 @@ const Home = () => {
           route="/users"
         />
 
+        {/* Total Vendors */}
+        <StatCard
+          title="Total Vendors"
+          value={totalVendor.toString()}
+          change="Vendor network expanding"
+          changeType="positive"
+          icon={Store}
+          color="purple"
+          route="/users"
+        />
+
         {/* Verified Vendors */}
         <StatCard
           title="Verified Vendors"
@@ -335,7 +335,7 @@ const Home = () => {
           changeType="positive"
           icon={ShieldCheck}
           color="green"
-          route="/users"
+          route="/vendor"
         />
 
         {/* Unverified Vendors */}
@@ -346,7 +346,7 @@ const Home = () => {
           changeType="negative"
           icon={ShieldAlert}
           color="red"
-          route="/users"
+          route="/vendor"
         />
 
         {/* Active Vendors */}
@@ -357,7 +357,7 @@ const Home = () => {
           changeType="positive"
           icon={Store}
           color="green"
-          route="/users"
+          route="/vendor"
         />
 
         {/* Inactive Vendors */}
@@ -368,7 +368,7 @@ const Home = () => {
           changeType="negative"
           icon={SiAutoprefixer}
           color="red"
-          route="/users"
+          route="/vendor"
         />
 
         {/* <StatCard
@@ -499,35 +499,6 @@ const Home = () => {
           icon={CalendarDays}
           color="yellow"
         /> */}
-        <StatCard
-          title="Pending Payments"
-          value={historyDataa?.paymentStatusWise?.pending?.length || 0}
-          change="Awaiting confirmation"
-          changeType="neutral"
-          icon={AlertCircle}
-          color="yellow"
-          route="/history"
-        />
-
-        <StatCard
-          title="Completed Payments"
-          value={historyDataa?.paymentStatusWise?.completed?.length || 0}
-          change="Successfully processed"
-          changeType="positive"
-          icon={CheckCircle}
-          color="green"
-          route="/history"
-        />
-
-        <StatCard
-          title="Rejected Payments"
-          value={historyDataa?.paymentStatusWise?.rejected?.length || 0}
-          change="Failed or declined"
-          changeType="negative"
-          icon={XCircle}
-          color="red"
-          route="/history"
-        />
 
         {/* Time Wise */}
         <StatCard
@@ -567,6 +538,35 @@ const Home = () => {
           changeType="negative"
           icon={XCircle}
           color="orange"
+        />
+
+        <StatCard
+          title="Pending Payments"
+          value={historyDataa?.paymentStatusWise?.pending?.length || 0}
+          change="Awaiting confirmation"
+          changeType="neutral"
+          icon={AlertCircle}
+          color="yellow"
+          route="/history"
+        />
+
+        <StatCard
+          title="Completed Payments"
+          value={historyDataa?.paymentStatusWise?.completed?.length || 0}
+          change="Successfully processed"
+          changeType="positive"
+          icon={CheckCircle}
+          color="green"
+          route="/history"
+        />
+        <StatCard
+          title="Rejected Payments"
+          value={historyDataa?.paymentStatusWise?.rejected?.length || 0}
+          change="Failed or declined"
+          changeType="negative"
+          icon={XCircle}
+          color="red"
+          route="/history"
         />
 
         {/* <StatCard

@@ -1,0 +1,338 @@
+import React from "react";
+import { X, Edit, Phone, Mail, Calendar, Wallet, IdCard } from "lucide-react";
+import { fetchVendorProperty } from "../../redux/slices/propertySlice";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
+const VendorViewModal = ({
+  show,
+  setShowViewModal,
+  isEditing,
+  setIsEditing,
+  formData,
+  handleChange,
+  handleImageChange,
+  handleSubmit,
+  selectedUser,
+}) => {
+  if (!show) return null;
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { data: users, loading: usersLoading } = useSelector(
+    (state) => state.users
+  );
+
+  const handleShowProperty = async (userId) => {
+    try {
+      console.log(userId);
+      await dispatch(fetchVendorProperty({ userId }));
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-3 z-50">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl animate-scaleIn overflow-hidden">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-5 text-white flex items-center justify-between">
+          <h2 className="text-xl sm:text-2xl font-semibold">
+            {isEditing ? "Edit Vendor" : "Vendor Details"}
+          </h2>
+
+          <button
+            onClick={() => {
+              setIsEditing(false);
+              setShowViewModal(false);
+            }}
+            className="p-2 bg-white/20 rounded-full hover:bg-white/30 transition"
+          >
+            <X className="w-5 h-5 text-white" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-5 space-y-6 max-h-[50vh] overflow-y-auto">
+          {/* Profile Section */}
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+            {/* Profile Image */}
+            <div className="relative">
+              <img
+                src={
+                  formData.userImagePreview ||
+                  formData.userImage ||
+                  selectedUser.userImage
+                }
+                alt="profile image"
+                className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-fill shadow-md"
+              />
+
+              {isEditing && (
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="absolute top-0 left-0 w-24 h-24 sm:w-28 sm:h-28 opacity-0 cursor-pointer"
+                />
+              )}
+            </div>
+
+            {/* Name + Email */}
+            <div className="flex-1 text-center sm:text-left">
+              {isEditing ? (
+                <input
+                  type="text"
+                  name="name"
+                  className="border w-full rounded-lg px-3 py-2 text-lg"
+                  value={formData.name}
+                  onChange={handleChange}
+                />
+              ) : (
+                <h3 className="text-2xl font-bold text-gray-900">
+                  {selectedUser.name || formData.name}
+                </h3>
+              )}
+
+              {isEditing ? (
+                <input
+                  type="email"
+                  name="email"
+                  className="border w-full rounded-lg px-3 py-2 mt-2"
+                  value={formData.email}
+                  onChange={handleChange}
+                />
+              ) : (
+                <p classname="text-gray-600 text-sm sm:text-base">
+                  {selectedUser.email || formData.email}
+                </p>
+              )}
+
+              {/* Optional Badge */}
+              <span
+                className={`inline-block mt-3 text-white  px-3 py-1 rounded-full text-xs font-semibold ${
+                  selectedUser.isVerified ? "bg-green-700" : "bg-red-700"
+                }`}
+              >
+                {selectedUser.isVerified ? "Verified User" : "Not Verified"}
+              </span>
+            </div>
+          </div>
+
+          {/* Information Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {/* Contact */}
+            <div className="p-4 rounded-xl bg-gray-50 border shadow-sm">
+              <h4 className="font-semibold flex items-center gap-2 text-gray-900 mb-3">
+                <Phone className="w-4 h-4 text-blue-600" />
+                Contact Info
+              </h4>
+
+              <div className="space-y-2 text-sm">
+                {/* Phone */}
+                <div className="flex items-center gap-3">
+                  <Phone className="text-gray-500 w-4 h-4" />
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      name="contact"
+                      className="border rounded px-2 py-1 w-full"
+                      value={formData.contact}
+                      onChange={handleChange}
+                    />
+                  ) : (
+                    <span>{selectedUser.phone || formData.contact}</span>
+                  )}
+                </div>
+
+                {/* Email */}
+                <div className="flex items-center gap-3">
+                  <Mail className="text-gray-500 w-4 h-4" />
+                  <span>{selectedUser.email || formData.email}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Account */}
+            <div className="p-4 rounded-xl bg-gray-50 border shadow-sm">
+              <h4 className="font-semibold flex items-center gap-2 text-gray-900 mb-3">
+                <Wallet className="w-4 h-4 text-green-600" />
+                Account Details
+              </h4>
+
+              <div className="space-y-2 text-sm">
+                {/* DOB */}
+                <div className="flex items-center gap-3">
+                  <Calendar className="text-gray-500 w-4 h-4" />
+                  {isEditing ? (
+                    <input
+                      type="date"
+                      name="DOB"
+                      value={formData.DOB || ""}
+                      onChange={handleChange}
+                      className="border rounded px-2 py-1 w-full"
+                    />
+                  ) : (
+                    <span>{selectedUser.DOB || formData.DOB}</span>
+                  )}
+                </div>
+
+                {/* Wallet */}
+                <div className="flex items-center gap-3">
+                  <Wallet className="text-gray-500 w-4 h-4" />
+                  {isEditing ? (
+                    <input
+                      type="number"
+                      name="walletBalance"
+                      className="border rounded px-2 py-1 w-full"
+                      value={formData.walletBalance}
+                      onChange={handleChange}
+                    />
+                  ) : (
+                    <span>
+                      ₹{selectedUser.walletBalance || formData.walletBalance}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* ID DETAILS */}
+            <div className="p-4 rounded-xl bg-gray-50 border shadow-sm">
+              <h4 className="font-semibold flex items-center gap-2 text-gray-900 mb-3">
+                <IdCard className="w-4 h-4 text-purple-600" />
+                Important Details
+              </h4>
+
+              <div className="space-y-2 text-sm">
+                {/* Aadhar */}
+                <div className="flex items-center gap-3">
+                  <IdCard className="text-gray-500 w-4 h-4" />
+                  {isEditing ? (
+                    <input
+                      name="adharNumber"
+                      className="border rounded px-2 py-1 w-full"
+                      value={formData.adharNumber}
+                      onChange={handleChange}
+                    />
+                  ) : (
+                    <span>
+                      {selectedUser.adharNumber || formData.adharNumber}
+                    </span>
+                  )}
+                </div>
+
+                {/* PAN */}
+                <div className="flex items-center gap-3">
+                  <IdCard className="text-gray-500 w-4 h-4" />
+                  {isEditing ? (
+                    <input
+                      name="panNumber"
+                      className="border rounded px-2 py-1 w-full"
+                      value={formData.panNumber}
+                      onChange={handleChange}
+                    />
+                  ) : (
+                    <span>{selectedUser.panNumber || formData.panNumber}</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Document Images */}
+          <div className="flex gap-3 overflow-x-auto py-3">
+            {[
+              formData.adharImage?.front || selectedUser.adharImage?.front,
+              formData.adharImage?.back || selectedUser.adharImage?.back,
+              formData.panImage || selectedUser.panImage,
+            ].map(
+              (img, i) =>
+                img && (
+                  <img
+                    key={i}
+                    src={img}
+                    className="w-24 h-24 rounded-lg border shadow-md object-cover flex-shrink-0"
+                  />
+                )
+            )}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex flex-col sm:flex-row justify-end gap-3 p-5 border-t bg-gray-50">
+          <button
+            onClick={() => {
+              setIsEditing(false);
+              setShowViewModal(false);
+            }}
+            className="px-4 py-2 rounded-lg border bg-white hover:bg-gray-100"
+          >
+            Close
+          </button>
+
+          {isEditing ? (
+            <button
+              onClick={handleSubmit}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 shadow-md"
+            >
+              Save Changes
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={() => setIsEditing(true)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md flex items-center gap-2 justify-center"
+              >
+                <Edit className="w-4 h-4" />
+                Edit User
+              </button>
+              {/* <button
+                onClick={() => {console.log("user id:", selectedUser.userId),
+                  handleShowProperty(selectedUser.userId)
+                navigate("/vendor/property")}}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md flex items-center gap-2 justify-center"
+              >
+                <Edit className="w-4 h-4" />
+                See property
+              </button> */}
+              <button
+                onClick={async () => {
+                  const vendorProperty = await dispatch(
+                    fetchVendorProperty({ userId: selectedUser.userId })
+                  ).unwrap();
+
+                  console.log("vendor property:", vendorProperty);
+                  if (vendorProperty?.data?.length > 0) {
+                    navigate("/vendor/property", {
+                      state: { vendorProperty, vendorId: selectedUser.userId },
+                    });
+                  } else {
+                    toast.warn("No property Register");
+                  }
+                }}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md flex items-center gap-2 justify-center"
+              >
+                <Edit className="w-4 h-4" />
+                See property
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Animation */}
+      <style>{`
+        @keyframes scaleIn {
+          0% { transform: scale(0.7); opacity: 0; }
+          100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-scaleIn {
+          animation: scaleIn 0.25s ease-out;
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default VendorViewModal;

@@ -47,6 +47,8 @@ import CustomDropdown from "./CustomDropDown";
 import StatusDropdown from "./StatusDropdown";
 import Loader from "../Loader/Loader";
 import DOBDatePicker from "./DOBDatePicker";
+import VendorViewModal from "./VendorViewModal";
+import VendorAddModal from "./VendorAddModal";
 const VendorPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -373,899 +375,764 @@ const VendorPage = () => {
     return <Loader />;
   }
 
-  return (
-    <div className="flex-1 p-2 overflow-x-hidden">
-      <div className="min-h-screen bg-gray-50 p-4">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-xl md:text-3xl font-bold text-gray-900">
-                Vendor Management
-              </h1>
-              <p className="text-gray-600 mt-1 text-sm">
-                Manage and monitor all users in your system
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
+return (
+  <div className="flex-1 overflow-hidden">
+    {" "}
+    {/* p-2 remove kiya, overflow-hidden add kiya */}
+    <div className="min-h-screen bg-gray-50 p-4">
+      {/* Header - Same */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl md:text-3xl font-bold text-gray-900">
+              Vendor Management
+            </h1>
+            <p className="text-gray-600 mt-1 text-sm">
+              Manage and monitor all users in your system
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 whitespace-nowrap"
+            >
+              <Plus className="w-4 h-4" />
+              Add Vendor
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+        <StatCard
+          title="Total Vendors"
+          value={totalVendor.toString()}
+          change="Vendor network expanding"
+          changeType="positive"
+          icon={Store}
+          color="purple"
+        />
+        <StatCard
+          title="Verified Vendors"
+          value={veryfiedVendor.toString()}
+          change="Trusted & verified vendors"
+          changeType="positive"
+          icon={ShieldCheck}
+          color="green"
+        />
+        <StatCard
+          title="Unverified Vendors"
+          value={notVeryfiedVendor.toString()}
+          change="Verification required"
+          changeType="negative"
+          icon={ShieldAlert}
+          color="red"
+        />
+        <StatCard
+          title="Active Vendors"
+          value={activeVendor.toString()}
+          change="Vendors actively serving"
+          changeType="positive"
+          icon={Store}
+          color="green"
+        />
+        <StatCard
+          title="Inactive Vendors"
+          value={inActiveVendor.toString()}
+          change="Vendor not active currently"
+          changeType="negative"
+          icon={SiAutoprefixer}
+          color="red"
+        />
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mb-8">
+        <PieChartComponent
+          title="User Status Distribution"
+          data={userStatusData}
+          height={250}
+        />
+        <div className="lg:col-span-1">
+          <PieChartComponent
+            title="User Growth by Role"
+            data={userTypeData}
+            bars={[
+              { dataKey: "Admin", fill: "#8b5cf6", name: "Admin" },
+              { dataKey: "Vendor", fill: "#3b82f6", name: "vendor" },
+              { dataKey: "User", fill: "#10b981", name: "User" },
+            ]}
+            height={250}
+          />
+        </div>
+      </div>
+
+      {/* Filters and Search */}
+      <Card className="mb-6">
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1 relative">
+            <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search users by name or email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <StatusDropdown
+            filterStatus={filterStatus}
+            setFilterStatus={setFilterStatus}
+          />
+          <CustomDropdown
+            value={filterRole}
+            onChange={(val) => setFilterRole(val)}
+          />
+          <DOBDatePicker value={dob} onChange={setDob} />
+        </div>
+
+        {selectedUsers.length > 0 && (
+          <div className="mt-4 p-4 bg-blue-50 rounded-lg flex items-center justify-between">
+            <span className="text-blue-700">
+              {selectedUsers.length} user(s) selected
+            </span>
+            <div className="flex gap-2">
               <button
-                onClick={() => setShowAddModal(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 whitespace-nowrap"
+                onClick={() => handleBulkAction("activate")}
+                className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
               >
-                <Plus className="w-4 h-4" />
-                Add Vendor
+                Activate
+              </button>
+              <button
+                onClick={() => handleBulkAction("delete")}
+                className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
+              >
+                Delete
               </button>
             </div>
           </div>
-        </div>
+        )}
+      </Card>
 
-        {/* Statistics Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-          {/* Total Vendors */}
-          <StatCard
-            title="Total Vendors"
-            value={totalVendor.toString()}
-            change="Vendor network expanding"
-            changeType="positive"
-            icon={Store}
-            color="purple"
-          />
-
-          {/* Verified Vendors */}
-          <StatCard
-            title="Verified Vendors"
-            value={veryfiedVendor.toString()}
-            change="Trusted & verified vendors"
-            changeType="positive"
-            icon={ShieldCheck}
-            color="green"
-          />
-
-          {/* Unverified Vendors */}
-          <StatCard
-            title="Unverified Vendors"
-            value={notVeryfiedVendor.toString()}
-            change="Verification required"
-            changeType="negative"
-            icon={ShieldAlert}
-            color="red"
-          />
-
-          {/* Active Vendors */}
-          <StatCard
-            title="Active Vendors"
-            value={activeVendor.toString()}
-            change="Vendors actively serving"
-            changeType="positive"
-            icon={Store}
-            color="green"
-          />
-
-          {/* Inactive Vendors */}
-          <StatCard
-            title="Inactive Vendors"
-            value={inActiveVendor.toString()}
-            change="Vendor not active currently"
-            changeType="negative"
-            icon={SiAutoprefixer}
-            color="red"
-          />
-        </div>
-
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mb-8">
-          <PieChartComponent
-            title="User Status Distribution"
-            data={userStatusData}
-            height={250}
-          />
-          <div className="lg:col-span-1">
-            <PieChartComponent
-              title="User Growth by Role"
-              data={userTypeData}
-              bars={[
-                { dataKey: "Admin", fill: "#8b5cf6", name: "Admin" },
-                { dataKey: "Vendor", fill: "#3b82f6", name: "vendor" },
-                { dataKey: "User", fill: "#10b981", name: "User" },
-              ]}
-              height={250}
-            />
-          </div>
-        </div>
-
-        {/* Filters and Search */}
-        <Card className="mb-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1 relative">
-              <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search users by name or email..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <StatusDropdown
-              filterStatus={filterStatus}
-              setFilterStatus={setFilterStatus}
-            />
-            <CustomDropdown
-              value={filterRole}
-              onChange={(val) => setFilterRole(val)}
-            />
-            <DOBDatePicker value={dob} onChange={setDob} />
-          </div>
-
-          {selectedUsers.length > 0 && (
-            <div className="mt-4 p-4 bg-blue-50 rounded-lg flex items-center justify-between">
-              <span className="text-blue-700">
-                {selectedUsers.length} user(s) selected
-              </span>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => handleBulkAction("activate")}
-                  className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
+      {/* Users Table - MAIN FIX */}
+      <Card>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr className="border-b border-gray-200">
+                <th className="text-left py-3 px-4 whitespace-nowrap">
+                  <input
+                    type="checkbox"
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedUsers(filteredUsers.map((u) => u.id));
+                      } else {
+                        setSelectedUsers([]);
+                      }
+                    }}
+                    className="rounded border-gray-300"
+                  />
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
+                  Vendor Id
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
+                  Vendor
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
+                  Contact
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
+                  Notification
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
+                  Adhar Number
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
+                  Pan Number
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
+                  Status
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
+                  Verify Vendor
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
+                  DOB
+                </th>
+                <th className="text-right py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredUsers.map((user) => (
+                <tr
+                  key={user.id}
+                  className="border-b border-gray-100 hover:bg-gray-50"
                 >
-                  Activate
-                </button>
-                <button
-                  onClick={() => handleBulkAction("delete")}
-                  className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          )}
-        </Card>
-
-        {/* Users Table */}
-        <Card>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4">
+                  <td className="py-3 px-4 whitespace-nowrap">
                     <input
                       type="checkbox"
+                      checked={selectedUsers.includes(user.id)}
                       onChange={(e) => {
                         if (e.target.checked) {
-                          setSelectedUsers(filteredUsers.map((u) => u.id));
+                          setSelectedUsers([...selectedUsers, user.id]);
                         } else {
-                          setSelectedUsers([]);
+                          setSelectedUsers(
+                            selectedUsers.filter((id) => id !== user.id)
+                          );
                         }
                       }}
                       className="rounded border-gray-300"
                     />
-                  </th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">
-                    Vendor Id
-                  </th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">
-                    Vendor
-                  </th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">
-                    Contact
-                  </th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">
-                    notification
-                  </th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">
-                    Adhar Number
-                  </th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">
-                    Pan Number
-                  </th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">
-                    Status
-                  </th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">
-                    Verify vendor
-                  </th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">
-                    DOB
-                  </th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-700">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredUsers.map((user) => (
-                  <tr
-                    key={user.id}
-                    className="border-b border-gray-100 hover:bg-gray-50"
-                  >
-                    <td className="py-3 px-4">
-                      <input
-                        type="checkbox"
-                        checked={selectedUsers.includes(user.id)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedUsers([...selectedUsers, user.id]);
-                          } else {
-                            setSelectedUsers(
-                              selectedUsers.filter((id) => id !== user.id)
-                            );
-                          }
-                        }}
-                        className="rounded border-gray-300"
-                      />
-                    </td>
-                    <td className="py-3 px-4 text-sm text-gray-600">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3" />
-                        {user.userId}
-                      </div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-3">
-                        {/* <img
-                        src={user.avatar}
-                        alt={user.name}
-                        className="w-8 h-8 rounded-full object-cover"
-                      /> */}
-                        <div>
-                          <div className="font-medium text-gray-900">
-                            {user.name}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {user.email}
-                          </div>
+                  </td>
+                  <td className="py-3 px-4 text-sm text-gray-600 whitespace-nowrap">
+                    <div className="flex items-center gap-1">
+                      <Calendar className="w-3 h-3" />
+                      {user.userId}
+                    </div>
+                  </td>
+                  <td className="py-3 px-4 whitespace-nowrap">
+                    <div className="flex items-center gap-3">
+                      <div>
+                        <div className="font-medium text-gray-900">
+                          {user.name}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {user.email}
                         </div>
                       </div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="text-sm">
-                        <div className="flex items-center gap-1 text-gray-600">
-                          <Phone className="w-3 h-3" />
-                          {user.phone}
-                        </div>
-                        {/* <div className="flex items-center gap-1 text-gray-500 mt-1">
-                        <MapPin className="w-3 h-3" />
-                        {user.location}
-                      </div> */}
+                    </div>
+                  </td>
+                  <td className="py-3 px-4 whitespace-nowrap">
+                    <div className="text-sm">
+                      <div className="flex items-center gap-1 text-gray-600">
+                        <Phone className="w-3 h-3" />
+                        {user.phone}
                       </div>
-                    </td>
-                    {/* <td className="py-3 px-4 cursor-pointer">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          getRoleData(user.user_type).color
-                        }`}
+                    </div>
+                  </td>
+                  <td className="py-3 px-4 whitespace-nowrap">
+                    <div className="flex justify-center">
+                      <button
+                        onClick={() => handleSendNotification(user.userId)}
+                        className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-200 backdrop-blur-sm text-white shadow-lg hover:bg-blue-500 hover:scale-110 hover:shadow-xl transition-all duration-200"
                       >
-                        {getRoleData(user.user_type).label}
-                      </span>
-                    </td> */}
-                    <td>
-                      <div className="flex justify-center">
-                        <button
-                          onClick={() => handleSendNotification(user.userId)}
-                          className="flex items-center justify-center w-10 h-10 rounded-full 
-                 bg-blue-200 backdrop-blur-sm text-white shadow-lg 
-                 hover:bg-blue-500 hover:scale-110 hover:shadow-xl 
-                 transition-all duration-200"
-                        >
-                          <Bell className="w-5 h-5" />
-                        </button>
+                        <Bell className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </td>
+                  <td className="py-3 px-4 whitespace-nowrap">
+                    <div className="text-sm">
+                      <div className="flex items-center gap-1 text-gray-600">
+                        <Phone className="w-3 h-3" />
+                        {user.adharNumber}
                       </div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="text-sm">
-                        <div className="flex items-center gap-1 text-gray-600">
-                          <Phone className="w-3 h-3" />
-                          {user.adharNumber}
-                        </div>
-                        {/* <div className="flex items-center gap-1 text-gray-500 mt-1">
-                        <MapPin className="w-3 h-3" />
-                        {user.location}
-                      </div> */}
+                    </div>
+                  </td>
+                  <td className="py-3 px-4 whitespace-nowrap">
+                    <div className="text-sm">
+                      <div className="flex items-center gap-1 text-gray-600">
+                        <Phone className="w-3 h-3" />
+                        {user.panNumber}
                       </div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="text-sm">
-                        <div className="flex items-center gap-1 text-gray-600">
-                          <Phone className="w-3 h-3" />
-                          {user.panNumber}
-                        </div>
-                        {/* <div className="flex items-center gap-1 text-gray-500 mt-1">
-                        <MapPin className="w-3 h-3" />
-                        {user.location}
-                      </div> */}
-                      </div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <select
-                        value={user.userStatus}
-                        onChange={(e) =>
-                          handleStatusChange(user.userId, e.target.value)
-                        }
-                        className={`px-2 py-1 rounded text-xs font-medium border-0 cursor-pointer ${
-                          getStatusdata(user.userStatus).color
-                        }
-`}
-                      >
-                        <option value="1">Active</option>
-                        <option value="0">Inactive</option>
-                      </select>
-                    </td>
-                    <td className="py-3 px-4">
-                      <select
-                        disabled={user.user_type !== "1"}
-                        value={user.isVerified}
-                        onChange={(e) =>
-                          handleVerificationChange(user.userId, e.target.value)
-                        }
-                        className={`px-2 py-1 rounded text-xs font-medium border-0 cursor-pointer ${
-                          getVeryfydata(user.isVerified).color
-                        }
-                          ${
-                            user.user_type != "1"
-                              ? "cursor-not-allowed opacity-60"
-                              : "cursor-pointer"
-                          }
-`}
-                      >
-                        <option value="true">Veryfied</option>
-                        <option value="false">Not Veryfied</option>
-                      </select>
-                    </td>
-                    <td className="py-3 px-4 text-sm text-gray-600">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3" />
-                        {user.DOB}
-                      </div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-1 justify-end">
-                        <button
-                          onClick={() => {
-                            setSelectedUser(user);
-                            setShowViewModal(true);
-                          }}
-                          className="p-1 text-blue-600 hover:bg-blue-100 rounded"
-                          title="View User"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
-                        {/* <button
+                    </div>
+                  </td>
+                  <td className="py-3 px-4 whitespace-nowrap">
+                    <select
+                      value={user.userStatus}
+                      onChange={(e) =>
+                        handleStatusChange(user.userId, e.target.value)
+                      }
+                      className={`px-2 py-1 rounded text-xs font-medium border-0 cursor-pointer ${
+                        getStatusdata(user.userStatus).color
+                      }`}
+                    >
+                      <option value="1">Active</option>
+                      <option value="0">Inactive</option>
+                    </select>
+                  </td>
+                  <td className="py-3 px-4 whitespace-nowrap">
+                    <select
+                      disabled={user.user_type !== "1"}
+                      value={user.isVerified}
+                      onChange={(e) =>
+                        handleVerificationChange(user.userId, e.target.value)
+                      }
+                      className={`px-2 py-1 rounded text-xs font-medium border-0 cursor-pointer ${
+                        getVeryfydata(user.isVerified).color
+                      } ${
+                        user.user_type != "1"
+                          ? "cursor-not-allowed opacity-60"
+                          : "cursor-pointer"
+                      }`}
+                    >
+                      <option value="true">Verified</option>
+                      <option value="false">Not Verified</option>
+                    </select>
+                  </td>
+                  <td className="py-3 px-4 text-sm text-gray-600 whitespace-nowrap">
+                    <div className="flex items-center gap-1">
+                      <Calendar className="w-3 h-3" />
+                      {user.DOB}
+                    </div>
+                  </td>
+                  <td className="py-3 px-4 whitespace-nowrap">
+                    <div className="flex items-center gap-1 justify-end">
+                      <button
                         onClick={() => {
                           setSelectedUser(user);
-                          setShowEditModal(true);
+                          setShowViewModal(true);
                         }}
-                        className="p-1 text-gray-600 hover:bg-gray-100 rounded"
-                        title="Edit User"
+                        className="p-1 text-blue-600 hover:bg-blue-100 rounded"
+                        title="View User"
                       >
-                        <Edit className="w-4 h-4" />
-                      </button> */}
-                        <button
-                          onClick={() => handleDeleteUser(user.userId)}
-                          className="p-1 text-red-600 hover:bg-red-100 rounded"
-                          title="Delete User"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {filteredUsers.length === 0 && (
-            <div className="text-center py-12">
-              <Users className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-gray-500 font-medium">No users found</h3>
-              <p className="text-gray-400 text-sm">
-                Try adjusting your search or filter criteria
-              </p>
-            </div>
-          )}
-        </Card>
-
-        {/* Add User Modal */}
-        {showAddModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg w-full max-w-md mx-4">
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-semibold text-gray-900">
-                    Add New Vendor
-                  </h2>
-                  <button
-                    onClick={() => setShowAddModal(false)}
-                    className="text-gray-400 hover:text-gray-600"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Name
-                    </label>
-                    <input
-                      type="text"
-                      value={newUser.name}
-                      onChange={(e) =>
-                        setNewUser({ ...newUser, name: e.target.value })
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Enter full name"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      required
-                      value={newUser.email}
-                      onChange={(e) =>
-                        setNewUser({ ...newUser, email: e.target.value })
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Enter email address"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Password
-                    </label>
-                    <input
-                      type="password"
-                      required
-                      value={newUser.password || ""}
-                      onChange={(e) =>
-                        setNewUser({ ...newUser, password: e.target.value })
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Enter password"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Date of Birth
-                    </label>
-                    <input
-                      type="date"
-                      value={newUser.dob || ""}
-                      onChange={(e) =>
-                        setNewUser({ ...newUser, dob: e.target.value })
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Phone
-                    </label>
-                    <input
-                      type="tel"
-                      required
-                      value={newUser.phone}
-                      onChange={(e) =>
-                        setNewUser({ ...newUser, phone: e.target.value })
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Enter phone number"
-                    />
-                  </div>
-
-                  <div className="hidden">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Role
-                    </label>
-                    <select
-                      value={newUser.role}
-                      onChange={(e) =>
-                        setNewUser({ ...newUser, role: e.target.value })
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="2">User</option>
-                      <option value="1">Vendor</option>
-                      <option value="0">Admin</option>
-                    </select>
-                  </div>
-
-                  <div className="hidden">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Location
-                    </label>
-                    <input
-                      type="text"
-                      value={newUser.location}
-                      onChange={(e) =>
-                        setNewUser({ ...newUser, location: e.target.value })
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Enter location"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex gap-3 mt-6">
-                  <button
-                    onClick={() => setShowAddModal(false)}
-                    className="flex-1 px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleAddUser}
-                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"
-                  >
-                    <Save className="w-4 h-4" />
-                    Add User
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* View User Modal */}
-        {/* {showViewModal && selectedUser && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg w-full max-w-2xl mx-4">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">
-                  User Details
-                </h2>
-                <button
-                  onClick={() => setShowViewModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="flex items-start gap-6">
-                <img
-                  src={selectedUser.userImage}
-                  alt={selectedUser.name}
-                  className="w-20 h-20 rounded-full object-cover"
-                />
-                <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-gray-900">
-                    {selectedUser.name}
-                  </h3>
-                  <p className="text-gray-600">{selectedUser.email}</p>
-
-                  <div className="flex items-center gap-4 mt-4">
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${getRoleColor(
-                        selectedUser.role
-                      )}`}
-                    >
-                      {selectedUser.role}
-                    </span>
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
-                        selectedUser.status
-                      )}`}
-                    >
-                      {selectedUser.status}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-6 mt-6">
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-3">
-                    Contact Information
-                  </h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2">
-                      <Phone className="w-4 h-4 text-gray-400" />
-                      <span>{selectedUser.phone}</span>
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteUser(user.userId)}
+                        className="p-1 text-red-600 hover:bg-red-100 rounded"
+                        title="Delete User"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Mail className="w-4 h-4 text-gray-400" />
-                      <span>{selectedUser.email}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-3">
-                    Account Details
-                  </h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-gray-400" />
-                      <span>DOB: {selectedUser.DOB}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Wallet className="w-4 h-4 text-gray-400" />
-                      <span>Wallet balamce: {selectedUser.walletBalance}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex gap-3 mt-8">
-                <button
-                  onClick={() => setShowViewModal(false)}
-                  className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
-                >
-                  Close
-                </button>
-                <button
-                  onClick={() => {
-                    setShowViewModal(false);
-                    setShowEditModal(true);
-                  }}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
-                >
-                  <Edit className="w-4 h-4" />
-                  Edit User
-                </button>
-              </div>
-            </div>
-          </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      )} */}
-        {showViewModal && selectedUser && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg w-full max-w-2xl mx-4">
-              <div className="p-6">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-semibold text-gray-900">
-                    {isEditing ? "Edit User" : "User Details"}
-                  </h2>
-                  <button
-                    onClick={() => {
-                      setIsEditing(false);
-                      setShowViewModal(false);
-                    }}
-                    className="text-gray-400 hover:text-gray-600"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
 
-                {/* Profile + Details */}
-                <div className="flex items-start gap-6">
-                  <div className="relative">
-                    <img
-                      src={
-                        formData.userImagePreview ||
-                        formData.userImage ||
-                        selectedUser.userImage
-                      }
-                      alt={formData.name}
-                      className="w-20 h-20 rounded-full object-cover"
-                    />
-                    {isEditing && (
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        className="absolute top-0 left-0 w-20 h-20 opacity-0 cursor-pointer"
-                      />
-                    )}
-                  </div>
-
-                  <div className="flex-1">
-                    {isEditing ? (
-                      <input
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        className="text-xl font-semibold text-gray-900 border rounded px-2 py-1 w-full"
-                      />
-                    ) : (
-                      <h3 className="text-xl font-semibold text-gray-900">
-                        {selectedUser.name || formData.name}
-                      </h3>
-                    )}
-                    {isEditing ? (
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="text-gray-600 border rounded px-2 py-1 w-full mt-1"
-                      />
-                    ) : (
-                      <p className="text-gray-600">
-                        {selectedUser.email || formData.email}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Grid Details */}
-                <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-                  {/* Contact */}
-                  <div>
-                    <h4 className="font-medium text-gray-900 mb-3">
-                      Contact Information
-                    </h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex items-center gap-2">
-                        <Phone className="w-4 h-4 text-gray-400" />
-                        {isEditing ? (
-                          <input
-                            type="text"
-                            name="contact"
-                            value={formData.contact}
-                            onChange={handleChange}
-                            className="border rounded px-2 py-1 w-full"
-                          />
-                        ) : (
-                          <span>{selectedUser.phone || formData.contact}</span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Mail className="w-4 h-4 text-gray-400" />
-                        <span>{selectedUser.email || formData.email}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Account */}
-                  <div>
-                    <h4 className="font-medium text-gray-900 mb-3">
-                      Account Details
-                    </h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-gray-400" />
-                        {isEditing ? (
-                          <input
-                            type="date"
-                            name="DOB"
-                            value={formData.DOB || ""}
-                            onChange={handleChange}
-                            className="border rounded px-2 py-1 w-full"
-                          />
-                        ) : (
-                          <span>DOB: {selectedUser.DOB || formData.DOB}</span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Wallet className="w-4 h-4 text-gray-400" />
-                        {isEditing ? (
-                          <input
-                            type="number"
-                            name="walletBalance"
-                            value={formData.walletBalance}
-                            onChange={handleChange}
-                            className="border rounded px-2 py-1 w-full"
-                          />
-                        ) : (
-                          <span>
-                            Wallet balance:{" "}
-                            {selectedUser.walletBalance ||
-                              formData.walletBalance}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  {/* Documents */}
-                  <div>
-                    <h4 className="font-medium text-gray-900 mb-3">
-                      Important Details
-                    </h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-gray-400" />
-                        {isEditing ? (
-                          <input
-                            type="date"
-                            name="DOB"
-                            value={formData.adharNumber || ""}
-                            onChange={handleChange}
-                            className="border rounded px-2 py-1 w-full"
-                          />
-                        ) : (
-                          <span>
-                            Adhar Number:{" "}
-                            {selectedUser.adharNumber || formData.adharNumber}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-gray-400" />
-                        {isEditing ? (
-                          <input
-                            type="date"
-                            name="DOB"
-                            value={formData.panNumber || ""}
-                            onChange={handleChange}
-                            className="border rounded px-2 py-1 w-full"
-                          />
-                        ) : (
-                          <span>
-                            Pan Number:{" "}
-                            {selectedUser.panNumber || formData.panNumber}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  {/* documents image */}
-                    {/* images */}
-                  <div className="flex gap-2">
-                    <img
-                      src={
-                        formData.adharImage?.front ||
-                        formData.adharImage?.front ||
-                        selectedUser.adharImage?.front
-                      }
-                      alt={formData.name}
-                      className="w-20 h-20 rounded-full object-cover"
-                    />
-                    <img
-                      src={
-                        formData.adharImage?.back ||
-                        formData.adharImage?.back ||
-                        selectedUser.adharImage?.back
-                      }
-                      alt={formData.name}
-                      className="w-20 h-20 rounded-full object-cover"
-                    />
-                    <img
-                      src={
-                        formData.panImage ||
-                        formData.panImage ||
-                        selectedUser.panImage
-                      }
-                      alt={formData.name}
-                      className="w-20 h-20 rounded-full object-cover"
-                    />
-                  </div>
-                </div>
-
-                {/* Buttons */}
-                <div className="flex gap-3 mt-8">
-                  <button
-                    onClick={() => {
-                      setIsEditing(false);
-                      setShowViewModal(false);
-                    }}
-                    className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
-                  >
-                    Close
-                  </button>
-
-                  {isEditing ? (
-                    <button
-                      onClick={handleSubmit}
-                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                    >
-                      Save Changes
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => setIsEditing(true)}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
-                    >
-                      <Edit className="w-4 h-4" />
-                      Edit User
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
+        {filteredUsers.length === 0 && (
+          <div className="text-center py-12">
+            <Users className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+            <h3 className="text-gray-500 font-medium">No users found</h3>
+            <p className="text-gray-400 text-sm">
+              Try adjusting your search or filter criteria
+            </p>
           </div>
         )}
-      </div>
+      </Card>
+
+      {/* Add User Modal */}
+      {showAddModal && (
+        // <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        //   <div className="bg-white rounded-lg w-full max-w-md mx-4">
+        //     <div className="p-6">
+        //       <div className="flex items-center justify-between mb-4">
+        //         <h2 className="text-xl font-semibold text-gray-900">
+        //           Add New Vendor
+        //         </h2>
+        //         <button
+        //           onClick={() => setShowAddModal(false)}
+        //           className="text-gray-400 hover:text-gray-600"
+        //         >
+        //           <X className="w-5 h-5" />
+        //         </button>
+        //       </div>
+
+        //       <div className="space-y-4">
+        //         <div>
+        //           <label className="block text-sm font-medium text-gray-700 mb-1">
+        //             Name
+        //           </label>
+        //           <input
+        //             type="text"
+        //             value={newUser.name}
+        //             onChange={(e) =>
+        //               setNewUser({ ...newUser, name: e.target.value })
+        //             }
+        //             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        //             placeholder="Enter full name"
+        //           />
+        //         </div>
+
+        //         <div>
+        //           <label className="block text-sm font-medium text-gray-700 mb-1">
+        //             Email
+        //           </label>
+        //           <input
+        //             type="email"
+        //             required
+        //             value={newUser.email}
+        //             onChange={(e) =>
+        //               setNewUser({ ...newUser, email: e.target.value })
+        //             }
+        //             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        //             placeholder="Enter email address"
+        //           />
+        //         </div>
+        //         <div>
+        //           <label className="block text-sm font-medium text-gray-700 mb-1">
+        //             Password
+        //           </label>
+        //           <input
+        //             type="password"
+        //             required
+        //             value={newUser.password || ""}
+        //             onChange={(e) =>
+        //               setNewUser({ ...newUser, password: e.target.value })
+        //             }
+        //             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        //             placeholder="Enter password"
+        //           />
+        //         </div>
+        //         <div>
+        //           <label className="block text-sm font-medium text-gray-700 mb-1">
+        //             Date of Birth
+        //           </label>
+        //           <input
+        //             type="date"
+        //             value={newUser.dob || ""}
+        //             onChange={(e) =>
+        //               setNewUser({ ...newUser, dob: e.target.value })
+        //             }
+        //             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        //           />
+        //         </div>
+
+        //         <div>
+        //           <label className="block text-sm font-medium text-gray-700 mb-1">
+        //             Phone
+        //           </label>
+        //           <input
+        //             type="tel"
+        //             required
+        //             value={newUser.phone}
+        //             onChange={(e) =>
+        //               setNewUser({ ...newUser, phone: e.target.value })
+        //             }
+        //             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        //             placeholder="Enter phone number"
+        //           />
+        //         </div>
+
+        //         <div className="hidden">
+        //           <label className="block text-sm font-medium text-gray-700 mb-1">
+        //             Role
+        //           </label>
+        //           <select
+        //             value={newUser.role}
+        //             onChange={(e) =>
+        //               setNewUser({ ...newUser, role: e.target.value })
+        //             }
+        //             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        //           >
+        //             <option value="2">User</option>
+        //             <option value="1">Vendor</option>
+        //             <option value="0">Admin</option>
+        //           </select>
+        //         </div>
+
+        //         <div className="hidden">
+        //           <label className="block text-sm font-medium text-gray-700 mb-1">
+        //             Location
+        //           </label>
+        //           <input
+        //             type="text"
+        //             value={newUser.location}
+        //             onChange={(e) =>
+        //               setNewUser({ ...newUser, location: e.target.value })
+        //             }
+        //             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        //             placeholder="Enter location"
+        //           />
+        //         </div>
+        //       </div>
+
+        //       <div className="flex gap-3 mt-6">
+        //         <button
+        //           onClick={() => setShowAddModal(false)}
+        //           className="flex-1 px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+        //         >
+        //           Cancel
+        //         </button>
+        //         <button
+        //           onClick={handleAddUser}
+        //           className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"
+        //         >
+        //           <Save className="w-4 h-4" />
+        //           Add User
+        //         </button>
+        //       </div>
+        //     </div>
+        //   </div>
+        // </div>
+        <VendorAddModal
+          show={showAddModal}
+          onClose={() => setShowAddModal(false)}
+          onSubmit={handleAddUser}
+          newUser={newUser}
+          setNewUser={setNewUser}
+        />
+      )}
+
+      {/* View User Modal */}
+      {showViewModal && selectedUser && (
+        // <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        //   <div className="bg-white rounded-lg w-full max-w-2xl mx-4">
+        //     <div className="p-6">
+        //       {/* Header */}
+        //       <div className="flex items-center justify-between mb-6">
+        //         <h2 className="text-xl font-semibold text-gray-900">
+        //           {isEditing ? "Edit User" : "User Details"}
+        //         </h2>
+        //         <button
+        //           onClick={() => {
+        //             setIsEditing(false);
+        //             setShowViewModal(false);
+        //           }}
+        //           className="text-gray-400 hover:text-gray-600"
+        //         >
+        //           <X className="w-5 h-5" />
+        //         </button>
+        //       </div>
+
+        //       {/* Profile + Details */}
+        //       <div className="flex items-start gap-6">
+        //         <div className="relative">
+        //           <img
+        //             src={
+        //               formData.userImagePreview ||
+        //               formData.userImage ||
+        //               selectedUser.userImage
+        //             }
+        //             alt={formData.name}
+        //             className="w-20 h-20 rounded-full object-cover"
+        //           />
+        //           {isEditing && (
+        //             <input
+        //               type="file"
+        //               accept="image/*"
+        //               onChange={handleImageChange}
+        //               className="absolute top-0 left-0 w-20 h-20 opacity-0 cursor-pointer"
+        //             />
+        //           )}
+        //         </div>
+
+        //         <div className="flex-1">
+        //           {isEditing ? (
+        //             <input
+        //               type="text"
+        //               name="name"
+        //               value={formData.name}
+        //               onChange={handleChange}
+        //               className="text-xl font-semibold text-gray-900 border rounded px-2 py-1 w-full"
+        //             />
+        //           ) : (
+        //             <h3 className="text-xl font-semibold text-gray-900">
+        //               {selectedUser.name || formData.name}
+        //             </h3>
+        //           )}
+        //           {isEditing ? (
+        //             <input
+        //               type="email"
+        //               name="email"
+        //               value={formData.email}
+        //               onChange={handleChange}
+        //               className="text-gray-600 border rounded px-2 py-1 w-full mt-1"
+        //             />
+        //           ) : (
+        //             <p className="text-gray-600">
+        //               {selectedUser.email || formData.email}
+        //             </p>
+        //           )}
+        //         </div>
+        //       </div>
+
+        //       {/* Grid Details */}
+        //       <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+        //         {/* Contact */}
+        //         <div>
+        //           <h4 className="font-medium text-gray-900 mb-3">
+        //             Contact Information
+        //           </h4>
+        //           <div className="space-y-2 text-sm">
+        //             <div className="flex items-center gap-2">
+        //               <Phone className="w-4 h-4 text-gray-400" />
+        //               {isEditing ? (
+        //                 <input
+        //                   type="text"
+        //                   name="contact"
+        //                   value={formData.contact}
+        //                   onChange={handleChange}
+        //                   className="border rounded px-2 py-1 w-full"
+        //                 />
+        //               ) : (
+        //                 <span>{selectedUser.phone || formData.contact}</span>
+        //               )}
+        //             </div>
+        //             <div className="flex items-center gap-2">
+        //               <Mail className="w-4 h-4 text-gray-400" />
+        //               <span>{selectedUser.email || formData.email}</span>
+        //             </div>
+        //           </div>
+        //         </div>
+
+        //         {/* Account */}
+        //         <div>
+        //           <h4 className="font-medium text-gray-900 mb-3">
+        //             Account Details
+        //           </h4>
+        //           <div className="space-y-2 text-sm">
+        //             <div className="flex items-center gap-2">
+        //               <Calendar className="w-4 h-4 text-gray-400" />
+        //               {isEditing ? (
+        //                 <input
+        //                   type="date"
+        //                   name="DOB"
+        //                   value={formData.DOB || ""}
+        //                   onChange={handleChange}
+        //                   className="border rounded px-2 py-1 w-full"
+        //                 />
+        //               ) : (
+        //                 <span>DOB: {selectedUser.DOB || formData.DOB}</span>
+        //               )}
+        //             </div>
+        //             <div className="flex items-center gap-2">
+        //               <Wallet className="w-4 h-4 text-gray-400" />
+        //               {isEditing ? (
+        //                 <input
+        //                   type="number"
+        //                   name="walletBalance"
+        //                   value={formData.walletBalance}
+        //                   onChange={handleChange}
+        //                   className="border rounded px-2 py-1 w-full"
+        //                 />
+        //               ) : (
+        //                 <span>
+        //                   Wallet balance:{" "}
+        //                   {selectedUser.walletBalance || formData.walletBalance}
+        //                 </span>
+        //               )}
+        //             </div>
+        //           </div>
+        //         </div>
+        //         {/* Documents */}
+        //         <div>
+        //           <h4 className="font-medium text-gray-900 mb-3">
+        //             Important Details
+        //           </h4>
+        //           <div className="space-y-2 text-sm">
+        //             <div className="flex items-center gap-2">
+        //               <Calendar className="w-4 h-4 text-gray-400" />
+        //               {isEditing ? (
+        //                 <input
+        //                   type="date"
+        //                   name="DOB"
+        //                   value={formData.adharNumber || ""}
+        //                   onChange={handleChange}
+        //                   className="border rounded px-2 py-1 w-full"
+        //                 />
+        //               ) : (
+        //                 <span>
+        //                   Adhar Number:{" "}
+        //                   {selectedUser.adharNumber || formData.adharNumber}
+        //                 </span>
+        //               )}
+        //             </div>
+        //             <div className="flex items-center gap-2">
+        //               <Calendar className="w-4 h-4 text-gray-400" />
+        //               {isEditing ? (
+        //                 <input
+        //                   type="date"
+        //                   name="DOB"
+        //                   value={formData.panNumber || ""}
+        //                   onChange={handleChange}
+        //                   className="border rounded px-2 py-1 w-full"
+        //                 />
+        //               ) : (
+        //                 <span>
+        //                   Pan Number:{" "}
+        //                   {selectedUser.panNumber || formData.panNumber}
+        //                 </span>
+        //               )}
+        //             </div>
+        //           </div>
+        //         </div>
+        //         {/* documents image */}
+        //         {/* images */}
+        //         <div className="flex gap-2">
+        //           <img
+        //             src={
+        //               formData.adharImage?.front ||
+        //               formData.adharImage?.front ||
+        //               selectedUser.adharImage?.front
+        //             }
+        //             alt={formData.name}
+        //             className="w-20 h-20 rounded-full object-cover"
+        //           />
+        //           <img
+        //             src={
+        //               formData.adharImage?.back ||
+        //               formData.adharImage?.back ||
+        //               selectedUser.adharImage?.back
+        //             }
+        //             alt={formData.name}
+        //             className="w-20 h-20 rounded-full object-cover"
+        //           />
+        //           <img
+        //             src={
+        //               formData.panImage ||
+        //               formData.panImage ||
+        //               selectedUser.panImage
+        //             }
+        //             alt={formData.name}
+        //             className="w-20 h-20 rounded-full object-cover"
+        //           />
+        //         </div>
+        //       </div>
+
+        //       {/* Buttons */}
+        //       <div className="flex gap-3 mt-8">
+        //         <button
+        //           onClick={() => {
+        //             setIsEditing(false);
+        //             setShowViewModal(false);
+        //           }}
+        //           className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+        //         >
+        //           Close
+        //         </button>
+
+        //         {isEditing ? (
+        //           <button
+        //             onClick={handleSubmit}
+        //             className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+        //           >
+        //             Save Changes
+        //           </button>
+        //         ) : (
+        //           <button
+        //             onClick={() => setIsEditing(true)}
+        //             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+        //           >
+        //             <Edit className="w-4 h-4" />
+        //             Edit User
+        //           </button>
+        //         )}
+        //       </div>
+        //     </div>
+        //   </div>
+        // </div>
+        <VendorViewModal
+          show={showViewModal}
+          setShowViewModal={setShowViewModal}
+          isEditing={isEditing}
+          setIsEditing={setIsEditing}
+          formData={formData}
+          handleChange={handleChange}
+          handleImageChange={handleImageChange}
+          handleSubmit={handleSubmit}
+          selectedUser={selectedUser}
+        />
+      )}
     </div>
-  );
+  </div>
+);
 };
 
 export default VendorPage

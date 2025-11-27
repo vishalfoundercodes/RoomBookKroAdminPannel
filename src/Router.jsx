@@ -15,6 +15,7 @@ import ProtectedRoute from "./pages/home/ProtectedRoute";
 import AddImagePage from "./pages/AddImagePage/AddImagePage";
 import Revenue from "./pages/Revenue/Revenue";
 import VendorPage from "./pages/User/Vendor";
+import VendorWiseProperty from "./pages/User/VendorWiseProperty";
 
 export const Router = createBrowserRouter([
   {
@@ -34,6 +35,7 @@ export const Router = createBrowserRouter([
           { path: "/notification/:id", element: <Notifications /> },
           { path: "/users", element: <UsersPage /> },
           { path: "/vendor", element: <VendorPage /> },
+          { path: "/vendor/property", element: <VendorWiseProperty /> },
           { path: "/property", element: <PropertyPage /> },
           { path: "/analytics", element: <Analytics /> },
           { path: "/settings", element: <Settings /> },

@@ -177,13 +177,6 @@ const inActiveVendor = users.filter(
   ];
 
   // Status color helper
-  const getStatusColor = (status) => {
-    const colors = {
-      0: "bg-red-100 text-red-800",
-      1: "bg-green-100 text-green-800",
-    };
-    return colors[status] || "bg-gray-100 text-gray-800";
-  };
 
   const getStatusdata = (status) => {
     const roles = {
@@ -197,38 +190,9 @@ const inActiveVendor = users.filter(
       }
     );
   };
-  const getVeryfydata = (status) => {
-    const roles = {
-      false: { label: "Inactive", color: "bg-purple-100 text-purple-800" },
-      true: { label: "Active", color: "bg-blue-100 text-blue-800" },
-    };
-    return (
-      roles[status] || {
-        label: "Unknown",
-        color: "bg-gray-100 text-gray-800",
-      }
-    );
-  };
+
 
   // Role color helper
-  const getRoleColor = (role) => {
-    const colors = {
-      0: "bg-purple-100 text-purple-800", // Admin
-      1: "bg-blue-100 text-blue-800", // Vendor
-      2: "bg-gray-100 text-gray-800", // User
-    };
-    return colors[role] || "bg-gray-100 text-gray-800";
-  };
-  const getRoleData = (role) => {
-    const roles = {
-      0: { label: "Admin", color: "bg-purple-100 text-purple-800" },
-      1: { label: "Vendor", color: "bg-blue-100 text-blue-800" },
-      2: { label: "User", color: "bg-green-200 text-gray-800" },
-    };
-    return (
-      roles[role] || { label: "Unknown", color: "bg-gray-100 text-gray-800" }
-    );
-  };
 
   // Handle user actions
   const handleAddUser = () => {
@@ -358,18 +322,73 @@ const inActiveVendor = users.filter(
   }, [success]);
 
   // Update the image display in your modal to use userImagePreview
-  // In your JSX:
-  // <img
-  //   src={formData.userImagePreview || formData.userImage || selectedUser.userImage}
-  //   alt={formData.name}
-  //   className="w-20 h-20 rounded-full object-cover"
-  // />
 const handleSendNotification = (user) => {
     // Navigate to Notification page with userId as param or state
     navigate(`/notification/${user}`); // Option 1: via URL param
     // OR
     // navigate("/notification", { state: { user } }); // Option 2: via state
   };
+
+  // --- Birth Month Chart Data (from DOB field) ---
+const monthNames = [
+  "Jan","Feb","Mar","Apr","May","Jun",
+  "Jul","Aug","Sep","Oct","Nov","Dec"
+];
+
+const barColors = [
+  "#3b82f6", // Jan - Blue
+  "#10b981", // Feb - Green
+  "#f59e0b", // Mar - Amber
+  "#ef4444", // Apr - Red
+  "#8b5cf6", // May - Purple
+  "#06b6d4", // Jun - Cyan
+  "#ec4899", // Jul - Pink
+  "#22c55e", // Aug - Lime
+  "#eab308", // Sep - Yellow
+  "#0ea5e9", // Oct - Sky
+  "#6366f1", // Nov - Indigo
+  "#14b8a6", // Dec - Teal
+];
+
+
+const parseDOB = (dobString) => {
+  if (!dobString) return null;
+
+  // Supports "DD-MM-YYYY" or "DD/MM/YYYY"
+  const parts = dobString.includes("-")
+    ? dobString.split("-")
+    : dobString.split("/");
+
+  if (parts.length !== 3) return null;
+
+  const [day, month, year] = parts;
+
+  return new Date(`${year}-${month}-${day}`); // Convert -> YYYY-MM-DD
+};
+
+
+// Count users by their birth month
+const birthMonthCount = Array(12).fill(0);
+
+users.forEach((u) => {
+  const date = parseDOB(u.DOB);
+  if (!date || isNaN(date)) return;
+
+  const m = date.getMonth(); // 0-11
+  birthMonthCount[m] += 1;
+});
+
+
+// Convert to chart-friendly format
+const birthMonthData = monthNames.map((m, i) => ({
+  name: m,
+  value: birthMonthCount[i],
+}));
+
+
+
+
+
 
     if (usersLoading || loading) {
       return <Loader />;
@@ -454,15 +473,17 @@ const handleSendNotification = (user) => {
             height={250}
           />
           <div className="lg:col-span-1">
-            <PieChartComponent
-              title="User Growth by Role"
-              data={userTypeData}
+            <BarChartComponent
+              title="Birth Month Distribution"
+              data={birthMonthData}
               bars={[
-                { dataKey: "Admin", fill: "#8b5cf6", name: "Admin" },
-                { dataKey: "Vendor", fill: "#3b82f6", name: "vendor" },
-                { dataKey: "User", fill: "#10b981", name: "User" },
+                {
+                  dataKey: "value",
+                  name: "Births",
+                  colors: barColors, // <-- IMPORTANT
+                },
               ]}
-              height={250}
+              height={280}
             />
           </div>
         </div>

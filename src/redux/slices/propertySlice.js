@@ -22,28 +22,21 @@ export const fetchProperty = createAsyncThunk(
     return res.data;
   }
 );
+// Async thunk to fetch property vendor wise
+export const fetchVendorProperty = createAsyncThunk(
+  "property/fetchProperty",
+  async ({userId}) => {
+    const res = await axios.get(
+      `${baseUrl}/getvendorproperty?userId=${userId}`
+    );
+    console.log("API vendor response:", res.data); 
+    return res.data;
+  }
+);
 
 /* =====================================================
    ✅ ADD PROPERTY
 ===================================================== */
-// export const addProperty = createAsyncThunk(
-//   "property/addProperty",
-//   async (formData, { rejectWithValue }) => {
-//     try {
-//       const res = await axios.post(`${baseUrl}/addproperty`, formData, {
-//         headers: { "Content-Type": "application/json" },
-//       });
-//         console.log("add property :", res?.data?.data?.message); 
-//         if(res.status === 201){
-//           toast.success(res?.message);
-//         }
-//       return res.data;
-//     } catch (err) {
-//       return rejectWithValue(err.response?.data || err.message);
-//     }
-//   }
-// );
-
 export const addProperty = createAsyncThunk(
   "property/addProperty",
   async (formData, { rejectWithValue }) => {

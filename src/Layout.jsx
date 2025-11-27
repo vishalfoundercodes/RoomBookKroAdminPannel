@@ -26,12 +26,12 @@ const Layout = () => {
 
   return (
     // ✅ UPDATED — Used flexbox for full-page layout
-    <div className="flex flex-col lg:flex-row min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="flex flex-col lg:flex-row min-h-screen bg-gray-100 dark:bg-gray-900 overflow-x-hidden">
       {/* ✅ SIDEBAR (Fixed on large screens, overlay on mobile) */}
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* ✅ MAIN CONTENT AREA — now flex container for column layout */}
-      <div className="flex flex-col flex-1 min-h-screen lg:ml-64 transition-all duration-300">
+      <div className="flex flex-col flex-1 min-h-screen lg:ml-64 transition-all duration-300 overflow-x-hidden">
         {/* ✅ HEADER — fixed top, adjusts for sidebar width */}
         <header className="fixed top-0 right-0 left-0 lg:left-64 z-20 bg-white dark:bg-gray-800 shadow-sm">
           <Header

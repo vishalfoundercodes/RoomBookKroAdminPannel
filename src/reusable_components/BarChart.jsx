@@ -1,6 +1,6 @@
 // BarChart.jsx - Reusable bar chart component
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 import { BarChart3 } from 'lucide-react';
 import Card from './Card';
 
@@ -26,28 +26,30 @@ const BarChartComponent = ({
   ];
 
   const chartData = data || defaultData;
+  console.log("chartData:", chartData);
+
 
   return (
     <Card title={title} icon={BarChart3}>
       <ResponsiveContainer width="100%" height={height}>
-        <BarChart data={chartData} layout={orientation === "horizontal" ? "horizontal" : "vertical"}>
+        <BarChart data={chartData}>
           {showGrid && <CartesianGrid strokeDasharray="3 3" />}
-          <XAxis 
-            dataKey="name" 
-            type={orientation === "horizontal" ? "number" : "category"}
-          />
-          <YAxis 
-            type={orientation === "horizontal" ? "category" : "number"}
-          />
+
+          <XAxis dataKey="name" />
+          <YAxis />
+
           <Tooltip />
           {showLegend && <Legend />}
+
           {bars.map((bar, index) => (
-            <Bar 
-              key={index}
-              dataKey={bar.dataKey} 
-              fill={bar.fill}
-              name={bar.name}
-            />
+            <Bar key={index} dataKey={bar.dataKey} name={bar.name}>
+              {chartData.map((entry, i) => (
+                <Cell
+                  key={i}
+                  fill={bar.colors ? bar.colors[i] : bar.fill || "#8884d8"}
+                />
+              ))}
+            </Bar>
           ))}
         </BarChart>
       </ResponsiveContainer>
