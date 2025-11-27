@@ -1198,6 +1198,7 @@ const VendorPage = () => {
                     </div>
                   </div>
                   {/* documents image */}
+                    {/* images */}
                   <div className="flex gap-2">
                     <img
                       src={
