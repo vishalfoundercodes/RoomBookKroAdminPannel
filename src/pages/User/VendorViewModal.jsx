@@ -1,9 +1,10 @@
-import React from "react";
-import { X, Edit, Phone, Mail, Calendar, Wallet, IdCard } from "lucide-react";
+import React,{useState} from "react";
+import { X, Edit, Phone, Mail, Calendar, Wallet, IdCard, MapPin, Landmark, Building, Home } from "lucide-react";
 import { fetchVendorProperty } from "../../redux/slices/propertySlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { fetchVendorRevenue } from "../../redux/slices/revenueSlice";
 
 const VendorViewModal = ({
   show,
@@ -17,6 +18,7 @@ const VendorViewModal = ({
   selectedUser,
 }) => {
   if (!show) return null;
+const [previewImage, setPreviewImage] = useState(null);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -24,17 +26,35 @@ const VendorViewModal = ({
     (state) => state.users
   );
 
-  const handleShowProperty = async (userId) => {
-    try {
-      console.log(userId);
-      await dispatch(fetchVendorProperty({ userId }));
-    } catch (error) {
-      console.log("error", error);
-    }
-  };
+const handleSeeProperty = async () => {
+  const vendorProperty = await dispatch(
+    fetchVendorProperty({ userId: selectedUser.userId })
+  ).unwrap();
+
+  const vendorPropertyRevenue = await dispatch(
+    fetchVendorRevenue({ userId: selectedUser.userId })
+  ).unwrap();
+
+  console.log("vendor property:", vendorProperty);
+
+  if (vendorProperty?.data?.length > 0) {
+    navigate("/vendor/property", {
+      state: {
+        vendorProperty,
+        vendorId: selectedUser.userId,
+        vendorPropertyRevenue,
+        vendorName: selectedUser.name,
+        vendorImage: selectedUser.userImage,
+      },
+    });
+  } else {
+    toast.warn("No property Register");
+  }
+};
+
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-3 z-50">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl animate-scaleIn overflow-hidden">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-3 z-50 scrollbar-hide">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl animate-scaleIn overflow-hidden scrollbar-hide">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-5 text-white flex items-center justify-between">
           <h2 className="text-xl sm:text-2xl font-semibold">
@@ -53,7 +73,7 @@ const VendorViewModal = ({
         </div>
 
         {/* Content */}
-        <div className="p-5 space-y-6 max-h-[50vh] overflow-y-auto">
+        <div className="p-5 space-y-6 max-h-[50vh] overflow-y-auto scrollbar-hide">
           {/* Profile Section */}
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
             {/* Profile Image */}
@@ -178,7 +198,7 @@ const VendorViewModal = ({
                 </div>
 
                 {/* Wallet */}
-                <div className="flex items-center gap-3">
+                {/* <div className="flex items-center gap-3">
                   <Wallet className="text-gray-500 w-4 h-4" />
                   {isEditing ? (
                     <input
@@ -193,7 +213,7 @@ const VendorViewModal = ({
                       ₹{selectedUser.walletBalance || formData.walletBalance}
                     </span>
                   )}
-                </div>
+                </div> */}
               </div>
             </div>
 
@@ -241,7 +261,7 @@ const VendorViewModal = ({
           </div>
 
           {/* Document Images */}
-          <div className="flex gap-3 overflow-x-auto py-3">
+          {/* <div className="flex gap-3 overflow-x-auto py-3">
             {[
               formData.adharImage?.front || selectedUser.adharImage?.front,
               formData.adharImage?.back || selectedUser.adharImage?.back,
@@ -256,7 +276,43 @@ const VendorViewModal = ({
                   />
                 )
             )}
+          </div> */}
+          {/* Document Images */}
+          <div className="flex gap-3 overflow-x-auto py-3">
+            {[
+              formData.adharImage?.front || selectedUser.adharImage?.front,
+              formData.adharImage?.back || selectedUser.adharImage?.back,
+              formData.panImage || selectedUser.panImage,
+            ].map(
+              (img, i) =>
+                img && (
+                  <img
+                    key={i}
+                    src={img}
+                    onClick={() => setPreviewImage(img)}
+                    className="w-24 h-24 rounded-lg border shadow-md object-cover flex-shrink-0 cursor-pointer hover:scale-105 transition"
+                  />
+                )
+            )}
           </div>
+
+          {previewImage && (
+            <div
+              className="fixed inset-0 bg-black/80 flex items-center justify-center z-[9999]"
+              onClick={() => setPreviewImage(null)}
+            >
+              <img
+                src={previewImage}
+                className="max-w-[90%] max-h-[90%] rounded-lg shadow-2xl"
+              />
+              <button
+                className="absolute top-5 right-5 text-white bg-black/50 p-2 rounded-full"
+                onClick={() => setPreviewImage(null)}
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Footer */}
@@ -266,7 +322,7 @@ const VendorViewModal = ({
               setIsEditing(false);
               setShowViewModal(false);
             }}
-            className="px-4 py-2 rounded-lg border bg-white hover:bg-gray-100"
+            className="px-4 py-2 rounded-lg border bg-red-700 hover:bg-red-800 text-white"
           >
             Close
           </button>
@@ -282,38 +338,16 @@ const VendorViewModal = ({
             <>
               <button
                 onClick={() => setIsEditing(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md flex items-center gap-2 justify-center"
+                className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-700 shadow-md flex items-center gap-2 justify-center"
               >
                 <Edit className="w-4 h-4" />
                 Edit User
               </button>
-              {/* <button
-                onClick={() => {console.log("user id:", selectedUser.userId),
-                  handleShowProperty(selectedUser.userId)
-                navigate("/vendor/property")}}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md flex items-center gap-2 justify-center"
-              >
-                <Edit className="w-4 h-4" />
-                See property
-              </button> */}
               <button
-                onClick={async () => {
-                  const vendorProperty = await dispatch(
-                    fetchVendorProperty({ userId: selectedUser.userId })
-                  ).unwrap();
-
-                  console.log("vendor property:", vendorProperty);
-                  if (vendorProperty?.data?.length > 0) {
-                    navigate("/vendor/property", {
-                      state: { vendorProperty, vendorId: selectedUser.userId },
-                    });
-                  } else {
-                    toast.warn("No property Register");
-                  }
-                }}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-md flex items-center gap-2 justify-center"
+                onClick={handleSeeProperty}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 shadow-md flex items-center gap-2 justify-center"
               >
-                <Edit className="w-4 h-4" />
+                <Home className="w-4 h-4" />
                 See property
               </button>
             </>

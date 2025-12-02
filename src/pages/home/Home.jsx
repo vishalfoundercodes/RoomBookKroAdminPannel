@@ -22,7 +22,7 @@ import { BiMobile, BiMoney, BiMoneyWithdraw } from "react-icons/bi";
 import { FcCallTransfer } from "react-icons/fc";
 import { fetchUsers } from "../../redux/slices/userSlice";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Loader from "../Loader/Loader";
 import { fetchOrderHistory } from "../../redux/slices/historySlice";
 import { SiAutoprefixer } from "react-icons/si";
@@ -58,6 +58,8 @@ const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 const Home = () => {
   
   const dispatch = useDispatch();
+  const [highlight,setHighlight]=useState(null)
+  const [title,setTitle]=useState(null)
   const { data: users, loading: usersLoading } = useSelector(
     (state) => state.users
   );
@@ -245,16 +247,17 @@ const Home = () => {
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 p-2">
         <StatCard
           title="Total Revenue"
-          value={totalCommission.toString()}
+          value={totalCommission.toFixed(2)}
           change="+12.5%"
           changeType="positive"
           icon={IndianRupee}
           color="green"
           route="/revenue"
+          titleHighlight="Total Revenue Count"
         />
         <StatCard
           title="Total Vendor Revenue"
-          value={totalVendorRevenue.toString()}
+          value={totalVendorRevenue.toFixed(2)}
           change="Growing steadily this month"
           changeType="positive"
           icon={Coins}
@@ -264,7 +267,7 @@ const Home = () => {
 
         <StatCard
           title="Total Booking Amount"
-          value={totalFinalAmount.toString()}
+          value={totalFinalAmount.toFixed(2)}
           change="Increase compared to last month"
           changeType="positive"
           icon={CreditCard}

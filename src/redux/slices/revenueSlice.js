@@ -1,6 +1,7 @@
 //admin.roombookkro.com/api/getRevenue
 // src/slices/profileSlice.js
 // https: 
+// https://admin.roombookkro.com/api/getvendorRevenue?vendorId=
 // src/redux/slices/historySlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
@@ -11,6 +12,22 @@ export const fetchRevenue = createAsyncThunk(
     try {
       const res = await axios.get(
         `https://admin.roombookkro.com/api/getRevenue`
+      );
+      console.log("revenue:", res?.data);
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || "Failed to fetch revenue data"
+      );
+    }
+  }
+);
+export const fetchVendorRevenue = createAsyncThunk(
+  "revenue/fetchRevenue",
+  async ({userId}, { rejectWithValue }) => {
+    try {
+      const res = await axios.get(
+        `https://admin.roombookkro.com/api/getvendorRevenue?vendorId=${userId}`
       );
       console.log("revenue:", res?.data);
       return res.data;

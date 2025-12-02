@@ -4,8 +4,17 @@ import { TrendingUp, TrendingDown } from 'lucide-react';
 import Card from './Card';
 import { useNavigate } from 'react-router-dom';
 
-const StatCard = ({ title, value, change, changeType = "positive", icon: Icon, color = "blue", route }) => {
-  const navigate=useNavigate()
+const StatCard = ({
+  title,
+  value,
+  change,
+  changeType = "positive",
+  icon: Icon,
+  color = "blue",
+  route,
+  titleHighlight,
+}) => {
+  const navigate = useNavigate();
   const colorClasses = {
     blue: "bg-blue-50 text-blue-600",
     green: "bg-green-50 text-green-600",
@@ -17,8 +26,9 @@ const StatCard = ({ title, value, change, changeType = "positive", icon: Icon, c
 
   return (
     <Card>
-      <div className="flex items-center justify-between cursor-pointer"
-      onClick={()=>navigate(route|| "#")}
+      <div
+        className="flex items-center justify-between cursor-pointer"
+        onClick={() => navigate(route || "#",{ state: { highlight: title }})}
       >
         <div>
           <p className="text-sm font-medium text-gray-600">{title}</p>
@@ -30,14 +40,20 @@ const StatCard = ({ title, value, change, changeType = "positive", icon: Icon, c
               ) : (
                 <TrendingDown className="w-4 h-4 text-red-500 mr-1" />
               )}
-              <span className={`text-sm ${changeType === "positive" ? "text-green-600" : "text-red-600"}`}>
+              <span
+                className={`text-sm ${
+                  changeType === "positive" ? "text-green-600" : "text-red-600"
+                }`}
+              >
                 {change}
               </span>
             </div>
           )}
         </div>
         {Icon && (
-          <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${colorClasses[color]}`}>
+          <div
+            className={`w-12 h-12 rounded-lg flex items-center justify-center ${colorClasses[color]}`}
+          >
             <Icon className="w-6 h-6" />
           </div>
         )}

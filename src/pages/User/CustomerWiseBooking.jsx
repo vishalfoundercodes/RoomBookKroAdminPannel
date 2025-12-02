@@ -1,3 +1,23 @@
+// import React,{useEffect} from 'react'
+// import { fetchOrderHistory } from '../../redux/slices/historySlice';
+// import { useLocation, useNavigate } from "react-router-dom";
+// import { useDispatch } from 'react-redux';
+
+// export default function CustomerWiseBooking() {
+    //  const location = useLocation();
+    //    const dispatch = useDispatch();
+    //   const userId = location.state?.userId || [];
+// useEffect(() => {
+//     dispatch(fetchOrderHistory({ userId }));
+
+//   }, [dispatch]);
+//     return (
+//     <div>
+//       Customer booking
+//     </div>
+//   )
+// }
+
 import React, { useState, useEffect } from "react";
 import {
   Calendar,
@@ -18,68 +38,58 @@ import { fetchOrderHistory, updatePaymentStatus } from "../../redux/slices/histo
 import Loader from "../Loader/Loader";
 import { toast } from "react-toastify";
 import StatCard from "../../reusable_components/StatCard";
+import { useLocation, useNavigate } from "react-router-dom";
 
-export default function History() {
+export default function CustomerWiseBooking() {
   const dispatch = useDispatch();
   const { loading, historyData, error } = useSelector((state) => state.history);
   const [activeTab, setActiveTab] = useState("paymentStatus");
   const [expandedBooking, setExpandedBooking] = useState(null);
-  const [userId, setUserId] = useState("");
+//   const [userId, setUserId] = useState("");
   const [searchUserId, setSearchUserId] = useState("");
   const [hasSearched, setHasSearched] = useState(false);
   const [bookingSubTab, setBookingSubTab] = useState("currentStay");
   const [paymentSubTab, setPaymentSubTab] = useState("pending");
-const [filteredData, setFilteredData] = useState(null);
+  const [filteredData, setFilteredData] = useState(null);
+  const [cutomerName,setCustomerName]=useState(null)
 
-
-
+  const navigate=useNavigate()
+      const location = useLocation();
+      const userId =location.state?.userId || [];
+      const userName = location.state?.userName || "";
+      const customerImage = location.state?.userImage || "";
   useEffect(() => {
-    dispatch(fetchOrderHistory({ userId: "all" }));
+        setCustomerName(location.state?.userName);
+    dispatch(fetchOrderHistory({ userId }));
     setHasSearched(true);
   }, [dispatch]);
 
-  const handleSearch = () => {
-    if (searchUserId.trim()) {
-      setUserId(searchUserId);
-      dispatch(fetchOrderHistory({ userId: searchUserId }));
-      setHasSearched(true);
+  const handlePaymentUpdate = async (orderId, userId, newPaymentStatus) => {
+    try {
+      const res = await dispatch(
+        updatePaymentStatus({ orderId, userId, newPaymentStatus })
+      ).unwrap();
+
+      // ✅ Fix: Only show text from API response
+      const message =
+        res?.msg ||
+        res?.message ||
+        (newPaymentStatus === 1
+          ? "Payment Accepted ✅"
+          : "Payment Rejected ❌");
+
+      if (res?.status === 200 || res?.success) {
+        toast.success(message);
+        // Refresh data after successful update
+        dispatch(fetchOrderHistory({ userId }));
+      } else {
+        toast.error(message || "Failed to update payment status");
+      }
+    } catch (err) {
+      console.error("❌ Error in handlePaymentUpdate:", err);
+      toast.error("Something went wrong while updating the transaction");
     }
   };
-
-  const handleShowAll = () => {
-    setUserId("");
-    setSearchUserId("");
-    dispatch(fetchOrderHistory({ userId: "all" }));
-    setHasSearched(true);
-  };
-
-const handlePaymentUpdate = async (orderId, userId, newPaymentStatus) => {
-  try {
-    const res = await dispatch(
-      updatePaymentStatus({ orderId, userId, newPaymentStatus })
-    ).unwrap();
-
-    // ✅ Fix: Only show text from API response
-    const message =
-      res?.msg ||
-      res?.message ||
-      (newPaymentStatus === 1
-        ? "Payment Accepted ✅"
-        : "Payment Rejected ❌");
-
-    if (res?.status === 200 || res?.success) {
-      toast.success(message);
-      // Refresh data after successful update
-      dispatch(fetchOrderHistory({ userId }));
-    } else {
-      toast.error(message || "Failed to update payment status");
-    }
-  } catch (err) {
-    console.error("❌ Error in handlePaymentUpdate:", err);
-    toast.error("Something went wrong while updating the transaction");
-  }
-};
-
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -105,9 +115,12 @@ const handlePaymentUpdate = async (orderId, userId, newPaymentStatus) => {
   };
 
   const getStatusColor = (status) => {
-    if (status === 0 || status === "pending") return "bg-yellow-50 border-yellow-200";
-    if (status === 1 || status === "completed") return "bg-green-50 border-green-200";
-    if (status === 2 || status === "rejected") return "bg-red-50 border-red-200";
+    if (status === 0 || status === "pending")
+      return "bg-yellow-50 border-yellow-200";
+    if (status === 1 || status === "completed")
+      return "bg-green-50 border-green-200";
+    if (status === 2 || status === "rejected")
+      return "bg-red-50 border-red-200";
     return "bg-gray-50";
   };
 
@@ -115,7 +128,9 @@ const handlePaymentUpdate = async (orderId, userId, newPaymentStatus) => {
     const isExpanded = expandedBooking === booking._id;
     const checkInDate = new Date(booking.checkInDate);
     const checkOutDate = new Date(booking.checkOutDate);
-    const nights = Math.ceil((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24));
+    const nights = Math.ceil(
+      (checkOutDate - checkInDate) / (1000 * 60 * 60 * 24)
+    );
 
     return (
       <div
@@ -140,7 +155,9 @@ const handlePaymentUpdate = async (orderId, userId, newPaymentStatus) => {
             <p className="text-sm font-medium text-gray-700">
               {getStatusLabel(booking.paymentStatus || booking.status)}
             </p>
-            <p className="text-lg font-bold text-gray-900">₹{booking.finalAmount}</p>
+            <p className="text-lg font-bold text-gray-900">
+              ₹{booking.finalAmount}
+            </p>
           </div>
         </div>
 
@@ -156,7 +173,9 @@ const handlePaymentUpdate = async (orderId, userId, newPaymentStatus) => {
           </div>
           <div className="flex items-center gap-2 text-sm">
             <Users className="w-4 h-4 text-gray-500" />
-            <span>{booking.nor} room{booking.nor > 1 ? "s" : ""}</span>
+            <span>
+              {booking.nor} room{booking.nor > 1 ? "s" : ""}
+            </span>
           </div>
           <div className="flex items-center gap-2 text-sm">
             <DollarSign className="w-4 h-4 text-gray-500" />
@@ -177,7 +196,9 @@ const handlePaymentUpdate = async (orderId, userId, newPaymentStatus) => {
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Booking For:</span>
-              <span className="font-medium capitalize">{booking.bookingFor}</span>
+              <span className="font-medium capitalize">
+                {booking.bookingFor}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Base Amount:</span>
@@ -239,17 +260,16 @@ const handlePaymentUpdate = async (orderId, userId, newPaymentStatus) => {
     });
   }, [searchUserId, historyData]);
 
-const totalBookings =
-  (historyData?.timeWise?.upcoming?.length || 0) +
-  (historyData?.timeWise?.currentStay?.length || 0) +
-  (historyData?.timeWise?.past?.length || 0) +
-  (historyData?.timeWise?.cancelled?.length || 0);
+  const totalBookings =
+    (historyData?.timeWise?.upcoming?.length || 0) +
+    (historyData?.timeWise?.currentStay?.length || 0) +
+    (historyData?.timeWise?.past?.length || 0) +
+    (historyData?.timeWise?.cancelled?.length || 0);
 
-const totalPayments =
-  (historyData?.paymentStatusWise?.pending?.length || 0) +
-  (historyData?.paymentStatusWise?.completed?.length || 0) +
-  (historyData?.paymentStatusWise?.rejected?.length || 0);
-
+  const totalPayments =
+    (historyData?.paymentStatusWise?.pending?.length || 0) +
+    (historyData?.paymentStatusWise?.completed?.length || 0) +
+    (historyData?.paymentStatusWise?.rejected?.length || 0);
 
   if (loading) return <Loader />;
 
@@ -271,16 +291,85 @@ const totalPayments =
     <div className="min-h-screen bg-gray-50 mt-4 rounded-xl">
       <div className=" px-4 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            Booking History
-          </h1>
-          <p className="text-gray-600">View and manage all your bookings</p>
+        {/* <div className="flex mb-2">
+          <div className=" mb-2 cursor-pointer" onClick={() => navigate(-1)}>
+            <svg
+              width="44"
+              height="44"
+              viewBox="0 0 44 44"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect width="44" height="44" rx="8" fill="#2563EB" />
+              <path
+                d="M28 31.202L26.2153 33L16.4945 23.2009C16.3378 23.0439 16.2134 22.8572 16.1285 22.6515C16.0437 22.4459 16 22.2253 16 22.0025C16 21.7798 16.0437 21.5592 16.1285 21.3536C16.2134 21.1479 16.3378 20.9612 16.4945 20.8042L26.2153 11L27.9983 12.798L18.8746 22L28 31.202Z"
+                fill="white"
+              />
+            </svg>
+          </div>
+          <img
+            src={customerImage}
+            alt="profile image"
+            className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-fill shadow-md"
+          />
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+              {cutomerName}'s Booking History
+            </h1>
+            <p className="text-gray-600">View and manage all your bookings</p>
+          </div>
+        </div> */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mb-6">
+          {/* Back Button */}
+          <div
+            className="cursor-pointer flex-shrink-0"
+            onClick={() => navigate(-1)}
+          >
+            <svg
+              width="44"
+              height="44"
+              viewBox="0 0 44 44"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-10 h-10 sm:w-11 sm:h-11"
+            >
+              <rect width="44" height="44" rx="8" fill="#2563EB" />
+              <path
+                d="M28 31.202L26.2153 33L16.4945 23.2009C16.3378 23.0439 16.2134 22.8572 16.1285 22.6515C16.0437 22.4459 16 22.2253 16 22.0025C16 21.7798 16.0437 21.5592 16.1285 21.3536C16.2134 21.1479 16.3378 20.9612 16.4945 20.8042L26.2153 11L27.9983 12.798L18.8746 22L28 31.202Z"
+                fill="white"
+              />
+            </svg>
+          </div>
+
+          {/* Profile Image */}
+          <img
+            src={customerImage}
+            alt="profile image"
+            className="
+      w-20 h-20 
+      sm:w-24 sm:h-24 
+      md:w-28 md:h-28 
+      rounded-full 
+      object-cover 
+      shadow-md 
+      flex-shrink-0
+    "
+          />
+
+          {/* Text Content */}
+          <div className="flex flex-col">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-1">
+              {cutomerName}'s Booking History
+            </h1>
+            <p className="text-gray-600 text-sm sm:text-base">
+              View and manage all your bookings
+            </p>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
           {/* Payment Status Wise */}
-          
+
           <StatCard
             title="Total Payments"
             value={totalPayments.toString()}

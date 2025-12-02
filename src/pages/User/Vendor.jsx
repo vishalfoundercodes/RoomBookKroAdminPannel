@@ -28,6 +28,11 @@ import {
   UserMinus,
   Send,
   Bell,
+  IdCard,
+  CreditCard,
+  Landmark,
+  Stamp,
+  BookUser,
 } from "lucide-react";
 import Card from "../../reusable_components/Card";
 import StatCard from "../../reusable_components/StatCard";
@@ -157,24 +162,17 @@ const VendorPage = () => {
     { name: "Inactive", value: inactiveUsers, color: "#ef4444" },
   ];
 
-  const Admin = users.filter((u) => u.user_type === "0").length;
-  const vendor = users.filter((u) => u.user_type === "1").length;
-  const Customer = users.filter((u) => u.user_type === "2").length;
+  const verifyVendorCount = users.filter((u) => u.isVerified === true).length;
+  const unverifyVendorCount = users.filter(
+    (u) => u.isVerified === false
+  ).length;
 
-  const userTypeData = [
-    { name: "Admin", value: Admin, color: "#10b981" },
-    { name: "vendor", value: vendor, color: "#f59e0b" },
-    { name: "Customer", value: Customer, color: "#ef4444" },
+  const vendorVerify = [
+    { name: "Verified Vendor", value: verifyVendorCount, color: "#10b981" },
+    { name: "UnVerified Vendor", value: unverifyVendorCount, color: "#f59e0b" },
   ];
 
-  const userRoleData = [
-    { name: "Jan", Admin: Admin, Manager: vendor, User: Customer },
-    { name: "Feb", Admin: 6, Manager: 10, User: 52 },
-    { name: "Mar", Admin: 7, Manager: 12, User: 58 },
-    { name: "Apr", Admin: 8, Manager: 15, User: 65 },
-    { name: "May", Admin: 9, Manager: 18, User: 72 },
-    { name: "Jun", Admin: 10, Manager: 20, User: 80 },
-  ];
+
 
   // Status color helper
   const getStatusColor = (status) => {
@@ -211,24 +209,7 @@ const VendorPage = () => {
   };
 
   // Role color helper
-  const getRoleColor = (role) => {
-    const colors = {
-      0: "bg-purple-100 text-purple-800", // Admin
-      1: "bg-blue-100 text-blue-800", // Vendor
-      2: "bg-gray-100 text-gray-800", // User
-    };
-    return colors[role] || "bg-gray-100 text-gray-800";
-  };
-  const getRoleData = (role) => {
-    const roles = {
-      0: { label: "Admin", color: "bg-purple-100 text-purple-800" },
-      1: { label: "Vendor", color: "bg-blue-100 text-blue-800" },
-      2: { label: "User", color: "bg-green-200 text-gray-800" },
-    };
-    return (
-      roles[role] || { label: "Unknown", color: "bg-gray-100 text-gray-800" }
-    );
-  };
+
 
   // Handle user actions
   const handleAddUser = () => {
@@ -376,7 +357,7 @@ const VendorPage = () => {
   }
 
 return (
-  <div className="flex-1 overflow-hidden">
+  <div className="flex-1 overflow-hidden mt-4 rounded-xl">
     {" "}
     {/* p-2 remove kiya, overflow-hidden add kiya */}
     <div className="min-h-screen bg-gray-50 p-4">
@@ -450,19 +431,14 @@ return (
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mb-8">
         <PieChartComponent
-          title="User Status Distribution"
+          title="Vendor Status Distribution"
           data={userStatusData}
           height={250}
         />
         <div className="lg:col-span-1">
           <PieChartComponent
-            title="User Growth by Role"
-            data={userTypeData}
-            bars={[
-              { dataKey: "Admin", fill: "#8b5cf6", name: "Admin" },
-              { dataKey: "Vendor", fill: "#3b82f6", name: "vendor" },
-              { dataKey: "User", fill: "#10b981", name: "User" },
-            ]}
+            title="Vendor Growth by verification"
+            data={vendorVerify}
             height={250}
           />
         </div>
@@ -608,8 +584,8 @@ return (
                   </td>
                   <td className="py-3 px-4 whitespace-nowrap">
                     <div className="text-sm">
-                      <div className="flex items-center gap-1 text-gray-600">
-                        <Phone className="w-3 h-3" />
+                      <div className="flex items-center gap-1 text-black">
+                        <Phone className="w-4 h-4 text-violet-800" />
                         {user.phone}
                       </div>
                     </div>
@@ -618,7 +594,7 @@ return (
                     <div className="flex justify-center">
                       <button
                         onClick={() => handleSendNotification(user.userId)}
-                        className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-200 backdrop-blur-sm text-white shadow-lg hover:bg-blue-500 hover:scale-110 hover:shadow-xl transition-all duration-200"
+                        className="flex items-center justify-center w-10 h-10 rounded-full bg-green-400 backdrop-blur-sm text-white shadow-lg hover:bg-blue-500 hover:scale-110 hover:shadow-xl transition-all duration-200"
                       >
                         <Bell className="w-5 h-5" />
                       </button>
@@ -626,16 +602,16 @@ return (
                   </td>
                   <td className="py-3 px-4 whitespace-nowrap">
                     <div className="text-sm">
-                      <div className="flex items-center gap-1 text-gray-600">
-                        <Phone className="w-3 h-3" />
+                      <div className="flex items-center gap-1 text-black">
+                        <IdCard className="w-5 h-5 text-blue-800" />
                         {user.adharNumber}
                       </div>
                     </div>
                   </td>
                   <td className="py-3 px-4 whitespace-nowrap">
                     <div className="text-sm">
-                      <div className="flex items-center gap-1 text-gray-600">
-                        <Phone className="w-3 h-3" />
+                      <div className="flex items-center gap-1 text-black">
+                        <BookUser className="w-5 h-5 text-orange-700" />
                         {user.panNumber}
                       </div>
                     </div>
@@ -673,9 +649,9 @@ return (
                       <option value="false">Not Verified</option>
                     </select>
                   </td>
-                  <td className="py-3 px-4 text-sm text-gray-600 whitespace-nowrap">
+                  <td className="py-3 px-4 text-sm text-black whitespace-nowrap">
                     <div className="flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
+                      <Calendar className="w-4 h-4 text-cyan-400" />
                       {user.DOB}
                     </div>
                   </td>
@@ -719,148 +695,6 @@ return (
 
       {/* Add User Modal */}
       {showAddModal && (
-        // <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        //   <div className="bg-white rounded-lg w-full max-w-md mx-4">
-        //     <div className="p-6">
-        //       <div className="flex items-center justify-between mb-4">
-        //         <h2 className="text-xl font-semibold text-gray-900">
-        //           Add New Vendor
-        //         </h2>
-        //         <button
-        //           onClick={() => setShowAddModal(false)}
-        //           className="text-gray-400 hover:text-gray-600"
-        //         >
-        //           <X className="w-5 h-5" />
-        //         </button>
-        //       </div>
-
-        //       <div className="space-y-4">
-        //         <div>
-        //           <label className="block text-sm font-medium text-gray-700 mb-1">
-        //             Name
-        //           </label>
-        //           <input
-        //             type="text"
-        //             value={newUser.name}
-        //             onChange={(e) =>
-        //               setNewUser({ ...newUser, name: e.target.value })
-        //             }
-        //             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        //             placeholder="Enter full name"
-        //           />
-        //         </div>
-
-        //         <div>
-        //           <label className="block text-sm font-medium text-gray-700 mb-1">
-        //             Email
-        //           </label>
-        //           <input
-        //             type="email"
-        //             required
-        //             value={newUser.email}
-        //             onChange={(e) =>
-        //               setNewUser({ ...newUser, email: e.target.value })
-        //             }
-        //             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        //             placeholder="Enter email address"
-        //           />
-        //         </div>
-        //         <div>
-        //           <label className="block text-sm font-medium text-gray-700 mb-1">
-        //             Password
-        //           </label>
-        //           <input
-        //             type="password"
-        //             required
-        //             value={newUser.password || ""}
-        //             onChange={(e) =>
-        //               setNewUser({ ...newUser, password: e.target.value })
-        //             }
-        //             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        //             placeholder="Enter password"
-        //           />
-        //         </div>
-        //         <div>
-        //           <label className="block text-sm font-medium text-gray-700 mb-1">
-        //             Date of Birth
-        //           </label>
-        //           <input
-        //             type="date"
-        //             value={newUser.dob || ""}
-        //             onChange={(e) =>
-        //               setNewUser({ ...newUser, dob: e.target.value })
-        //             }
-        //             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        //           />
-        //         </div>
-
-        //         <div>
-        //           <label className="block text-sm font-medium text-gray-700 mb-1">
-        //             Phone
-        //           </label>
-        //           <input
-        //             type="tel"
-        //             required
-        //             value={newUser.phone}
-        //             onChange={(e) =>
-        //               setNewUser({ ...newUser, phone: e.target.value })
-        //             }
-        //             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        //             placeholder="Enter phone number"
-        //           />
-        //         </div>
-
-        //         <div className="hidden">
-        //           <label className="block text-sm font-medium text-gray-700 mb-1">
-        //             Role
-        //           </label>
-        //           <select
-        //             value={newUser.role}
-        //             onChange={(e) =>
-        //               setNewUser({ ...newUser, role: e.target.value })
-        //             }
-        //             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        //           >
-        //             <option value="2">User</option>
-        //             <option value="1">Vendor</option>
-        //             <option value="0">Admin</option>
-        //           </select>
-        //         </div>
-
-        //         <div className="hidden">
-        //           <label className="block text-sm font-medium text-gray-700 mb-1">
-        //             Location
-        //           </label>
-        //           <input
-        //             type="text"
-        //             value={newUser.location}
-        //             onChange={(e) =>
-        //               setNewUser({ ...newUser, location: e.target.value })
-        //             }
-        //             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        //             placeholder="Enter location"
-        //           />
-        //         </div>
-        //       </div>
-
-        //       <div className="flex gap-3 mt-6">
-        //         <button
-        //           onClick={() => setShowAddModal(false)}
-        //           className="flex-1 px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
-        //         >
-        //           Cancel
-        //         </button>
-        //         <button
-        //           onClick={handleAddUser}
-        //           className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"
-        //         >
-        //           <Save className="w-4 h-4" />
-        //           Add User
-        //         </button>
-        //       </div>
-        //     </div>
-        //   </div>
-        // </div>
         <VendorAddModal
           show={showAddModal}
           onClose={() => setShowAddModal(false)}
@@ -872,252 +706,6 @@ return (
 
       {/* View User Modal */}
       {showViewModal && selectedUser && (
-        // <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        //   <div className="bg-white rounded-lg w-full max-w-2xl mx-4">
-        //     <div className="p-6">
-        //       {/* Header */}
-        //       <div className="flex items-center justify-between mb-6">
-        //         <h2 className="text-xl font-semibold text-gray-900">
-        //           {isEditing ? "Edit User" : "User Details"}
-        //         </h2>
-        //         <button
-        //           onClick={() => {
-        //             setIsEditing(false);
-        //             setShowViewModal(false);
-        //           }}
-        //           className="text-gray-400 hover:text-gray-600"
-        //         >
-        //           <X className="w-5 h-5" />
-        //         </button>
-        //       </div>
-
-        //       {/* Profile + Details */}
-        //       <div className="flex items-start gap-6">
-        //         <div className="relative">
-        //           <img
-        //             src={
-        //               formData.userImagePreview ||
-        //               formData.userImage ||
-        //               selectedUser.userImage
-        //             }
-        //             alt={formData.name}
-        //             className="w-20 h-20 rounded-full object-cover"
-        //           />
-        //           {isEditing && (
-        //             <input
-        //               type="file"
-        //               accept="image/*"
-        //               onChange={handleImageChange}
-        //               className="absolute top-0 left-0 w-20 h-20 opacity-0 cursor-pointer"
-        //             />
-        //           )}
-        //         </div>
-
-        //         <div className="flex-1">
-        //           {isEditing ? (
-        //             <input
-        //               type="text"
-        //               name="name"
-        //               value={formData.name}
-        //               onChange={handleChange}
-        //               className="text-xl font-semibold text-gray-900 border rounded px-2 py-1 w-full"
-        //             />
-        //           ) : (
-        //             <h3 className="text-xl font-semibold text-gray-900">
-        //               {selectedUser.name || formData.name}
-        //             </h3>
-        //           )}
-        //           {isEditing ? (
-        //             <input
-        //               type="email"
-        //               name="email"
-        //               value={formData.email}
-        //               onChange={handleChange}
-        //               className="text-gray-600 border rounded px-2 py-1 w-full mt-1"
-        //             />
-        //           ) : (
-        //             <p className="text-gray-600">
-        //               {selectedUser.email || formData.email}
-        //             </p>
-        //           )}
-        //         </div>
-        //       </div>
-
-        //       {/* Grid Details */}
-        //       <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-        //         {/* Contact */}
-        //         <div>
-        //           <h4 className="font-medium text-gray-900 mb-3">
-        //             Contact Information
-        //           </h4>
-        //           <div className="space-y-2 text-sm">
-        //             <div className="flex items-center gap-2">
-        //               <Phone className="w-4 h-4 text-gray-400" />
-        //               {isEditing ? (
-        //                 <input
-        //                   type="text"
-        //                   name="contact"
-        //                   value={formData.contact}
-        //                   onChange={handleChange}
-        //                   className="border rounded px-2 py-1 w-full"
-        //                 />
-        //               ) : (
-        //                 <span>{selectedUser.phone || formData.contact}</span>
-        //               )}
-        //             </div>
-        //             <div className="flex items-center gap-2">
-        //               <Mail className="w-4 h-4 text-gray-400" />
-        //               <span>{selectedUser.email || formData.email}</span>
-        //             </div>
-        //           </div>
-        //         </div>
-
-        //         {/* Account */}
-        //         <div>
-        //           <h4 className="font-medium text-gray-900 mb-3">
-        //             Account Details
-        //           </h4>
-        //           <div className="space-y-2 text-sm">
-        //             <div className="flex items-center gap-2">
-        //               <Calendar className="w-4 h-4 text-gray-400" />
-        //               {isEditing ? (
-        //                 <input
-        //                   type="date"
-        //                   name="DOB"
-        //                   value={formData.DOB || ""}
-        //                   onChange={handleChange}
-        //                   className="border rounded px-2 py-1 w-full"
-        //                 />
-        //               ) : (
-        //                 <span>DOB: {selectedUser.DOB || formData.DOB}</span>
-        //               )}
-        //             </div>
-        //             <div className="flex items-center gap-2">
-        //               <Wallet className="w-4 h-4 text-gray-400" />
-        //               {isEditing ? (
-        //                 <input
-        //                   type="number"
-        //                   name="walletBalance"
-        //                   value={formData.walletBalance}
-        //                   onChange={handleChange}
-        //                   className="border rounded px-2 py-1 w-full"
-        //                 />
-        //               ) : (
-        //                 <span>
-        //                   Wallet balance:{" "}
-        //                   {selectedUser.walletBalance || formData.walletBalance}
-        //                 </span>
-        //               )}
-        //             </div>
-        //           </div>
-        //         </div>
-        //         {/* Documents */}
-        //         <div>
-        //           <h4 className="font-medium text-gray-900 mb-3">
-        //             Important Details
-        //           </h4>
-        //           <div className="space-y-2 text-sm">
-        //             <div className="flex items-center gap-2">
-        //               <Calendar className="w-4 h-4 text-gray-400" />
-        //               {isEditing ? (
-        //                 <input
-        //                   type="date"
-        //                   name="DOB"
-        //                   value={formData.adharNumber || ""}
-        //                   onChange={handleChange}
-        //                   className="border rounded px-2 py-1 w-full"
-        //                 />
-        //               ) : (
-        //                 <span>
-        //                   Adhar Number:{" "}
-        //                   {selectedUser.adharNumber || formData.adharNumber}
-        //                 </span>
-        //               )}
-        //             </div>
-        //             <div className="flex items-center gap-2">
-        //               <Calendar className="w-4 h-4 text-gray-400" />
-        //               {isEditing ? (
-        //                 <input
-        //                   type="date"
-        //                   name="DOB"
-        //                   value={formData.panNumber || ""}
-        //                   onChange={handleChange}
-        //                   className="border rounded px-2 py-1 w-full"
-        //                 />
-        //               ) : (
-        //                 <span>
-        //                   Pan Number:{" "}
-        //                   {selectedUser.panNumber || formData.panNumber}
-        //                 </span>
-        //               )}
-        //             </div>
-        //           </div>
-        //         </div>
-        //         {/* documents image */}
-        //         {/* images */}
-        //         <div className="flex gap-2">
-        //           <img
-        //             src={
-        //               formData.adharImage?.front ||
-        //               formData.adharImage?.front ||
-        //               selectedUser.adharImage?.front
-        //             }
-        //             alt={formData.name}
-        //             className="w-20 h-20 rounded-full object-cover"
-        //           />
-        //           <img
-        //             src={
-        //               formData.adharImage?.back ||
-        //               formData.adharImage?.back ||
-        //               selectedUser.adharImage?.back
-        //             }
-        //             alt={formData.name}
-        //             className="w-20 h-20 rounded-full object-cover"
-        //           />
-        //           <img
-        //             src={
-        //               formData.panImage ||
-        //               formData.panImage ||
-        //               selectedUser.panImage
-        //             }
-        //             alt={formData.name}
-        //             className="w-20 h-20 rounded-full object-cover"
-        //           />
-        //         </div>
-        //       </div>
-
-        //       {/* Buttons */}
-        //       <div className="flex gap-3 mt-8">
-        //         <button
-        //           onClick={() => {
-        //             setIsEditing(false);
-        //             setShowViewModal(false);
-        //           }}
-        //           className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
-        //         >
-        //           Close
-        //         </button>
-
-        //         {isEditing ? (
-        //           <button
-        //             onClick={handleSubmit}
-        //             className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-        //           >
-        //             Save Changes
-        //           </button>
-        //         ) : (
-        //           <button
-        //             onClick={() => setIsEditing(true)}
-        //             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
-        //           >
-        //             <Edit className="w-4 h-4" />
-        //             Edit User
-        //           </button>
-        //         )}
-        //       </div>
-        //     </div>
-        //   </div>
-        // </div>
         <VendorViewModal
           show={showViewModal}
           setShowViewModal={setShowViewModal}

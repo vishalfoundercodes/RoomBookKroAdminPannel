@@ -628,8 +628,8 @@ const birthMonthData = monthNames.map((m, i) => ({
                     </td>
                     <td className="py-3 px-4">
                       <div className="text-sm">
-                        <div className="flex items-center gap-1 text-gray-600">
-                          <Phone className="w-3 h-3" />
+                        <div className="flex items-center gap-1 text-black">
+                          <Phone className="w-4 h-4 text-violet-800" />
                           {user.phone}
                         </div>
                         {/* <div className="flex items-center gap-1 text-gray-500 mt-1">
@@ -652,7 +652,7 @@ const birthMonthData = monthNames.map((m, i) => ({
                         <button
                           onClick={() => handleSendNotification(user.userId)}
                           className="flex items-center justify-center w-10 h-10 rounded-full 
-                 bg-blue-200 backdrop-blur-sm text-white shadow-lg 
+                 bg-green-400 backdrop-blur-sm text-white shadow-lg 
                  hover:bg-blue-500 hover:scale-110 hover:shadow-xl 
                  transition-all duration-200"
                         >
@@ -697,9 +697,9 @@ const birthMonthData = monthNames.map((m, i) => ({
                         <option value="false">Not Veryfied</option>
                       </select>
                     </td> */}
-                    <td className="py-3 px-4 text-sm text-gray-600">
+                    <td className="py-3 px-4 text-sm text-black">
                       <div className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3" />
+                        <Calendar className="w-4 h-4 text-cyan-400" />
                         {user.DOB}
                       </div>
                     </td>
@@ -898,131 +898,29 @@ const birthMonthData = monthNames.map((m, i) => ({
         )}
 
         {/* View User Modal */}
-        {/* {showViewModal && selectedUser && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg w-full max-w-2xl mx-4">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
+        {showViewModal && selectedUser && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-3">
+            <div className="bg-white rounded-2xl w-full max-w-2xl shadow-xl overflow-hidden">
+              {/* Header */}
+              <div className="flex items-center justify-between px-6 py-4 border-b">
                 <h2 className="text-xl font-semibold text-gray-900">
-                  User Details
+                  {isEditing ? "Edit User" : "User Details"}
                 </h2>
                 <button
-                  onClick={() => setShowViewModal(false)}
+                  onClick={() => {
+                    setIsEditing(false);
+                    setShowViewModal(false);
+                  }}
                   className="text-gray-400 hover:text-gray-600"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              <div className="flex items-start gap-6">
-                <img
-                  src={selectedUser.userImage}
-                  alt={selectedUser.name}
-                  className="w-20 h-20 rounded-full object-cover"
-                />
-                <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-gray-900">
-                    {selectedUser.name}
-                  </h3>
-                  <p className="text-gray-600">{selectedUser.email}</p>
-
-                  <div className="flex items-center gap-4 mt-4">
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${getRoleColor(
-                        selectedUser.role
-                      )}`}
-                    >
-                      {selectedUser.role}
-                    </span>
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
-                        selectedUser.status
-                      )}`}
-                    >
-                      {selectedUser.status}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-6 mt-6">
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-3">
-                    Contact Information
-                  </h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2">
-                      <Phone className="w-4 h-4 text-gray-400" />
-                      <span>{selectedUser.phone}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Mail className="w-4 h-4 text-gray-400" />
-                      <span>{selectedUser.email}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-3">
-                    Account Details
-                  </h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4 text-gray-400" />
-                      <span>DOB: {selectedUser.DOB}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Wallet className="w-4 h-4 text-gray-400" />
-                      <span>Wallet balamce: {selectedUser.walletBalance}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex gap-3 mt-8">
-                <button
-                  onClick={() => setShowViewModal(false)}
-                  className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
-                >
-                  Close
-                </button>
-                <button
-                  onClick={() => {
-                    setShowViewModal(false);
-                    setShowEditModal(true);
-                  }}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
-                >
-                  <Edit className="w-4 h-4" />
-                  Edit User
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )} */}
-        {showViewModal && selectedUser && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg w-full max-w-2xl mx-4">
-              <div className="p-6">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-semibold text-gray-900">
-                    {isEditing ? "Edit User" : "User Details"}
-                  </h2>
-                  <button
-                    onClick={() => {
-                      setIsEditing(false);
-                      setShowViewModal(false);
-                    }}
-                    className="text-gray-400 hover:text-gray-600"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-
-                {/* Profile + Details */}
-                <div className="flex items-start gap-6">
+              {/* Body */}
+              <div className="p-6 space-y-8">
+                {/* Profile */}
+                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
                   <div className="relative">
                     <img
                       src={
@@ -1031,56 +929,58 @@ const birthMonthData = monthNames.map((m, i) => ({
                         selectedUser.userImage
                       }
                       alt={formData.name}
-                      className="w-20 h-20 rounded-full object-cover"
+                      className="w-24 h-24 rounded-full object-cover border shadow"
                     />
                     {isEditing && (
                       <input
                         type="file"
                         accept="image/*"
                         onChange={handleImageChange}
-                        className="absolute top-0 left-0 w-20 h-20 opacity-0 cursor-pointer"
+                        className="absolute top-0 left-0 w-24 h-24 opacity-0 cursor-pointer"
                       />
                     )}
                   </div>
 
-                  <div className="flex-1">
+                  <div className="flex-1 space-y-1">
                     {isEditing ? (
-                      <input
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        className="text-xl font-semibold text-gray-900 border rounded px-2 py-1 w-full"
-                      />
+                      <>
+                        <input
+                          type="text"
+                          name="name"
+                          value={formData.name}
+                          onChange={handleChange}
+                          className="text-xl font-semibold border rounded-lg px-3 py-2 w-full"
+                        />
+                        <input
+                          type="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleChange}
+                          className="text-gray-600 border rounded-lg px-3 py-2 w-full"
+                        />
+                      </>
                     ) : (
-                      <h3 className="text-xl font-semibold text-gray-900">
-                        {selectedUser.name || formData.name}
-                      </h3>
-                    )}
-                    {isEditing ? (
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        className="text-gray-600 border rounded px-2 py-1 w-full mt-1"
-                      />
-                    ) : (
-                      <p className="text-gray-600">
-                        {selectedUser.email || formData.email}
-                      </p>
+                      <>
+                        <h3 className="text-xl font-semibold text-gray-900">
+                          {selectedUser.name}
+                        </h3>
+                        <p className="text-gray-600">{selectedUser.email}</p>
+                      </>
                     )}
                   </div>
                 </div>
 
-                {/* Grid Details */}
-                <div className="grid grid-cols-2 gap-6 mt-6">
+                <hr />
+
+                {/* Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                   {/* Contact */}
                   <div>
                     <h4 className="font-medium text-gray-900 mb-3">
                       Contact Information
                     </h4>
-                    <div className="space-y-2 text-sm">
+                    <div className="space-y-3 text-sm">
+                      {/* Phone */}
                       <div className="flex items-center gap-2">
                         <Phone className="w-4 h-4 text-gray-400" />
                         {isEditing ? (
@@ -1089,15 +989,17 @@ const birthMonthData = monthNames.map((m, i) => ({
                             name="contact"
                             value={formData.contact}
                             onChange={handleChange}
-                            className="border rounded px-2 py-1 w-full"
+                            className="border rounded-lg px-3 py-2 w-full"
                           />
                         ) : (
-                          <span>{selectedUser.phone || formData.contact}</span>
+                          <span>{selectedUser.phone}</span>
                         )}
                       </div>
+
+                      {/* Email */}
                       <div className="flex items-center gap-2">
                         <Mail className="w-4 h-4 text-gray-400" />
-                        <span>{selectedUser.email || formData.email}</span>
+                        <span>{selectedUser.email}</span>
                       </div>
                     </div>
                   </div>
@@ -1107,7 +1009,8 @@ const birthMonthData = monthNames.map((m, i) => ({
                     <h4 className="font-medium text-gray-900 mb-3">
                       Account Details
                     </h4>
-                    <div className="space-y-2 text-sm">
+                    <div className="space-y-3 text-sm">
+                      {/* DOB */}
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-gray-400" />
                         {isEditing ? (
@@ -1116,12 +1019,14 @@ const birthMonthData = monthNames.map((m, i) => ({
                             name="DOB"
                             value={formData.DOB || ""}
                             onChange={handleChange}
-                            className="border rounded px-2 py-1 w-full"
+                            className="border rounded-lg px-3 py-2 w-full"
                           />
                         ) : (
-                          <span>DOB: {selectedUser.DOB || formData.DOB}</span>
+                          <span>DOB: {selectedUser.DOB}</span>
                         )}
                       </div>
+
+                      {/* Wallet */}
                       <div className="flex items-center gap-2">
                         <Wallet className="w-4 h-4 text-gray-400" />
                         {isEditing ? (
@@ -1130,49 +1035,69 @@ const birthMonthData = monthNames.map((m, i) => ({
                             name="walletBalance"
                             value={formData.walletBalance}
                             onChange={handleChange}
-                            className="border rounded px-2 py-1 w-full"
+                            className="border rounded-lg px-3 py-2 w-full"
                           />
                         ) : (
                           <span>
-                            Wallet balance:{" "}
-                            {selectedUser.walletBalance ||
-                              formData.walletBalance}
+                            Wallet Balance: {selectedUser.walletBalance}
                           </span>
                         )}
                       </div>
                     </div>
                   </div>
                 </div>
+              </div>
 
-                {/* Buttons */}
-                <div className="flex gap-3 mt-8">
+              {/* Footer Buttons */}
+              <div className="px-6 py-4 border-t flex flex-wrap gap-3 justify-end">
+                {/* Close */}
+                <button
+                  onClick={() => {
+                    setIsEditing(false);
+                    setShowViewModal(false);
+                  }}
+                  className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+                >
+                  Close
+                </button>
+
+                {/* Edit / Save */}
+                {isEditing ? (
                   <button
-                    onClick={() => {
-                      setIsEditing(false);
-                      setShowViewModal(false);
-                    }}
-                    className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+                    onClick={handleSubmit}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 shadow-sm"
                   >
-                    Close
+                    Save Changes
                   </button>
-
-                  {isEditing ? (
-                    <button
-                      onClick={handleSubmit}
-                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                    >
-                      Save Changes
-                    </button>
-                  ) : (
+                ) : (
+                  <>
                     <button
                       onClick={() => setIsEditing(true)}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-sm flex items-center gap-2"
                     >
                       <Edit className="w-4 h-4" />
                       Edit User
                     </button>
-                  )}
-                </div>
+                    {/* New Button → See All Bookings */}
+                    <button
+                      onClick={() =>
+                       { navigate(`/customer/booking`, {
+                         state: {
+                           userId: selectedUser.userId,
+                           userName: selectedUser.name,
+                           userImage: selectedUser.userImage,
+                         },
+                       });
+                       console.log("userImage", selectedUser.name);
+                      }
+                      }
+                      className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-sm flex items-center gap-2"
+                    >
+                      <Calendar className="w-4 h-4" />
+                      See All Bookings
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>

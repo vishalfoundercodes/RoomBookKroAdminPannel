@@ -13,6 +13,7 @@ import PrettyDropdown from "./Dropdown";
 import RevenueChart from "./RevenueChart";
 import RevenuePie from "./RevenuePiChart";
 import Loader from "../Loader/Loader";
+import { useLocation } from "react-router-dom";
 
 
 const Revenue = () => {
@@ -23,6 +24,8 @@ const Revenue = () => {
     const [filterQuickDate, setFilterQuickDate] = useState("All");
     const [checkInFilter, setCheckInFilter] = useState("");
     const [checkOutFilter, setCheckOutFilter] = useState("");
+    const location = useLocation();
+    const [highlight, setHighlight] = useState("");
 
 
      const dispatch = useDispatch();
@@ -99,6 +102,19 @@ const filteredRevenue = revenueList?.filter((item) => {
     0
   );
 
+
+
+    useEffect(() => {
+      if (location.state?.highlight) {
+        setHighlight(location.state.highlight);
+
+        const timer = setTimeout(() => {
+          setHighlight("");
+        }, 1200);
+
+        return () => clearTimeout(timer);
+      }
+    }, [location.state]);
  
    if ( loading) {
      return <Loader />;
@@ -114,7 +130,11 @@ const filteredRevenue = revenueList?.filter((item) => {
         {/* Summary Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-8">
           {/* Total Revenue Count */}
-          <div className="p-4 sm:p-6 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl sm:rounded-2xl shadow-lg text-white flex items-center justify-between cursor-pointer">
+          <div
+            className={`p-4 sm:p-6 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl sm:rounded-2xl shadow-lg text-white flex items-center justify-between cursor-pointer 
+         
+            `}
+          >
             <div>
               <p className="text-xs sm:text-sm opacity-80">
                 Total Revenue Count
@@ -127,35 +147,51 @@ const filteredRevenue = revenueList?.filter((item) => {
           </div>
 
           {/* Total Commission */}
-          <div className="p-4 sm:p-6 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl sm:rounded-2xl shadow-lg text-white flex items-center justify-between cursor-pointer">
+          <div
+            className={`p-4 sm:p-6 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl sm:rounded-2xl shadow-lg text-white flex items-center justify-between cursor-pointer ${
+              highlight == "Total Revenue" ? "animate-bounce bg-yellow-100" : ""
+            }`}
+          >
             <div>
               <p className="text-xs sm:text-sm opacity-80">Total Commission</p>
               <h2 className="text-xl sm:text-3xl font-bold mt-1">
-                ₹{totalCommission}
+                ₹{Number(totalCommission).toFixed(2)}
               </h2>
             </div>
             <Wallet className="w-8 h-8 sm:w-12 sm:h-12 opacity-80" />
           </div>
 
           {/* Vendor Revenue */}
-          <div className="p-4 sm:p-6 bg-gradient-to-r from-green-500 to-green-600 rounded-xl sm:rounded-2xl shadow-lg text-white flex items-center justify-between cursor-pointer">
+          <div
+            className={`p-4 sm:p-6 bg-gradient-to-r from-green-500 to-green-600 rounded-xl sm:rounded-2xl shadow-lg text-white flex items-center justify-between cursor-pointe ${
+              highlight == "Total Vendor Revenue"
+                ? "animate-bounce bg-yellow-100"
+                : ""
+            }`}
+          >
             <div>
               <p className="text-xs sm:text-sm opacity-80">Vendor Earnings</p>
               <h2 className="text-xl sm:text-3xl font-bold mt-1">
-                ₹{totalVendorRevenue}
+                ₹{Number(totalVendorRevenue).toFixed(2)}
               </h2>
             </div>
             <Coins className="w-8 h-8 sm:w-12 sm:h-12 opacity-80" />
           </div>
 
           {/* Final Amount */}
-          <div className="p-4 sm:p-6 bg-gradient-to-r from-pink-500 to-pink-600 rounded-xl sm:rounded-2xl shadow-lg text-white flex items-center justify-between cursor-pointer">
+          <div
+            className={`p-4 sm:p-6 bg-gradient-to-r from-pink-500 to-pink-600 rounded-xl sm:rounded-2xl shadow-lg text-white flex items-center justify-between cursor-pointer  ${
+              highlight == "Total Booking Amount"
+                ? "animate-bounce bg-yellow-100"
+                : ""
+            }`}
+          >
             <div>
               <p className="text-xs sm:text-sm opacity-80">
                 Total Booking Amount
               </p>
               <h2 className="text-xl sm:text-3xl font-bold mt-1">
-                ₹{totalFinalAmount}
+                ₹{Number(totalFinalAmount).toFixed(2)}
               </h2>
             </div>
             <CreditCard className="w-8 h-8 sm:w-12 sm:h-12 opacity-80" />

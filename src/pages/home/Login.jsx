@@ -60,7 +60,7 @@ const handleSubmit = async () => {
 
       // Save token
       localStorage.setItem("token", loginToken);
-      toast.success("Login successful");
+      toast.success("Welcome to the admin dashboard");
 
       console.log("Login successful:", user);
 
