@@ -17,6 +17,8 @@ import EditPropertyModal from './EditPropertyModal';
 import CustomVerificationDropdown from './CustomVerify';
 import CustomPropertyTypeDropdown from './CustomPropertyDropDown';
 import CustomAvailabilityDropdown from './CustomAvailableDropdown';
+import NewStatCard from '../User/Newstate';
+import { useLocation } from 'react-router-dom';
 
 const PropertyPage = () => {
   const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -25,7 +27,8 @@ const PropertyPage = () => {
 
 
   const [isUploading, setIsUploading] = useState(false);
-
+  const location = useLocation();
+  const highlight = location.state?.highlight;
 
 
   const dispatch = useDispatch();
@@ -273,7 +276,7 @@ const handleCommissionChange = async(id, value) => {
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-8">
-        <StatCard
+        {/* <StatCard
           title="Total Property"
           value={totalProperty.toString()}
           change="+12 this month"
@@ -356,6 +359,77 @@ const handleCommissionChange = async(id, value) => {
           changeType="neutral"
           icon={Users}
           color="teal"
+        /> */}
+        <NewStatCard
+          title="Total Property"
+          highlight={highlight}
+          value={totalProperty.toString()}
+          icon={Home}
+          gradient="from-blue-700 to-cyan-500"
+        />
+
+        <NewStatCard
+          title="Available Property"
+          highlight={highlight}
+          value={activeProperty.toString()}
+          icon={UserCheck}
+          gradient="from-green-700 to-lime-500"
+        />
+
+        <NewStatCard
+          title="Not Available Property"
+          highlight={highlight}
+          value={inactiveProperty.toString()}
+          icon={UserX}
+          gradient="from-red-700 to-orange-500"
+        />
+
+        <NewStatCard
+          title="Not Verified Property"
+          highlight={highlight}
+          value={notVerifyPropertyCount.toString()}
+          icon={ShieldCheck}
+          gradient="from-yellow-600 to-amber-400"
+        />
+
+        <NewStatCard
+          title="Verified Property"
+          highlight={highlight}
+          value={verifyPropertyCount.toString()}
+          icon={ShieldCheck}
+          gradient="from-emerald-700 to-green-500"
+        />
+
+        <NewStatCard
+          title="Hotel Property"
+          highlight={highlight}
+          value={hotelCount.toString()}
+          icon={Hotel}
+          gradient="from-purple-700 to-pink-500"
+        />
+
+        <NewStatCard
+          title="PG Property"
+          highlight={highlight}
+          value={pgCount.toString()}
+          icon={Building2}
+          gradient="from-indigo-700 to-violet-500"
+        />
+
+        <NewStatCard
+          title="Apartment Property"
+          highlight={highlight}
+          value={AppartmentCount.toString()}
+          icon={Building}
+          gradient="from-cyan-700 to-blue-400"
+        />
+
+        <NewStatCard
+          title="Dormitory Property"
+          highlight={highlight}
+          value={dormitaryCount.toString()}
+          icon={Users}
+          gradient="from-teal-700 to-emerald-500"
         />
       </div>
 

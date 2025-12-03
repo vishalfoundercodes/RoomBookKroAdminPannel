@@ -13,7 +13,7 @@ import PrettyDropdown from "./Dropdown";
 import RevenueChart from "./RevenueChart";
 import RevenuePie from "./RevenuePiChart";
 import Loader from "../Loader/Loader";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 
 const Revenue = () => {
@@ -26,6 +26,7 @@ const Revenue = () => {
     const [checkOutFilter, setCheckOutFilter] = useState("");
     const location = useLocation();
     const [highlight, setHighlight] = useState("");
+    const navigate=useNavigate()
 
 
      const dispatch = useDispatch();
@@ -139,7 +140,7 @@ const filteredRevenue = revenueList?.filter((item) => {
               <p className="text-xs sm:text-sm opacity-80">
                 Total Revenue Count
               </p>
-              <h2 className="text-xl sm:text-3xl font-bold mt-1">
+              <h2 className="text-sm sm:text-3xl font-bold mt-1">
                 {revenueCount}
               </h2>
             </div>
@@ -154,7 +155,7 @@ const filteredRevenue = revenueList?.filter((item) => {
           >
             <div>
               <p className="text-xs sm:text-sm opacity-80">Total Commission</p>
-              <h2 className="text-xl sm:text-3xl font-bold mt-1">
+              <h2 className="text-sm sm:text-3xl font-bold mt-1">
                 ₹{Number(totalCommission).toFixed(2)}
               </h2>
             </div>
@@ -168,10 +169,11 @@ const filteredRevenue = revenueList?.filter((item) => {
                 ? "animate-bounce bg-yellow-100"
                 : ""
             }`}
+            onClick={() => navigate("/revenue/vendorlist")}
           >
             <div>
               <p className="text-xs sm:text-sm opacity-80">Vendor Earnings</p>
-              <h2 className="text-xl sm:text-3xl font-bold mt-1">
+              <h2 className="text-sm sm:text-3xl font-bold mt-1">
                 ₹{Number(totalVendorRevenue).toFixed(2)}
               </h2>
             </div>
@@ -187,10 +189,8 @@ const filteredRevenue = revenueList?.filter((item) => {
             }`}
           >
             <div>
-              <p className="text-xs sm:text-sm opacity-80">
-                Total Booking Amount
-              </p>
-              <h2 className="text-xl sm:text-3xl font-bold mt-1">
+              <p className="text-xs sm:text-sm opacity-80">Total Revenue</p>
+              <h2 className="text-sm sm:text-3xl font-bold mt-1">
                 ₹{Number(totalFinalAmount).toFixed(2)}
               </h2>
             </div>
@@ -359,15 +359,15 @@ const filteredRevenue = revenueList?.filter((item) => {
                     </td>
 
                     <td className="py-4 px-5 text-blue-600 font-semibold">
-                      ₹{item.commisionAmount}
+                      ₹{item.commisionAmount.toFixed(2)}
                     </td>
 
                     <td className="py-4 px-5 text-green-600 font-semibold">
-                      ₹{item.vendorRevenue}
+                      ₹{item.vendorRevenue.toFixed(2)}
                     </td>
 
                     <td className="py-4 px-5 text-purple-600 font-semibold">
-                      ₹{item.finalAmount}
+                      ₹{item.finalAmount.toFixed(2)}
                     </td>
 
                     <td className="py-4 px-5">

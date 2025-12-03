@@ -82,12 +82,13 @@ export const Sidebar = ({ isOpen, onClose }) => {
         {/* Sidebar Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-700">
           {/* <h2 className="text-xl font-bold">Admin Panel</h2> */}
-          <h2 className="text-xl font-bold"> Room Book Karo </h2>
-          {/* <img
+          
+          <img
             src="/logo.png"
             className="w-12 h-12 border-2 border-green-600 rounded-full"
             alt="Logo"
-          /> */}
+          />
+          <h2 className="text-lg lg:text-xl font-bold whitespace-nowrap"> Room Book Karo </h2>
           <button onClick={onClose} className="lg:hidden">
             <X size={20} />
           </button>

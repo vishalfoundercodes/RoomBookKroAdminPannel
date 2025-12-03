@@ -19,6 +19,7 @@ import CustomPropertyTypeDropdown from "../Property/CustomPropertyDropDown";
 import CustomAvailabilityDropdown from '../Property/CustomAvailableDropdown';
 import { useLocation, useNavigate } from "react-router-dom";
   import { useParams } from "react-router-dom";
+import NewStatCard from './Newstate';
 
 const PropertyPage = () => {
   const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -421,7 +422,7 @@ const PropertyPage = () => {
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-        <StatCard
+        {/* <StatCard
           title="Total Property"
           value={totalProperty.toString()}
           change="+12 this month"
@@ -514,6 +515,77 @@ const PropertyPage = () => {
           icon={Users}
           color="teal"
           route="/vendor/property"
+        /> */}
+        <NewStatCard
+          title="Total Property"
+          value={totalProperty}
+          icon={Home}
+          // route="/vendor/property"
+          gradient="from-blue-700 to-cyan-500"
+        />
+
+        <NewStatCard
+          title="Available Property"
+          value={activeProperty}
+          icon={UserCheck}
+          gradient="from-green-700 to-lime-500"
+        />
+
+        <NewStatCard
+          title="Not Available Property"
+          value={inactiveProperty}
+          icon={UserX}
+          gradient="from-red-700 to-orange-500"
+        />
+
+        <NewStatCard
+          title="Not Verified Property"
+          value={notVerifyPropertyCount}
+          icon={ShieldCheck}
+          gradient="from-yellow-600 to-amber-400"
+        />
+
+        <NewStatCard
+          title="Verified Property"
+          value={verifyPropertyCount}
+          icon={ShieldCheck}
+          gradient="from-emerald-700 to-green-500"
+        />
+
+        <NewStatCard
+          title="Hotel Property"
+          value={hotelCount}
+          icon={Hotel}
+          gradient="from-purple-700 to-pink-500"
+        />
+
+        <NewStatCard
+          title="PG Property"
+          value={pgCount}
+          icon={Building2}
+          gradient="from-indigo-700 to-violet-500"
+        />
+
+        <NewStatCard
+          title="Apartment Property"
+          value={AppartmentCount}
+          icon={Building}
+          gradient="from-cyan-700 to-blue-400"
+        />
+
+        <NewStatCard
+          title="Dormitory Property"
+          value={dormitaryCount}
+          icon={Users}
+          gradient="from-teal-700 to-emerald-500"
+        />
+
+        <NewStatCard
+          title="Total Revenue"
+          value={vendorRevenue}
+          icon={Users}
+          // route="/vendor/property"
+          gradient="from-rose-700 to-pink-500"
         />
       </div>
 

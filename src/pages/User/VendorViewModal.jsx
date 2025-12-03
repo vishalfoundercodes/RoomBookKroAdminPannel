@@ -198,22 +198,22 @@ const handleSeeProperty = async () => {
                 </div>
 
                 {/* Wallet */}
-                {/* <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3">
                   <Wallet className="text-gray-500 w-4 h-4" />
                   {isEditing ? (
                     <input
                       type="number"
                       name="walletBalance"
                       className="border rounded px-2 py-1 w-full"
-                      value={formData.walletBalance}
+                      value={formData.vendorRevenue}
                       onChange={handleChange}
                     />
                   ) : (
                     <span>
-                      ₹{selectedUser.walletBalance || formData.walletBalance}
+                      ₹{selectedUser.vendorRevenue || formData.vendorRevenue}
                     </span>
                   )}
-                </div> */}
+                </div>
               </div>
             </div>
 

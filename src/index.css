@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+.animate-bounce-twice {
+  animation: bounce 1s ease-in-out 2;
+}

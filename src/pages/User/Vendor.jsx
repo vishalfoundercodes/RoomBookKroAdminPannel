@@ -33,6 +33,7 @@ import {
   Landmark,
   Stamp,
   BookUser,
+  TrendingUp,
 } from "lucide-react";
 import Card from "../../reusable_components/Card";
 import StatCard from "../../reusable_components/StatCard";
@@ -46,7 +47,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchUsers } from "../../redux/slices/userSlice";
 import { signupUser } from "../../redux/slices/authSlice";
 import { profileUpdate, profileDelete } from "../../redux/slices/profileSlice";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { SiAutoprefixer } from "react-icons/si";
 import CustomDropdown from "./CustomDropDown";
 import StatusDropdown from "./StatusDropdown";
@@ -352,6 +353,20 @@ const VendorPage = () => {
     // navigate("/notification", { state: { user } }); // Option 2: via state
   };
 
+      const location = useLocation();
+      const [highlight, setHighlight] = useState("");
+          useEffect(() => {
+            if (location.state?.highlight) {
+              setHighlight(location.state.highlight);
+      
+              const timer = setTimeout(() => {
+                setHighlight("");
+              }, 1200);
+      
+              return () => clearTimeout(timer);
+            }
+          }, [location.state]);
+
   if (usersLoading || loading) {
     return <Loader />;
   }
@@ -386,46 +401,191 @@ return (
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-        <StatCard
-          title="Total Vendors"
-          value={totalVendor.toString()}
-          change="Vendor network expanding"
-          changeType="positive"
-          icon={Store}
-          color="purple"
-        />
-        <StatCard
+        {/* <div
+          className={` ${
+            highlight == "Total Vendors" ? "animate-bounce bg-yellow-100" : ""
+          }`}
+        >
+          <StatCard
+            title="Total Vendors"
+            value={totalVendor.toString()}
+            change="Vendor network expanding"
+            changeType="positive"
+            icon={Store}
+            color="#E3F2FD"
+          />
+        </div> */}
+        <div
+          className={`transition-all duration-300 
+    ${highlight == "Total Vendors" ? "animate-bounce" : ""}
+  `}
+        >
+          <div
+            className="
+      p-4 sm:p-6 
+      bg-gradient-to-r from-blue-500 to-blue-600 
+      rounded-xl sm:rounded-2xl 
+      shadow-lg text-white 
+      flex items-center justify-between 
+      cursor-pointer
+    "
+          >
+            {/* LEFT SIDE CONTENT */}
+            <div>
+              <p className="text-xs sm:text-sm opacity-80">Total Vendors</p>
+              <h2 className="text-sm sm:text-3xl font-bold mt-1">
+                {totalVendor}
+              </h2>
+            </div>
+
+            {/* ICON */}
+            <Store className="w-8 h-8 sm:w-12 sm:h-12 opacity-80" />
+          </div>
+        </div>
+
+        {/* <StatCard
           title="Verified Vendors"
           value={veryfiedVendor.toString()}
           change="Trusted & verified vendors"
           changeType="positive"
           icon={ShieldCheck}
           color="green"
-        />
-        <StatCard
+        /> */}
+
+        <div
+          className={`transition-all duration-300 
+    ${highlight == "Verified Vendors" ? "animate-bounce" : ""}
+  `}
+        >
+          {" "}
+          <div
+            className={`
+    p-4 sm:p-6 
+    bg-gradient-to-r from-green-500 to-emerald-600
+    rounded-xl sm:rounded-2xl 
+    shadow-lg text-white 
+    flex items-center justify-between 
+    cursor-pointer
+  `}
+          >
+            <div>
+              <p className="text-xs sm:text-sm opacity-80">Verified Vendors</p>
+              <h2 className="text-sm sm:text-3xl font-bold mt-1">
+                {veryfiedVendor}
+              </h2>
+            </div>
+
+            <ShieldCheck className="w-8 h-8 sm:w-12 sm:h-12 opacity-80" />
+          </div>
+        </div>
+
+        {/* <StatCard
           title="Unverified Vendors"
           value={notVeryfiedVendor.toString()}
           change="Verification required"
           changeType="negative"
           icon={ShieldAlert}
           color="red"
-        />
-        <StatCard
+        /> */}
+
+        <div
+          className={`transition-all duration-300 
+    ${highlight == "Unverified Vendors" ? "animate-bounce" : ""}
+  `}
+        >
+          <div
+            className={`
+    p-4 sm:p-6 
+    bg-gradient-to-r from-red-500 to-orange-600
+    rounded-xl sm:rounded-2xl 
+    shadow-lg text-white 
+    flex items-center justify-between 
+    cursor-pointer
+  `}
+          >
+            <div>
+              <p className="text-xs sm:text-sm opacity-80">
+                Unverified Vendors
+              </p>
+              <h2 className="text-sm sm:text-3xl font-bold mt-1">
+                {notVeryfiedVendor}
+              </h2>
+            </div>
+
+            <ShieldAlert className="w-8 h-8 sm:w-12 sm:h-12 opacity-80" />
+          </div>
+        </div>
+
+        {/* <StatCard
           title="Active Vendors"
           value={activeVendor.toString()}
           change="Vendors actively serving"
           changeType="positive"
           icon={Store}
           color="green"
-        />
-        <StatCard
+        /> */}
+
+        <div
+          className={`transition-all duration-300 
+    ${highlight == "Active Vendors" ? "animate-bounce" : ""}
+  `}
+        >
+          {" "}
+          <div
+            className={`
+    p-4 sm:p-6 
+    bg-gradient-to-r from-purple-500 to-indigo-600
+    rounded-xl sm:rounded-2xl 
+    shadow-lg text-white 
+    flex items-center justify-between 
+    cursor-pointer
+  `}
+          >
+            <div>
+              <p className="text-xs sm:text-sm opacity-80">Active Vendors</p>
+              <h2 className="text-sm sm:text-3xl font-bold mt-1">
+                {activeVendor}
+              </h2>
+            </div>
+
+            <Store className="w-8 h-8 sm:w-12 sm:h-12 opacity-80" />
+          </div>
+        </div>
+
+        {/* <StatCard
           title="Inactive Vendors"
           value={inActiveVendor.toString()}
           change="Vendor not active currently"
           changeType="negative"
           icon={SiAutoprefixer}
           color="red"
-        />
+        /> */}
+
+        <div
+          className={`transition-all duration-300 
+    ${highlight == "Inactive Vendors" ? "animate-bounce" : ""}
+  `}
+        >
+          <div
+            className={`
+    p-4 sm:p-6 
+    bg-gradient-to-r from-gray-500 to-blue-500
+    rounded-xl sm:rounded-2xl 
+    shadow-lg text-white 
+    flex items-center justify-between 
+    cursor-pointer
+  `}
+          >
+            <div>
+              <p className="text-xs sm:text-sm opacity-80">Inactive Vendors</p>
+              <h2 className="text-sm sm:text-3xl font-bold mt-1">
+                {inActiveVendor}
+              </h2>
+            </div>
+
+            <SiAutoprefixer className="w-8 h-8 sm:w-12 sm:h-12 opacity-80" />
+          </div>
+        </div>
       </div>
 
       {/* Charts Section */}
@@ -533,6 +693,9 @@ return (
                 </th>
                 <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
                   Verify Vendor
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
+                  Vendor Revenue
                 </th>
                 <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
                   DOB
@@ -648,6 +811,12 @@ return (
                       <option value="true">Verified</option>
                       <option value="false">Not Verified</option>
                     </select>
+                  </td>
+                  <td className="py-3 px-4 text-sm text-black whitespace-nowrap">
+                    <div className="flex items-center gap-1">
+                      <TrendingUp className="w-4 h-4 text-green-400" />
+                      {user.vendorRevenue}
+                    </div>
                   </td>
                   <td className="py-3 px-4 text-sm text-black whitespace-nowrap">
                     <div className="flex items-center gap-1">

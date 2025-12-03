@@ -41,7 +41,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchUsers } from "../../redux/slices/userSlice";
 import { signupUser } from "../../redux/slices/authSlice";
 import { profileUpdate, profileDelete } from "../../redux/slices/profileSlice";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { SiAutoprefixer } from 'react-icons/si';
 import CustomDropdown from './CustomDropDown';
 import StatusDropdown from './StatusDropdown';
@@ -387,6 +387,19 @@ const birthMonthData = monthNames.map((m, i) => ({
 
 
 
+      const location = useLocation();
+      const [highlight, setHighlight] = useState("");
+      useEffect(() => {
+        if (location.state?.highlight) {
+          setHighlight(location.state.highlight);
+
+          const timer = setTimeout(() => {
+            setHighlight("");
+          }, 1200);
+
+          return () => clearTimeout(timer);
+        }
+      }, [location.state]);
 
 
 
@@ -433,17 +446,42 @@ const birthMonthData = monthNames.map((m, i) => ({
           /> */}
 
           {/* Total Customers */}
-          <StatCard
+          {/* <StatCard
             title="Total Customers"
             value={totalCustomer.toString()}
             change="Customer base growing steadily"
             changeType="positive"
             icon={UserRound}
             color="green"
-          />
+          /> */}
+          <div
+            className={`transition-all duration-300 
+    ${highlight == "Total Customers" ? "animate-bounce" : ""}
+  `}
+          >
+            <div
+              className="
+      p-4 sm:p-6 
+      bg-gradient-to-r from-blue-500 to-purple-600
+      rounded-xl sm:rounded-2xl 
+      shadow-lg text-white 
+      flex items-center justify-between 
+      cursor-pointer
+    "
+            >
+              <div>
+                <p className="text-xs sm:text-sm opacity-80">Total Customers</p>
+                <h2 className="text-sm sm:text-3xl font-bold mt-1">
+                  {totalCustomer}
+                </h2>
+              </div>
+
+              <UserRound className="w-8 h-8 sm:w-12 sm:h-12 opacity-80" />
+            </div>
+          </div>
 
           {/* Active Customers */}
-          <StatCard
+          {/* <StatCard
             title="Active Customers"
             value={activeUsers.toString()}
             change={`${((activeUsers / totalUsers) * 100).toFixed(
@@ -452,17 +490,71 @@ const birthMonthData = monthNames.map((m, i) => ({
             changeType="positive"
             icon={UserCheck}
             color="green"
-          />
+          /> */}
+          <div
+            className={`transition-all duration-300 
+    ${highlight == "Active Customers" ? "animate-bounce" : ""}
+  `}
+          >
+            <div
+              className="
+      p-4 sm:p-6 
+      bg-gradient-to-r from-green-500 to-emerald-600
+      rounded-xl sm:rounded-2xl 
+      shadow-lg text-white 
+      flex items-center justify-between 
+      cursor-pointer
+    "
+            >
+              <div>
+                <p className="text-xs sm:text-sm opacity-80">
+                  Active Customers
+                </p>
+                <h2 className="text-sm sm:text-3xl font-bold mt-1">
+                  {activeUsers}
+                </h2>
+              </div>
+
+              <UserCheck className="w-8 h-8 sm:w-12 sm:h-12 opacity-80" />
+            </div>
+          </div>
 
           {/* Inactive Customers */}
-          <StatCard
+          {/* <StatCard
             title="Inactive Customers"
             value={inactiveUsers.toString()}
             change="Re-engagement recommended"
             changeType="negative"
             icon={UserMinus}
             color="red"
-          />
+          /> */}
+          <div
+            className={`transition-all duration-300 
+    ${highlight == "Inactive Customers" ? "animate-bounce" : ""}
+  `}
+          >
+            <div
+              className="
+      p-4 sm:p-6 
+      bg-gradient-to-r from-gray-600 to-red-500
+      rounded-xl sm:rounded-2xl 
+      shadow-lg text-white 
+      flex items-center justify-between 
+      cursor-pointer
+    "
+            >
+              <div>
+                <p className="text-xs sm:text-sm opacity-80">
+                  Inactive Customers
+                </p>
+                <h2 className="text-sm sm:text-3xl font-bold mt-1">
+                  {inactiveUsers}
+                </h2>
+              </div>
+
+              <UserMinus className="w-8 h-8 sm:w-12 sm:h-12 opacity-80" />
+            </div>
+          </div>
         </div>
 
         {/* Charts Section */}
@@ -1080,17 +1172,16 @@ const birthMonthData = monthNames.map((m, i) => ({
                     </button>
                     {/* New Button → See All Bookings */}
                     <button
-                      onClick={() =>
-                       { navigate(`/customer/booking`, {
-                         state: {
-                           userId: selectedUser.userId,
-                           userName: selectedUser.name,
-                           userImage: selectedUser.userImage,
-                         },
-                       });
-                       console.log("userImage", selectedUser.name);
-                      }
-                      }
+                      onClick={() => {
+                        navigate(`/customer/booking`, {
+                          state: {
+                            userId: selectedUser.userId,
+                            userName: selectedUser.name,
+                            userImage: selectedUser.userImage,
+                          },
+                        });
+                        console.log("userImage", selectedUser.name);
+                      }}
                       className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-sm flex items-center gap-2"
                     >
                       <Calendar className="w-4 h-4" />

@@ -17,6 +17,7 @@ import Revenue from "./pages/Revenue/Revenue";
 import VendorPage from "./pages/User/Vendor";
 import VendorWiseProperty from "./pages/User/VendorWiseProperty";
 import CustomerWiseBooking from "./pages/User/CustomerWiseBooking";
+import VendorRevenueList from "./pages/Revenue/VendorRevenueList";
 
 export const Router = createBrowserRouter([
   {
@@ -47,6 +48,7 @@ export const Router = createBrowserRouter([
           { path: "/history", element: <History /> },
           { path: "/addimagepage", element: <AddImagePage /> },
           { path: "/revenue", element: <Revenue /> },
+          { path: "/revenue/vendorlist", element: <VendorRevenueList /> },
         ],
       },
     ],

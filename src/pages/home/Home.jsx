@@ -246,12 +246,11 @@ const Home = () => {
       {/* Statistics Cards Row */}
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 p-2">
         <StatCard
-          title="Total Revenue"
+          title="Total Admin Revenue"
           value={totalCommission.toFixed(2)}
           change="+12.5%"
           changeType="positive"
           icon={IndianRupee}
-          color="green"
           route="/revenue"
           titleHighlight="Total Revenue Count"
         />
@@ -261,29 +260,26 @@ const Home = () => {
           change="Growing steadily this month"
           changeType="positive"
           icon={Coins}
-          color="green"
           route="/revenue"
         />
 
         <StatCard
-          title="Total Booking Amount"
+          title="Total Revenue"
           value={totalFinalAmount.toFixed(2)}
           change="Increase compared to last month"
           changeType="positive"
           icon={CreditCard}
-          color="green"
           route="/revenue"
         />
 
-        <StatCard
+        {/* <StatCard
           title="Total Users"
           value={totalUsers.toString()}
           change="+12 this month"
           changeType="positive"
           icon={Users}
-          color="blue"
           route="/users"
-        />
+        /> */}
         {/* Total Customers */}
         <StatCard
           title="Total Customers"
@@ -291,7 +287,6 @@ const Home = () => {
           change="Customer base growing steadily"
           changeType="positive"
           icon={UserRound}
-          color="green"
           route="/users"
         />
 
@@ -304,7 +299,6 @@ const Home = () => {
           )}% active users`}
           changeType="positive"
           icon={UserCheck}
-          color="green"
           route="/users"
         />
 
@@ -315,7 +309,6 @@ const Home = () => {
           change="Re-engagement recommended"
           changeType="negative"
           icon={UserMinus}
-          color="red"
           route="/users"
         />
 
@@ -326,8 +319,7 @@ const Home = () => {
           change="Vendor network expanding"
           changeType="positive"
           icon={Store}
-          color="purple"
-          route="/users"
+          route="/vendor"
         />
 
         {/* Verified Vendors */}
@@ -337,7 +329,6 @@ const Home = () => {
           change="Trusted & verified vendors"
           changeType="positive"
           icon={ShieldCheck}
-          color="green"
           route="/vendor"
         />
 
@@ -348,7 +339,6 @@ const Home = () => {
           change="Verification required"
           changeType="negative"
           icon={ShieldAlert}
-          color="red"
           route="/vendor"
         />
 
@@ -359,7 +349,6 @@ const Home = () => {
           change="Vendors actively serving"
           changeType="positive"
           icon={Store}
-          color="green"
           route="/vendor"
         />
 
@@ -370,7 +359,6 @@ const Home = () => {
           change="Vendor not active currently"
           changeType="negative"
           icon={SiAutoprefixer}
-          color="red"
           route="/vendor"
         />
 
@@ -388,7 +376,6 @@ const Home = () => {
           change="+8.7%"
           changeType="positive"
           icon={User}
-          color="yellow"
           route="/property"
         />
         {/* <StatCard
@@ -406,7 +393,6 @@ const Home = () => {
           change={`12% available`}
           changeType="positive"
           icon={UserCheck}
-          color="green"
           route="/property"
         />
 
@@ -416,7 +402,6 @@ const Home = () => {
           change="Unavailable currently"
           changeType="negative"
           icon={UserX}
-          color="red"
           route="/property"
         />
 
@@ -426,7 +411,6 @@ const Home = () => {
           change="Verification pending"
           changeType="warning"
           icon={ShieldCheck}
-          color="yellow"
           route="/property"
         />
 
@@ -436,7 +420,6 @@ const Home = () => {
           change="Verified successfully"
           changeType="positive"
           icon={ShieldCheck}
-          color="green"
           route="/property"
         />
 
@@ -446,7 +429,6 @@ const Home = () => {
           change="Hotel listings"
           changeType="neutral"
           icon={Hotel}
-          color="purple"
           route="/property"
         />
 
@@ -456,7 +438,6 @@ const Home = () => {
           change="PG listings"
           changeType="neutral"
           icon={Building2}
-          color="indigo"
           route="/property"
         />
 
@@ -466,7 +447,6 @@ const Home = () => {
           change="Apartment listings"
           changeType="neutral"
           icon={Building}
-          color="cyan"
           route="/property"
         />
 
@@ -476,7 +456,6 @@ const Home = () => {
           change="Dorm listings"
           changeType="neutral"
           icon={Users}
-          color="teal"
           route="/property"
         />
         <StatCard
@@ -485,7 +464,6 @@ const Home = () => {
           change="2.1%"
           changeType="positive"
           icon={ShoppingCart}
-          color="purple"
           route="/history"
         />
         {/* <StatCard
@@ -510,7 +488,6 @@ const Home = () => {
           change="Guests staying now"
           changeType="neutral"
           icon={Clock}
-          color="blue"
           route="/history"
         />
 
@@ -520,7 +497,6 @@ const Home = () => {
           change="Scheduled reservations"
           changeType="positive"
           icon={Calendar}
-          color="purple"
           route="/history"
         />
 
@@ -530,7 +506,6 @@ const Home = () => {
           change="Completed stays"
           changeType="neutral"
           icon={History}
-          color="indigo"
           route="/history"
         />
 
@@ -540,7 +515,6 @@ const Home = () => {
           change="Cancelled by user/vendor"
           changeType="negative"
           icon={XCircle}
-          color="orange"
         />
 
         <StatCard
@@ -549,7 +523,6 @@ const Home = () => {
           change="Awaiting confirmation"
           changeType="neutral"
           icon={AlertCircle}
-          color="yellow"
           route="/history"
         />
 
@@ -559,7 +532,6 @@ const Home = () => {
           change="Successfully processed"
           changeType="positive"
           icon={CheckCircle}
-          color="green"
           route="/history"
         />
         <StatCard
@@ -568,7 +540,6 @@ const Home = () => {
           change="Failed or declined"
           changeType="negative"
           icon={XCircle}
-          color="red"
           route="/history"
         />
 
@@ -578,7 +549,6 @@ const Home = () => {
           change="+8.7%"
           changeType="positive"
           icon={BiMoney}
-          color="red"
         /> */}
       </div>
 
