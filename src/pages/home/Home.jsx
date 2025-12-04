@@ -260,7 +260,7 @@ const Home = () => {
           change="Growing steadily this month"
           changeType="positive"
           icon={Coins}
-          route="/revenue"
+          route="/revenue/vendorlist"
         />
 
         <StatCard

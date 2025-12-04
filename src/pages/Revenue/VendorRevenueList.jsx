@@ -148,6 +148,7 @@ import { useNavigate } from "react-router-dom";
 import { fetchVendorProperty } from "../../redux/slices/propertySlice";
 import { fetchVendorRevenue } from "../../redux/slices/revenueSlice";
 import PrettyDropdown from "./Dropdown"; // <- adjust path
+import { toast } from "react-toastify";
 
 export default function VendorRevenueList() {
   const dispatch = useDispatch();

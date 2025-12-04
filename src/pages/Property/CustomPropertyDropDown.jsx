@@ -8,7 +8,7 @@ export default function CustomPropertyTypeDropdown({ value, onChange }) {
     { value: "All", label: "All Property" },
     { value: "hotel", label: "Hotel" },
     { value: "pg", label: "PG" },
-    { value: "appartment", label: "Appartment" },
+    { value: "apartment", label: "Apartment" },
     { value: "dormitary", label: "Dormitory" },
   ];
 

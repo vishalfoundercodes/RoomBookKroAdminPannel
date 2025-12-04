@@ -138,7 +138,7 @@ const PropertyPage = () => {
   const hotelCount =
     filteredProperty?.filter((u) => u.type == "hotel" || u.type=="Hotel").length || 0;
   const AppartmentCount =
-    filteredProperty?.filter((u) => u.type == "appartment").length || 0;
+    filteredProperty?.filter((u) => u.type == "apartment").length || 0;
   const dormitaryCount =
     filteredProperty?.filter((u) => u.type == "dormitary").length || 0;
 
@@ -146,6 +146,11 @@ const PropertyPage = () => {
     { name: "Active", value: activeProperty, color: "#10b981" },
     { name: "Inactive", value: inactiveProperty, color: "#ef4444" },
   ];
+
+    const PropertyVerifiction = [
+      { name: "Verify", value: verifyPropertyCount, color: "#10b981" },
+      { name: "Unverify", value: notVerifyPropertyCount, color: "#ef4444" },
+    ];
 
 
   const handleDeleteUser = (id) => {
@@ -275,7 +280,7 @@ const handleCommissionChange = async(id, value) => {
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
         {/* <StatCard
           title="Total Property"
           value={totalProperty.toString()}
@@ -440,6 +445,11 @@ const handleCommissionChange = async(id, value) => {
           data={PropertytatusData}
           height={300}
         />
+             <PieChartComponent
+                  title="Property Verification Distribution"
+                  data={PropertyVerifiction}
+                  height={300}
+                />
       </div>
 
       {/* Filters and Search */}
@@ -724,7 +734,7 @@ const handleCommissionChange = async(id, value) => {
       {showAddModal && (
         <AddProperty
           onClose={() => setShowAddModal(false)}
-          onSuccess={() => fetchProperties()}
+          onSuccess={() => fetchProperty()}
         />
       )}
 

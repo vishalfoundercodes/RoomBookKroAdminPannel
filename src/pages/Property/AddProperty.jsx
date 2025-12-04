@@ -40,6 +40,7 @@ import ViewProperty from "./viewProperty";
 const AddProperty = ({ onClose, onSuccess }) => {
   const [searchQuery, setSearchQuery] = useState("");
     const [manualLocation, setManualLocation] = useState(false);
+    const [selectedCoords, setSelectedCoords] = useState({ lat: 0, lng: 0 });
     // Inside your PropertyPage component, add state for upload progress
     const [uploadProgress, setUploadProgress] = useState(0);
   const [searchResults, setSearchResults] = useState([]);
@@ -59,9 +60,9 @@ const AddProperty = ({ onClose, onSuccess }) => {
         error,
       } = useSelector((state) => state.property);
     
-      useEffect(() => {
-        dispatch(fetchProperty());
-      }, [dispatch]);
+      // useEffect(() => {
+      //   dispatch(fetchProperty());
+      // }, [dispatch]);
 
       const [newProperty, setNewProperty] = useState({
         userId,
@@ -968,8 +969,8 @@ const AddProperty = ({ onClose, onSuccess }) => {
                   </div>
                 )}
 
-                {(newProperty.type === "pg" ||
-                  newProperty.type === "apartment") && (
+                {(newProperty.type == "pg" ||
+                  newProperty.type == "apartment") && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block font-medium mb-1">
