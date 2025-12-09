@@ -3,6 +3,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toast } from "react-toastify";
 
+const baseUrl = "https://root.roombookkro.com/api";
 // 🔹 Fetch booking/order history
 export const fetchOrderHistory = createAsyncThunk(
   "history/fetchOrderHistory",
@@ -10,7 +11,7 @@ export const fetchOrderHistory = createAsyncThunk(
     console.log("🟡 [fetchOrderHistory] called with userId:", userId);
     try {
       const response = await axios.post(
-        "https://admin.roombookkro.com/api/orderHistory",
+        `${baseUrl}/orderHistory"`,
         { userId }
       );
       console.log("response history", response);
@@ -29,7 +30,7 @@ export const updatePaymentStatus = createAsyncThunk(
   async ({ orderId, userId, newPaymentStatus }, { rejectWithValue }) => {
     try {
       const res = await axios.post(
-        "https://admin.roombookkro.com/api/manageTransaction",
+        `${baseUrl}/manageTransaction`,
         {
           orderId,
           userId,

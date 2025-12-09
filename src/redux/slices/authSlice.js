@@ -3,7 +3,7 @@ import axios from "axios";
 import { fetchUsers } from "./userSlice";
 import { toast } from "react-toastify";
 
-const baseUrl = "https://admin.roombookkro.com/api";
+const baseUrl = "https://root.roombookkro.com/api";
 
 // Signup Thunk
 export const signupUser = createAsyncThunk(

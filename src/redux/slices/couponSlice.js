@@ -4,7 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 // import { fetchCoupons } from "./couponListSlice"; // optional: if you have a list fetch slice
 
-const baseUrl = "https://admin.roombookkro.com/api";
+const baseUrl = "https://root.roombookkro.com/api";
 
 // ✅ Create Coupon Thunk
 export const createCoupon = createAsyncThunk(

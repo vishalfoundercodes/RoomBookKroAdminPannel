@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const baseUrl = "https://admin.roombookkro.com/api";
+const baseUrl = "https://root.roombookkro.com/api";
 
 // Async thunk to fetch users
 export const fetchUsers = createAsyncThunk("users/fetchUsers", async () => {

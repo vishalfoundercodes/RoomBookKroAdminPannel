@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-const baseUrl = "https://admin.roombookkro.com/api";
+const baseUrl = "https://root.roombookkro.com/api";
 
 // Create axios instance with default timeout
 const axiosInstance = axios.create({

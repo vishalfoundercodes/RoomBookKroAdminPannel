@@ -4,24 +4,10 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 // Base API URL
-const API_URL = "https://admin.roombookkro.com/api";
+const API_URL = "https://root.roombookkro.com/api";
 // ---------------
 // ✅ Thunks
 // ---------------
-
-// POST /addbanner
-// export const addBanner = createAsyncThunk(
-//   "images/addBanner",
-//   async (payload, { rejectWithValue }) => {
-//     try {
-//       const res = await axios.post(`${API_URL}/addbanner`, payload);
-//       console.log("resadd banenr :",res)
-//       return res.data;
-//     } catch (err) {
-//       return rejectWithValue(err.response?.data || err.message);
-//     }
-//   }
-// );
 
 export const addBanner = createAsyncThunk(
   "images/addBanner",

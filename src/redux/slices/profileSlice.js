@@ -4,7 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { fetchUsers } from "./userSlice";
 
-const baseUrl = "https://admin.roombookkro.com/api";
+const baseUrl = "https://root.roombookkro.com/api";
 
 // ✅ Profile Update Thunk
 export const profileUpdate = createAsyncThunk(
