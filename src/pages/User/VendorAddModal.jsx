@@ -2,11 +2,33 @@ import React from "react";
 import { X, Save } from "lucide-react";
 
 const VendorAddModal = ({ show, onClose, onSubmit, newUser, setNewUser }) => {
+  const fileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file); // base64 with mime type
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  const handleFileChange = async (e, key) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const base64 = await fileToBase64(file);
+
+    setNewUser((prev) => ({
+      ...prev,
+      [key]: base64, // yaha base64 store hoga
+    }));
+  };
+
+
   if (!show) return null;
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn">
-      <div className="bg-white shadow-2xl rounded-2xl w-full max-w-md mx-4 transform animate-scaleIn">
+      <div className="bg-white shadow-2xl rounded-2xl w-full max-w-md mx-4 transform animate-scaleIn max-h-[90vh] overflow-y-auto scrollbar-hide">
         <div className="p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-5 pb-3 border-b">
@@ -22,8 +44,9 @@ const VendorAddModal = ({ show, onClose, onSubmit, newUser, setNewUser }) => {
           </div>
 
           {/* Form Inputs */}
-          <div className="space-y-4">
+          <div className="space-y-4 ">
             {/* Name */}
+            <h1 className="flex justify-center ">Personal Information</h1>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Name
@@ -57,7 +80,7 @@ const VendorAddModal = ({ show, onClose, onSubmit, newUser, setNewUser }) => {
             </div>
 
             {/* Password */}
-            <div>
+            {/* <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Password
               </label>
@@ -71,7 +94,7 @@ const VendorAddModal = ({ show, onClose, onSubmit, newUser, setNewUser }) => {
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/60 shadow-sm"
                 placeholder="Enter password"
               />
-            </div>
+            </div> */}
 
             {/* DOB */}
             <div>
@@ -129,6 +152,86 @@ const VendorAddModal = ({ show, onClose, onSubmit, newUser, setNewUser }) => {
                 }
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg"
                 placeholder="Enter location"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Adhar Number
+              </label>
+              <input
+                type="tel"
+                required
+                value={newUser.adharNumber}
+                max={12}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, adharNumber: e.target.value })
+                }
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/60 shadow-sm"
+                placeholder="Enter phone number"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Adhar front image
+              </label>
+              <input
+                type="file"
+                required
+                // value={newUser.adharFront}
+                // onChange={(e) =>
+                //   setNewUser({ ...newUser, adharFront: e.target.value })
+                // }
+                onChange={(e) => handleFileChange(e, "adharFront")}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/60 shadow-sm"
+                placeholder="Enter phone number"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Adhar back image
+              </label>
+              <input
+                type="file"
+                required
+                // value={newUser.adharBack}
+                // onChange={(e) =>
+                //   setNewUser({ ...newUser, adharBack: e.target.value })
+                // }
+                onChange={(e) => handleFileChange(e, "adharBack")}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/60 shadow-sm"
+                placeholder="Enter phone number"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Pan number
+              </label>
+              <input
+                type="tel"
+                required
+                value={newUser.panNumber}
+                onChange={(e) =>
+                  setNewUser({ ...newUser, panNumber: e.target.value })
+                }
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/60 shadow-sm"
+                placeholder="Enter phone number"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Pan Image
+              </label>
+              <input
+                type="file"
+                required
+                // value={newUser.panImage}
+                // onChange={(e) =>
+                //   setNewUser({ ...newUser, panImage: e.target.value })
+                // }
+                onChange={(e) => handleFileChange(e, "panImage")}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/60 shadow-sm"
+                placeholder="Enter phone number"
               />
             </div>
           </div>

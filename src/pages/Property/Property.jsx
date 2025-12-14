@@ -486,9 +486,9 @@ const handleCommissionChange = async(id, value) => {
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-200">
-                <th className="text-left py-3 px-4">
+                {/* <th className="text-left py-3 px-4">
                   <input type="checkbox" className="rounded border-gray-300" />
-                </th>
+                </th> */}
                 <th className="text-left py-3 px-4 font-medium text-gray-700">
                   Property name
                 </th>
@@ -524,12 +524,12 @@ const handleCommissionChange = async(id, value) => {
                   key={user._id}
                   className="border-b border-gray-100 hover:bg-gray-50"
                 >
-                  <td className="py-3 px-4">
+                  {/* <td className="py-3 px-4">
                     <input
                       type="checkbox"
                       className="rounded border-gray-300"
                     />
-                  </td>
+                  </td> */}
                   <td className="py-3 px-4">
                     <div className="flex items-center gap-3">
                       <div>

@@ -13,12 +13,15 @@ export const signupUser = createAsyncThunk(
       const res = await axios.post(`${baseUrl}/authentication`, payload);
       if (res?.data?.status === 200) {
         toast.success("User added successfully");
-        dispatch(fetchUsers());
+        // dispatch(fetchUsers());
       } else {
+        console.error("User creation failed:", res);
         toast.error("User not created");
       }
       return res?.data;
     } catch (error) {
+      console.error("Signup error:", error);
+      toast.error(error.response?.data?.message || "Signup failed");
       return rejectWithValue(error.response?.data || { message: error.message });
     }
   }
@@ -30,10 +33,11 @@ export const loginUser = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       console.log("payload:",payload)
-      const res = await axios.post(`${baseUrl}/login`, payload);
+      const res = await axios.post(`${baseUrl}/authentication`, payload);
       console.log("resss data ", res.data);
       return res?.data; // { user, loginToken, message }
     } catch (error) {
+      console.error("Login error:", error);
       return rejectWithValue(error.response?.data || { message: error.message });
     }
   }

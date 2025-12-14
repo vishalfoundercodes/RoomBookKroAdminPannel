@@ -58,6 +58,8 @@ import VendorAddModal from "./VendorAddModal";
 const VendorPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [submitting, setSubmitting] = useState(false);
+
   const { user, loading, error, success } = useSelector(
     (state) => state.profile
   );
@@ -87,6 +89,12 @@ const VendorPage = () => {
     phone: "",
     role: "1",
     location: "",
+    adharNumber: "",
+    panNumber: "",
+    adharFront: "",
+    adharBack: "",
+    panImage: "",
+    fcmToken:"fA9uHmp4QWEREXAMPLE67890:APA91bE8LkPpEXAMPLEY0Gk7R1JhZ9tEXAMPLEXqnDSfjQOCa3mF4f8jY2hP9JqT2Lk5rAfUwBsEXAMPLE",
   });
 
   const onlyTypeOneUsers = users?.filter((u) => u.user_type == 1) || [];
@@ -213,34 +221,52 @@ const VendorPage = () => {
 
 
   // Handle user actions
-  const handleAddUser = () => {
+  const handleAddUser = async() => {
     // prepare payload as per API
-    const payload = {
-      action: "signup",
-      name: newUser.name,
-      email: newUser.email,
-      password: newUser.password, // ✅ need to add password field in form
-      user_type: newUser.role, // ✅ map role to number: 0,1,2
-      phone: newUser.phone,
-      DOB: newUser.dob, // ✅ need to add DOB field in form
-    };
+    try {
+      setSubmitting(true);
+      const payload = {
+        action: "signup",
+        name: newUser.name,
+        email: newUser.email,
+        password: newUser.password, // ✅ need to add password field in form
+        user_type: "1", // ✅ map role to number: 0,1,2
+        phone: newUser.phone,
+        DOB: newUser.dob, // ✅ need to add DOB field in form
+        adharNumber: newUser.adharNumber,
+        panNumber: newUser.panNumber,
+        adharFront: newUser.adharFront,
+        adharBack: newUser.adharBack,
+        panImage: newUser.panImage,
+        fcmToken: newUser.fcmToken,
+      };
 
-    console.log("Payload to send:", payload);
-    // ✅ Dispatch redux thunk
-    dispatch(signupUser(payload));
-    dispatch(fetchUsers());
+      console.log("Payload to send:", payload);
+      // ✅ Dispatch redux thunk
+      // await dispatch(signupUser(payload));
+      // await dispatch(fetchUsers());
+      // ✅ 1. signup complete hone ka wait
+      await dispatch(signupUser(payload)).unwrap();
 
-    // reset form + close modal
-    setNewUser({
-      name: "",
-      email: "",
-      phone: "",
-      role: "2", // default User
-      location: "",
-      password: "",
-      dob: "",
-    });
-    setShowAddModal(false);
+      // ✅ 2. users fetch hone ka wait
+      await dispatch(fetchUsers()).unwrap();
+
+      // reset form + close modal
+      setNewUser({
+        name: "",
+        email: "",
+        phone: "",
+        role: "2", // default User
+        location: "",
+        password: "",
+        dob: "",
+      });
+      setShowAddModal(false);
+    } catch (error) {
+      console.error("Add user failed:", error);
+    }finally{
+        setSubmitting(false);
+    }
   };
 
   const handleDeleteUser = (userId) => {
@@ -367,7 +393,7 @@ const VendorPage = () => {
             }
           }, [location.state]);
 
-  if (usersLoading || loading) {
+  if (usersLoading || loading || submitting) {
     return <Loader />;
   }
 
@@ -657,7 +683,7 @@ return (
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr className="border-b border-gray-200">
-                <th className="text-left py-3 px-4 whitespace-nowrap">
+                {/* <th className="text-left py-3 px-4 whitespace-nowrap">
                   <input
                     type="checkbox"
                     onChange={(e) => {
@@ -669,7 +695,7 @@ return (
                     }}
                     className="rounded border-gray-300"
                   />
-                </th>
+                </th> */}
                 <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
                   Vendor Id
                 </th>
@@ -711,7 +737,7 @@ return (
                   key={user.id}
                   className="border-b border-gray-100 hover:bg-gray-50"
                 >
-                  <td className="py-3 px-4 whitespace-nowrap">
+                  {/* <td className="py-3 px-4 whitespace-nowrap">
                     <input
                       type="checkbox"
                       checked={selectedUsers.includes(user.id)}
@@ -726,7 +752,7 @@ return (
                       }}
                       className="rounded border-gray-300"
                     />
-                  </td>
+                  </td> */}
                   <td className="py-3 px-4 text-sm text-gray-600 whitespace-nowrap">
                     <div className="flex items-center gap-1">
                       <Calendar className="w-3 h-3" />

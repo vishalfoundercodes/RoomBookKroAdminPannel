@@ -9,6 +9,7 @@ import notificationReducer from "./slices/notificationSlice";
 import historyReducer from "./slices/historySlice";
 import addImageReducer from "./slices/addImageSlice";
 import  revenueReducer   from "./slices/revenueSlice";
+import amenitiesReducer from "./slices/amenitiesSlice";
 
 const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ const store = configureStore({
     history: historyReducer,
     images: addImageReducer,
     revenue: revenueReducer,
+    amenities: amenitiesReducer,
   },
 });
 

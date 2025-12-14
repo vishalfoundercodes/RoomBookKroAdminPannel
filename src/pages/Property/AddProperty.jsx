@@ -37,6 +37,7 @@ import Loader from "../Loader/Loader";
 import commisionIcon from "../../../src/assets/commision.png";
 import verifyIcon from "../../../src/assets/verify.png";
 import ViewProperty from "./viewProperty";
+import { fetchPropertitesAmenities, fetchRoomAmenities } from "../../redux/slices/amenitiesSlice";
 const AddProperty = ({ onClose, onSuccess }) => {
   const [searchQuery, setSearchQuery] = useState("");
     const [manualLocation, setManualLocation] = useState(false);
@@ -59,6 +60,8 @@ const AddProperty = ({ onClose, onSuccess }) => {
         loading,
         error,
       } = useSelector((state) => state.property);
+
+      const { propertyAmenities, roomAmenities } = useSelector((state) => state.amenities);
     
       // useEffect(() => {
       //   dispatch(fetchProperty());
@@ -487,6 +490,18 @@ const AddProperty = ({ onClose, onSuccess }) => {
           }
         }, [manualLocation]);
 
+        useEffect(() => {
+          dispatch(fetchRoomAmenities())
+          dispatch(fetchPropertitesAmenities());
+        }, []);
+
+        useEffect(() => {
+          console.log("Property Amenities updated:", propertyAmenities);
+        }, [propertyAmenities]);
+
+        useEffect(() => {
+          console.log("Room Amenities updated:", roomAmenities);
+        }, [roomAmenities]);
           if (isUploading) {
             return <Loader />;
           }
@@ -1034,12 +1049,13 @@ const AddProperty = ({ onClose, onSuccess }) => {
 
                   <div>
                     <label className="block font-medium mb-1">
-                      Old MRP (₹)
+                      Pricing before discount (₹)
                     </label>
                     <input
                       type="number"
                       placeholder="Enter old price"
-                      value={newProperty.oldMrp}
+                      // value={newProperty.oldMrp}
+                      value={(newProperty.pricePerNight || newProperty.pricePerMonth)*newProperty.discount/100 + (newProperty.pricePerNight || newProperty.pricePerMonth)}
                       onChange={(e) =>
                         setNewProperty({
                           ...newProperty,

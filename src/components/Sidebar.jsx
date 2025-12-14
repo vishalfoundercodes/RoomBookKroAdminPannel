@@ -24,6 +24,8 @@ import {
 } from "lucide-react";
 import { Link, NavLink } from "react-router-dom";
 import { BiPhotoAlbum } from "react-icons/bi";
+import { MdOutlineHomeWork } from "react-icons/md";
+import { AiOutlineAppstore } from "react-icons/ai";
 
 // Sidebar Component
 export const Sidebar = ({ isOpen, onClose }) => {
@@ -53,6 +55,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
     // { icon: IndianRupee, label: "Revenue", to: "/revenue" },
 
     { icon: BiPhotoAlbum, label: "Add Images Page", to: "/addimagepage" },
+    { icon: AiOutlineAppstore, label: "Facility", to: "/amenitiespage" },
     // // { icon: Star, label: "Extra Item 2", to: "#" },
     // // { icon: Star, label: "Extra Item 3", to: "#" },
     // // { icon: Star, label: "Extra Item 4", to: "#" },
@@ -88,7 +91,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
             className="w-12 h-12 border-2 border-green-600 rounded-full"
             alt="Logo"
           />
-          <h2 className="text-lg lg:text-xl font-bold whitespace-nowrap"> Room Book Karo </h2>
+          <h2 className="text-lg lg:text-xl font-bold whitespace-nowrap"> Room Book Kro </h2>
           <button onClick={onClose} className="lg:hidden">
             <X size={20} />
           </button>

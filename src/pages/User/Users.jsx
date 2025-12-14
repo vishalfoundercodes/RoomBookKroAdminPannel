@@ -637,7 +637,7 @@ const birthMonthData = monthNames.map((m, i) => ({
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4">
+                  {/* <th className="text-left py-3 px-4">
                     <input
                       type="checkbox"
                       onChange={(e) => {
@@ -649,7 +649,7 @@ const birthMonthData = monthNames.map((m, i) => ({
                       }}
                       className="rounded border-gray-300"
                     />
-                  </th>
+                  </th> */}
                   <th className="text-left py-3 px-4 font-medium text-gray-700">
                     Customer Id
                   </th>
@@ -679,7 +679,7 @@ const birthMonthData = monthNames.map((m, i) => ({
                     key={user.id}
                     className="border-b border-gray-100 hover:bg-gray-50"
                   >
-                    <td className="py-3 px-4">
+                    {/* <td className="py-3 px-4">
                       <input
                         type="checkbox"
                         checked={selectedUsers.includes(user.id)}
@@ -694,7 +694,7 @@ const birthMonthData = monthNames.map((m, i) => ({
                         }}
                         className="rounded border-gray-300"
                       />
-                    </td>
+                    </td> */}
                     <td className="py-3 px-4 text-sm text-gray-600">
                       <div className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />

@@ -11,8 +11,8 @@ export const fetchOrderHistory = createAsyncThunk(
     console.log("🟡 [fetchOrderHistory] called with userId:", userId);
     try {
       const response = await axios.post(
-        `${baseUrl}/orderHistory"`,
-        { userId }
+        `${baseUrl}/orderHistory`,
+        { userId:userId }
       );
       console.log("response history", response);
       return response.data;

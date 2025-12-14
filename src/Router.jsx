@@ -18,6 +18,7 @@ import VendorPage from "./pages/User/Vendor";
 import VendorWiseProperty from "./pages/User/VendorWiseProperty";
 import CustomerWiseBooking from "./pages/User/CustomerWiseBooking";
 import VendorRevenueList from "./pages/Revenue/VendorRevenueList";
+import AmenitiesManagement from "./pages/Amentites/AmenitiesManagement";
 
 export const Router = createBrowserRouter([
   {
@@ -49,6 +50,7 @@ export const Router = createBrowserRouter([
           { path: "/addimagepage", element: <AddImagePage /> },
           { path: "/revenue", element: <Revenue /> },
           { path: "/revenue/vendorlist", element: <VendorRevenueList /> },
+          { path: "amenitiespage", element: <AmenitiesManagement /> },
         ],
       },
     ],

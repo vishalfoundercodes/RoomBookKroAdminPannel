@@ -460,7 +460,7 @@ const Home = () => {
         />
         <StatCard
           title="Total Bookings"
-          value={totalorder}
+          value={totalorder|| 0}
           change="2.1%"
           changeType="positive"
           icon={ShoppingCart}
