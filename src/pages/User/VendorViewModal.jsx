@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { fetchVendorRevenue } from "../../redux/slices/revenueSlice";
+import { FaUniversity } from "react-icons/fa";
 
 const VendorViewModal = ({
   show,
@@ -52,6 +53,8 @@ const handleSeeProperty = async () => {
   }
 };
 
+
+
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-3 z-50 scrollbar-hide">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-3xl animate-scaleIn overflow-hidden scrollbar-hide">
@@ -93,6 +96,7 @@ const handleSeeProperty = async () => {
                   type="file"
                   accept="image/*"
                   onChange={handleImageChange}
+                  placeholder="update profile image"
                   className="absolute top-0 left-0 w-24 h-24 sm:w-28 sm:h-28 opacity-0 cursor-pointer"
                 />
               )}
@@ -104,6 +108,7 @@ const handleSeeProperty = async () => {
                 <input
                   type="text"
                   name="name"
+                  placeholder="Update name"
                   className="border w-full rounded-lg px-3 py-2 text-lg"
                   value={formData.name}
                   onChange={handleChange}
@@ -118,6 +123,7 @@ const handleSeeProperty = async () => {
                 <input
                   type="email"
                   name="email"
+                  placeholder="Update email"
                   className="border w-full rounded-lg px-3 py-2 mt-2"
                   value={formData.email}
                   onChange={handleChange}
@@ -156,6 +162,7 @@ const handleSeeProperty = async () => {
                     <input
                       type="text"
                       name="contact"
+                      placeholder="Update contact"
                       className="border rounded px-2 py-1 w-full"
                       value={formData.contact}
                       onChange={handleChange}
@@ -188,6 +195,7 @@ const handleSeeProperty = async () => {
                     <input
                       type="date"
                       name="DOB"
+                      placeholder="Update DOB"
                       value={formData.DOB || ""}
                       onChange={handleChange}
                       className="border rounded px-2 py-1 w-full"
@@ -204,6 +212,7 @@ const handleSeeProperty = async () => {
                     <input
                       type="number"
                       name="walletBalance"
+                      placeholder="Update Wallet"
                       className="border rounded px-2 py-1 w-full"
                       value={formData.vendorRevenue}
                       onChange={handleChange}
@@ -231,6 +240,7 @@ const handleSeeProperty = async () => {
                   {isEditing ? (
                     <input
                       name="adharNumber"
+                      placeholder="Update adhar number"
                       className="border rounded px-2 py-1 w-full"
                       value={formData.adharNumber}
                       onChange={handleChange}
@@ -248,6 +258,7 @@ const handleSeeProperty = async () => {
                   {isEditing ? (
                     <input
                       name="panNumber"
+                      placeholder="Update pan number"
                       className="border rounded px-2 py-1 w-full"
                       value={formData.panNumber}
                       onChange={handleChange}
@@ -278,7 +289,7 @@ const handleSeeProperty = async () => {
             )}
           </div> */}
           {/* Document Images */}
-          <div className="flex gap-3 overflow-x-auto py-3">
+          {/* <div className="flex gap-3 overflow-x-auto py-3">
             {[
               formData.adharImage?.front || selectedUser.adharImage?.front,
               formData.adharImage?.back || selectedUser.adharImage?.back,
@@ -292,6 +303,43 @@ const handleSeeProperty = async () => {
                     onClick={() => setPreviewImage(img)}
                     className="w-24 h-24 rounded-lg border shadow-md object-cover flex-shrink-0 cursor-pointer hover:scale-105 transition"
                   />
+                )
+            )}
+          </div> */}
+          <div className="flex gap-3 overflow-x-auto py-3">
+            {[
+              {
+                img:
+                  formData.adharImage?.front || selectedUser.adharImage?.front,
+                label: "Aadhar Front",
+              },
+              {
+                img: formData.adharImage?.back || selectedUser.adharImage?.back,
+                label: "Aadhar Back",
+              },
+              {
+                img: formData.panImage || selectedUser.panImage,
+                label: "PAN Card",
+              },
+            ].map(
+              (item, i) =>
+                item.img && (
+                  <div
+                    key={i}
+                    className="relative w-24 flex-shrink-0 cursor-pointer"
+                    onClick={() => setPreviewImage(item.img)}
+                  >
+                    {/* LABEL */}
+                    <span className="absolute top-1 left-1 bg-black/70 text-white text-[10px] px-2 py-[2px] rounded">
+                      {item.label}
+                    </span>
+
+                    {/* IMAGE */}
+                    <img
+                      src={item.img}
+                      className="w-24 h-24 rounded-lg border shadow-md object-cover hover:scale-105 transition"
+                    />
+                  </div>
                 )
             )}
           </div>
@@ -342,6 +390,22 @@ const handleSeeProperty = async () => {
               >
                 <Edit className="w-4 h-4" />
                 Edit User
+              </button>
+              <button
+                onClick={() => {
+                  navigate(`/bankDetailsUserWise`, {
+                    state: {
+                      userId: selectedUser.userId,
+                      userName: selectedUser.name,
+                      userImage: selectedUser.userImage,
+                    },
+                  });
+                  console.log("userImage", selectedUser.name);
+                }}
+                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-sm flex items-center gap-2"
+              >
+                <FaUniversity className="w-4 h-4" />
+                Bank Details
               </button>
               <button
                 onClick={handleSeeProperty}

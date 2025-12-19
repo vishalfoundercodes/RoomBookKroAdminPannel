@@ -8,6 +8,10 @@ import {
   Save,
   X,
 } from "lucide-react";
+import ConfirmModal from "../../reusable_components/ConfirmationModel";
+import axios from "axios";
+import { toast } from "react-toastify";
+import Loader from "../Loader/Loader";
 
 export default function AmenitiesManagement() {
   const [activeTab, setActiveTab] = useState("property");
@@ -16,6 +20,8 @@ export default function AmenitiesManagement() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [editingId, setEditingId] = useState(null);
+  const [deleteAmenityId, setDeleteAmenityId] = useState(null);
+
 
   const [newAmenity, setNewAmenity] = useState({
     name: "",
@@ -122,40 +128,67 @@ export default function AmenitiesManagement() {
     }
   };
 
-  const handleDeleteAmenity = async (id) => {
-    if (!confirm("Are you sure you want to delete this amenity?")) return;
+//   const handleDeleteAmenity = async (id) => {
 
-    try {
-      setLoading(true);
+//     try {
+//       setLoading(true);
 
-      const endpoint =
-        activeTab === "property"
-          ? `https://root.roombookkro.com/api/delete-amenity/property/${id}`
-          : `https://root.roombookkro.com/api/delete-amenity/room/${id}`;
+//       const endpoint =
+//         activeTab === "property"
+//           ? `https://root.roombookkro.com/api/delete-amenity/property/${id}`
+//           : `https://root.roombookkro.com/api/delete-amenity/room/${id}`;
+//  console.log(endpoint);
+//       const response = await axios.delete(endpoint);
+     
+//       console.log("res",response)
+//       if (response.ok) {
+//         fetchAmenities();
+//       } else {
+//         const data = await response.json();
+//         setError(data.message || "Failed to delete amenity");
 
-      const response = await fetch(endpoint, {
-        method: "DELETE",
-        headers: {
-          Authorization: "Bearer YOUR_TOKEN_HERE", // Replace with actual token
-        },
-      });
+//       }
+//     } catch (err) {
+// console.error("Delete error:", err);
+//       setError("Failed to delete amenity: " + err.message);
+      
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
 
-      if (response.ok) {
-        fetchAmenities();
-      } else {
-        const data = await response.json();
-        setError(data.message || "Failed to delete amenity");
-      }
-    } catch (err) {
-      setError("Failed to delete amenity: " + err.message);
-      console.error("Delete error:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+const handleDeleteAmenity = async (id) => {
+  try {
+    setLoading(true);
+
+    console.log("id:",id)
+    const endpoint =
+      activeTab === "property"
+        ? `https://root.roombookkro.com/api/delete-amenity/property/${id}`
+        : `https://root.roombookkro.com/api/delete-amenity/room/${id}`;
+
+    console.log("DELETE API:", endpoint);
+
+     const response = await axios.delete(endpoint, {
+       data: { id }, // ✅ IMPORTANT
+     });
+
+    console.log("Delete success:", response.data);
+
+    fetchAmenities(); // ✅ success pe direct call
+    toast.success("Amenity deleted successfully");
+  } catch (err) {
+    console.error("Delete error:", err.response?.data || err.message);
+    toast.error(err.response?.data?.message || "Failed to delete amenity");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const currentAmenities =
     activeTab === "property" ? propertyAmenities : roomAmenities;
+
+    if(loading){return <Loader/>}
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-3 sm:p-4 md:p-6">
@@ -203,9 +236,7 @@ export default function AmenitiesManagement() {
               </h2>
 
               {loading && (
-                <div className="flex justify-center py-8">
-                  <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
-                </div>
+               <Loader />
               )}
 
               <div className="space-y-3 max-h-[500px] sm:max-h-[600px] overflow-y-auto">
@@ -243,7 +274,8 @@ export default function AmenitiesManagement() {
                     </div>
 
                     <button
-                      onClick={() => handleDeleteAmenity(amenity._id)}
+                      // onClick={() => handleDeleteAmenity(amenity._id)}
+                      onClick={() => {console.log(amenity._id),setDeleteAmenityId(amenity._id)}}
                       className="ml-2 p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0"
                       disabled={loading}
                     >
@@ -353,6 +385,16 @@ export default function AmenitiesManagement() {
           </div>
         </div>
       </div>
+      <ConfirmModal
+        open={!!deleteAmenityId}
+        title="Delete Amenity"
+        message="Are you sure you want to delete this amenity? This action cannot be undone."
+        onCancel={() => setDeleteAmenityId(null)}
+        onConfirm={async () => {
+          await handleDeleteAmenity(deleteAmenityId);
+          setDeleteAmenityId(null);
+        }}
+      />
     </div>
   );
 }

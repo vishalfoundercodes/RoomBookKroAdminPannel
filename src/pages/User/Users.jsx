@@ -47,10 +47,14 @@ import CustomDropdown from './CustomDropDown';
 import StatusDropdown from './StatusDropdown';
 import Loader from '../Loader/Loader';
 import DOBDatePicker from './DOBDatePicker';
+import ConfirmModal from '../../reusable_components/ConfirmationModel';
+import { FaUniversity } from 'react-icons/fa';
 const UsersPage = () => {
     const navigate = useNavigate();
     const [dob, setDob] = useState("");
   const dispatch = useDispatch();
+  const [deleteCustomerId, setDeleteCustomerId] = useState(null);
+
   const { user, loading, error, success } = useSelector(
     (state) => state.profile
   );
@@ -818,7 +822,8 @@ const birthMonthData = monthNames.map((m, i) => ({
                         <Edit className="w-4 h-4" />
                       </button> */}
                         <button
-                          onClick={() => handleDeleteUser(user.userId)}
+                          // onClick={() => handleDeleteUser(user.userId)}
+                          onClick={() => setDeleteCustomerId(user.userId)}
                           className="p-1 text-red-600 hover:bg-red-100 rounded"
                           title="Delete User"
                         >
@@ -1187,12 +1192,39 @@ const birthMonthData = monthNames.map((m, i) => ({
                       <Calendar className="w-4 h-4" />
                       See All Bookings
                     </button>
+                    <button
+                      onClick={() => {
+                        navigate(`/bankDetailsUserWise`, {
+                          state: {
+                            userId: selectedUser.userId,
+                            userName: selectedUser.name,
+                            userImage: selectedUser.userImage,
+                          },
+                        });
+                        console.log("userImage", selectedUser.name);
+                      }}
+                      className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-sm flex items-center gap-2"
+                    >
+                      <FaUniversity className="w-4 h-4" />
+                      Bank Details
+                    </button>
                   </>
                 )}
               </div>
             </div>
           </div>
         )}
+
+        <ConfirmModal
+          open={!!deleteCustomerId}
+          title="Delete Customer"
+          message="Are you sure you want to delete this customer? This action cannot be undone."
+          onCancel={() => setDeleteCustomerId(null)}
+          onConfirm={async () => {
+            await handleDeleteUser(deleteCustomerId);
+            setDeleteCustomerId(null);
+          }}
+        />
       </div>
     </div>
   );

@@ -142,14 +142,15 @@ const Home = () => {
     properties?.filter((u) => u.verifyProperty === true).length || 0;
   const notVerifyPropertyCount =
     properties?.filter((u) => u.verifyProperty === false).length || 0;
-  const pgCount = properties?.filter((u) => u.type === "pg").length || 0;
+  const pgCount = properties?.filter((u) => u.type == "pg"|| u.type =="PG").length || 0;
   const hotelCount =
     properties?.filter((u) => u.type == "hotel" || u.type == "Hotel").length ||
     0;
   const AppartmentCount =
-    properties?.filter((u) => u.type == "appartment").length || 0;
+    properties?.filter((u) => u.type == "apartment" || u.type == "Apartment")
+      .length || 0;
   const dormitaryCount =
-    properties?.filter((u) => u.type == "dormitary").length || 0;
+    properties?.filter((u) => u.type == "dormitary" || u.type =="Dormitary").length || 0;
 
   // Sample data
   const salesData = [
@@ -207,17 +208,17 @@ const Home = () => {
   const typeData = [
     {
       name: "PG",
-      count: properties?.filter((u) => normalize(u.type) === "pg").length || 0,
+      count: properties?.filter((u) => normalize(u.type) == "pg").length || 0,
     },
     {
       name: "Hotel",
       count:
-        properties?.filter((u) => normalize(u.type) === "hotel").length || 0,
+        properties?.filter((u) => normalize(u.type) == "hotel").length || 0,
     },
     {
       name: "Apartment",
       count:
-        properties?.filter((u) => normalize(u.type) === "appartment").length ||
+        properties?.filter((u) => normalize(u.type) == "apartment").length ||
         0,
     },
     {

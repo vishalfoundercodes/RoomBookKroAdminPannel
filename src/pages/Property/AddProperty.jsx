@@ -38,6 +38,7 @@ import commisionIcon from "../../../src/assets/commision.png";
 import verifyIcon from "../../../src/assets/verify.png";
 import ViewProperty from "./viewProperty";
 import { fetchPropertitesAmenities, fetchRoomAmenities } from "../../redux/slices/amenitiesSlice";
+import AmenitiesDropdown from "./AmenitiesDropdown";
 const AddProperty = ({ onClose, onSuccess }) => {
   const [searchQuery, setSearchQuery] = useState("");
     const [manualLocation, setManualLocation] = useState(false);
@@ -61,7 +62,14 @@ const AddProperty = ({ onClose, onSuccess }) => {
         error,
       } = useSelector((state) => state.property);
 
-      const { propertyAmenities, roomAmenities } = useSelector((state) => state.amenities);
+      // const {  roomAmenities } = useSelector((state) => state.amenities);
+      // const { propertyAmentities } = useSelector(
+      //   (state) => state.propertyAmentities
+      // );
+      const amenitiesState = useSelector((state) => state.amenities);
+
+      const propertyAmenities = amenitiesState?.propertyAmenities || [];
+      const roomAmenities = amenitiesState?.roomAmenities || [];
     
       // useEffect(() => {
       //   dispatch(fetchProperty());
@@ -276,21 +284,28 @@ const AddProperty = ({ onClose, onSuccess }) => {
             }
       
             // Property-level amenities
-            const amenityNames = newProperty.amenities
-              .map((a) => a.name)
-              .filter((n) => n && n.trim())
+            // const amenityNames = newProperty.amenities
+            //   .map((a) => a.name)
+            //   .filter((n) => n && n.trim())
+            //   .join(",");
+      
+            // if (amenityNames) {
+            //   formData.append("amenitiesMainName", amenityNames);
+      
+            //   // Amenity icons
+            //   newProperty.amenities.forEach((a) => {
+            //     if (a.icon instanceof File) {
+            //       formData.append("amenitiesMainIcon", a.icon, a.icon.name);
+            //     }
+            //   });
+            // }
+
+            const propertyAmenityIds = newProperty.amenities
+              .map((a) => a._id)
               .join(",");
-      
-            if (amenityNames) {
-              formData.append("amenitiesMainName", amenityNames);
-      
-              // Amenity icons
-              newProperty.amenities.forEach((a) => {
-                if (a.icon instanceof File) {
-                  formData.append("amenitiesMainIcon", a.icon, a.icon.name);
-                }
-              });
-            }
+
+            formData.append("propertyAmenityIds", propertyAmenityIds);
+
       
             // Rooms data - Arrays for multiple rooms
             const roomTypes = [];
@@ -330,21 +345,32 @@ const AddProperty = ({ onClose, onSuccess }) => {
                 .filter((n) => n && n.trim())
                 .join(",");
       
-              if (roomAmenityNames) {
-                formData.append(`amenities.name[${i}]`, roomAmenityNames);
+              // if (roomAmenityNames) {
+              //   formData.append(`amenities.name[${i}]`, roomAmenityNames);
       
-                // Room amenity icons
-                let iconCount = 0;
-                room.amenities?.forEach((a) => {
-                  if (a.icon instanceof File) {
-                    formData.append(`amenities.icon[${i}]`, a.icon, a.icon.name);
-                    iconCount++;
-                  }
-                });
-                formData.append(`roomAmenitiesCount[${i}]`, iconCount);
-              } else {
-                formData.append(`roomAmenitiesCount[${i}]`, 0);
-              }
+              //   // Room amenity icons
+              //   let iconCount = 0;
+              //   room.amenities?.forEach((a) => {
+              //     if (a.icon instanceof File) {
+              //       formData.append(`amenities.icon[${i}]`, a.icon, a.icon.name);
+              //       iconCount++;
+              //     }
+              //   });
+              //   formData.append(`roomAmenitiesCount[${i}]`, iconCount);
+              // } else {
+              //   formData.append(`roomAmenitiesCount[${i}]`, 0);
+              // }
+
+              // newProperty.rooms.forEach((room, i) => {
+                const roomAmenityIds = room.amenities
+                  ?.map((a) => a._id)
+                  .join(",");
+
+                if (roomAmenityIds) {
+                  formData.append(`roomAmenityIds[${i}]`, roomAmenityIds);
+                }
+              // });
+
       
               // Room availability
               formData.append("isAvailable", "true");
@@ -387,7 +413,8 @@ const AddProperty = ({ onClose, onSuccess }) => {
             await dispatch(addProperty(formData))
               .unwrap()
               .then(() => {
-                setShowAddModal(false);
+                // setShowAddModal(false);
+                onSuccess(); 
                 onClose();
                 // Reset form
                 setNewProperty({
@@ -422,13 +449,14 @@ const AddProperty = ({ onClose, onSuccess }) => {
                   availableRooms: 0,
                   isAvailable: true,
                 });
+                //  dispatch(fetchProperty());
               })
               .catch((err) => {
                 toast.error(err?.message || "Failed to add property");
                 console.error("❌ Error adding property:", err);
               });
       
-            dispatch(fetchProperty());
+            // dispatch(fetchProperty());
           } catch (err) {
             console.error("❌ Error adding property:", err);
             toast.error(err?.message || err || "Failed to add property");
@@ -1055,7 +1083,13 @@ const AddProperty = ({ onClose, onSuccess }) => {
                       type="number"
                       placeholder="Enter old price"
                       // value={newProperty.oldMrp}
-                      value={(newProperty.pricePerNight || newProperty.pricePerMonth)*newProperty.discount/100 + (newProperty.pricePerNight || newProperty.pricePerMonth)}
+                      value={
+                        ((newProperty.pricePerNight ||
+                          newProperty.pricePerMonth) *
+                          newProperty.discount) /
+                          100 +
+                        (newProperty.pricePerNight || newProperty.pricePerMonth)
+                      }
                       onChange={(e) =>
                         setNewProperty({
                           ...newProperty,
@@ -1090,7 +1124,7 @@ const AddProperty = ({ onClose, onSuccess }) => {
                       Amenities
                     </label>
 
-                    {newProperty.amenities.map((amenity, index) => (
+                    {/* {newProperty.amenities.map((amenity, index) => (
                       <div key={index} className="flex gap-4 items-center">
                         <input
                           type="text"
@@ -1120,15 +1154,71 @@ const AddProperty = ({ onClose, onSuccess }) => {
                           ✕
                         </button>
                       </div>
-                    ))}
+                    ))} */}
 
-                    <button
+                    <AmenitiesDropdown
+                      options={propertyAmenities.filter(
+                        (opt) =>
+                          !newProperty.amenities.some((a) => a._id === opt._id)
+                      )}
+                      value={[]}
+                      placeholder="Select Property Amenities"
+                      onChange={(selected) => {
+                        setNewProperty((prev) => ({
+                          ...prev,
+                          amenities: [
+                            ...prev.amenities,
+                            {
+                              _id: selected[0]._id, // ✅ MUST
+                              name: selected[0].name,
+                              icon: selected[0].icon,
+                            },
+                          ],
+                        }));
+                      }}
+                    />
+
+                    {/* Selected Amenities List */}
+                    <div className="space-y-2 mt-3">
+                      {newProperty.amenities.map((amenity, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between border px-3 py-2 rounded"
+                        >
+                          <div className="flex items-center gap-3">
+                            <img
+                              src={amenity.icon}
+                              className="w-5 h-5"
+                              alt=""
+                            />
+                            <span className="text-sm">{amenity.name}</span>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setNewProperty((prev) => ({
+                                ...prev,
+                                amenities: prev.amenities.filter(
+                                  (_, i) => i !== index
+                                ),
+                              }))
+                            }
+                            className="text-red-500"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* <button
                       type="button"
                       onClick={handleAddAmenity}
                       className="text-blue-600 hover:underline text-sm mt-2"
                     >
                       + Add Amenity
-                    </button>
+                    </button> */}
                   </div>
 
                   <div>
@@ -1378,7 +1468,7 @@ const AddProperty = ({ onClose, onSuccess }) => {
                             Room Amenities
                           </label>
 
-                          {room.amenities?.map((a, index) => (
+                          {/* {room.amenities?.map((a, index) => (
                             <div
                               key={index}
                               className="flex gap-3 items-center"
@@ -1429,9 +1519,74 @@ const AddProperty = ({ onClose, onSuccess }) => {
                                 ✕
                               </button>
                             </div>
-                          ))}
+                          ))} */}
 
-                          <button
+                          <label className="block text-sm font-semibold text-gray-700">
+                            Room Amenities
+                          </label>
+
+                          <AmenitiesDropdown
+                            options={roomAmenities.filter(
+                              (opt) =>
+                                !room.amenities?.some((a) => a._id === opt._id)
+                            )}
+                            value={[]}
+                            placeholder="Select Room Amenities"
+                            onChange={(selected) => {
+                              const updatedRooms = [...newProperty.rooms];
+
+                              if (!updatedRooms[i].amenities) {
+                                updatedRooms[i].amenities = [];
+                              }
+
+                              updatedRooms[i].amenities.push({
+                                _id: selected[0]._id, // ✅ MUST
+                                name: selected[0].name,
+                                icon: selected[0].icon,
+                              });
+
+                              setNewProperty({
+                                ...newProperty,
+                                rooms: updatedRooms,
+                              });
+                            }}
+                          />
+
+                          {/* Selected Room Amenities */}
+                          <div className="space-y-2 mt-3">
+                            {room.amenities?.map((a, index) => (
+                              <div
+                                key={index}
+                                className="flex items-center justify-between border px-3 py-2 rounded"
+                              >
+                                <div className="flex items-center gap-3">
+                                  <img
+                                    src={a.icon}
+                                    className="w-5 h-5"
+                                    alt=""
+                                  />
+                                  <span className="text-sm">{a.name}</span>
+                                </div>
+
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const updated = [...newProperty.rooms];
+                                    updated[i].amenities.splice(index, 1);
+                                    setNewProperty({
+                                      ...newProperty,
+                                      rooms: updated,
+                                    });
+                                  }}
+                                  className="text-red-500"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* <button
                             type="button"
                             onClick={() => {
                               const updated = [...newProperty.rooms];
@@ -1450,7 +1605,7 @@ const AddProperty = ({ onClose, onSuccess }) => {
                             className="text-blue-600 hover:underline text-sm"
                           >
                             + Add Amenity
-                          </button>
+                          </button> */}
                         </div>
                       </div>
                     </div>

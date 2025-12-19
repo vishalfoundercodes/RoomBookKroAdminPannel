@@ -19,6 +19,11 @@ import VendorWiseProperty from "./pages/User/VendorWiseProperty";
 import CustomerWiseBooking from "./pages/User/CustomerWiseBooking";
 import VendorRevenueList from "./pages/Revenue/VendorRevenueList";
 import AmenitiesManagement from "./pages/Amentites/AmenitiesManagement";
+import Options from "./pages/Options/Options";
+import DepositHistroy from "./pages/Deposit/DepositHistroy";
+import WithdrawHistory from "./pages/Withdraw/WithdrawHistory";
+import BankDetails from "./pages/Bank/BankDetails";
+import UserBankDetails from "./pages/Bank/UserBankDetails";
 
 export const Router = createBrowserRouter([
   {
@@ -51,6 +56,11 @@ export const Router = createBrowserRouter([
           { path: "/revenue", element: <Revenue /> },
           { path: "/revenue/vendorlist", element: <VendorRevenueList /> },
           { path: "amenitiespage", element: <AmenitiesManagement /> },
+          { path: "/options", element: <Options /> },
+          { path: "/depositHistory", element: <DepositHistroy /> },
+          { path: "/withdrawHistory", element: <WithdrawHistory /> },
+          { path: "/bankDetails", element: <BankDetails /> },
+          { path: "/bankDetailsUserWise", element: <UserBankDetails /> },
         ],
       },
     ],

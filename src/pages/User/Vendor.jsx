@@ -34,6 +34,8 @@ import {
   Stamp,
   BookUser,
   TrendingUp,
+  AlertCircle,
+  IndianRupee,
 } from "lucide-react";
 import Card from "../../reusable_components/Card";
 import StatCard from "../../reusable_components/StatCard";
@@ -55,10 +57,13 @@ import Loader from "../Loader/Loader";
 import DOBDatePicker from "./DOBDatePicker";
 import VendorViewModal from "./VendorViewModal";
 import VendorAddModal from "./VendorAddModal";
+import ConfirmModal from "../../reusable_components/ConfirmationModel";
 const VendorPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [submitting, setSubmitting] = useState(false);
+  const [deleteVendorId, setDeleteVendorId] = useState(null);
+
 
   const { user, loading, error, success } = useSelector(
     (state) => state.profile
@@ -724,6 +729,12 @@ return (
                   Vendor Revenue
                 </th>
                 <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
+                  Admin due
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
+                  Vendor Wallet
+                </th>
+                <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
                   DOB
                 </th>
                 <th className="text-right py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
@@ -846,6 +857,18 @@ return (
                   </td>
                   <td className="py-3 px-4 text-sm text-black whitespace-nowrap">
                     <div className="flex items-center gap-1">
+                      <AlertCircle className="w-4 h-4 text-red-400" />
+                      {user.adminDue}
+                    </div>
+                  </td>
+                  <td className="py-3 px-4 text-sm text-black whitespace-nowrap">
+                    <div className="flex items-center gap-1">
+                      <IndianRupee className="w-4 h-4 text-green-800" />
+                      {user.walletBalance}
+                    </div>
+                  </td>
+                  <td className="py-3 px-4 text-sm text-black whitespace-nowrap">
+                    <div className="flex items-center gap-1">
                       <Calendar className="w-4 h-4 text-cyan-400" />
                       {user.DOB}
                     </div>
@@ -863,7 +886,8 @@ return (
                         <Eye className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDeleteUser(user.userId)}
+                        // onClick={() => handleDeleteUser(user.userId)}
+                        onClick={() => setDeleteVendorId(user.userId)}
                         className="p-1 text-red-600 hover:bg-red-100 rounded"
                         title="Delete User"
                       >
@@ -913,6 +937,16 @@ return (
           selectedUser={selectedUser}
         />
       )}
+      <ConfirmModal
+        open={!!deleteVendorId}
+        title="Delete Vendor"
+        message="Are you sure you want to delete this vendor? This action cannot be undone."
+        onCancel={() => setDeleteVendorId(null)}
+        onConfirm={async () => {
+          await handleDeleteUser(deleteVendorId);
+          setDeleteVendorId(null);
+        }}
+      />
     </div>
   </div>
 );

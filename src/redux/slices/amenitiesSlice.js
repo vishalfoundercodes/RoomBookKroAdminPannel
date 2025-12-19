@@ -6,27 +6,24 @@ import { toast } from "react-toastify";
 const baseUrl = "https://root.roombookkro.com/api";
 // 🔹 Fetch booking/order history
 export const fetchPropertitesAmenities = createAsyncThunk(
-  "history/fetchPropertitesAmenities",
+  "amenities/fetchPropertitesAmenities",
   async (_, { rejectWithValue }) => {
-    console.log("🟡 [fetchOrderHistory] called with userId:", userId);
     try {
       const response = await axios.get(`${baseUrl}/get-amenities/property`);
-      console.log("Property Amenities updated", response);
       return response.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data || "Failed to fetch order history"
-      );
+      return rejectWithValue(error.response?.data || "Failed");
     }
   }
 );
+
 
 export const fetchRoomAmenities = createAsyncThunk(
   "history/fetchRoomAmenities",
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get(`${baseUrl}/get-amenities/room`);
-      console.log("response facility", response);
+      // console.log("response facility", response);
       return response.data;
     } catch (error) {
       return rejectWithValue(

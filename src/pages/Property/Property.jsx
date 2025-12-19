@@ -19,11 +19,13 @@ import CustomPropertyTypeDropdown from './CustomPropertyDropDown';
 import CustomAvailabilityDropdown from './CustomAvailableDropdown';
 import NewStatCard from '../User/Newstate';
 import { useLocation } from 'react-router-dom';
-
+import ConfirmModal from '../../reusable_components/ConfirmationModel';
 const PropertyPage = () => {
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const [manualLocation, setManualLocation] = useState(false);
   const [selectedCoords, setSelectedCoords] = useState({ lat: 0, lng: 0 });
+  const [deleteUserId, setDeleteUserId] = useState(null);
+
 
 
   const [isUploading, setIsUploading] = useState(false);
@@ -38,6 +40,10 @@ const PropertyPage = () => {
     loading,
     error,
   } = useSelector((state) => state.property);
+
+  const fetchPropertyList = () => {
+    dispatch(fetchProperty());
+  };
 
   useEffect(() => {
     dispatch(fetchProperty());
@@ -134,13 +140,15 @@ const PropertyPage = () => {
   const notVerifyPropertyCount =
     filteredProperty?.filter((u) => u.verifyProperty === false).length || 0;
   const pgCount =
-    filteredProperty?.filter((u) => u.type === "pg").length || 0;
+    filteredProperty?.filter((u) => u.type === "pg"||u.type =="PG"|| u.type=='Pg').length || 0;
   const hotelCount =
     filteredProperty?.filter((u) => u.type == "hotel" || u.type=="Hotel").length || 0;
   const AppartmentCount =
-    filteredProperty?.filter((u) => u.type == "apartment").length || 0;
+    filteredProperty?.filter((u) => u.type == "apartment" || u.type == "Apartment").length || 0;
   const dormitaryCount =
-    filteredProperty?.filter((u) => u.type == "dormitary").length || 0;
+    filteredProperty?.filter(
+      (u) => u.type == "dormitary" || u.type == "Dormitary"
+    ).length || 0;
 
   const PropertytatusData = [
     { name: "Active", value: activeProperty, color: "#10b981" },
@@ -194,7 +202,7 @@ const handleAvailabilityChange = async(id, value) => {
       };
 
       await dispatch(editProperty({ id, payload }));
-      dispatch(fetchProperty());
+     await dispatch(fetchProperty());
   } catch (error) {
     console.error("❌ Error updating availability:", error);
     toast.error("Failed to update availability");
@@ -219,7 +227,7 @@ const handleverifyPropertyChange = async (id, value) => {
     };
 
     await dispatch(editProperty({ id, payload }));
-    dispatch(fetchProperty());
+   await dispatch(fetchProperty());
   } catch (error) {
     console.error("❌ Error updating availability:", error);
     toast.error("Failed to update availability");
@@ -234,7 +242,7 @@ const handleCommissionChange = async(id, value) => {
         commision: Number(value),
       };
       await dispatch(editProperty({ id, payload }));
-      dispatch(fetchProperty());
+     await dispatch(fetchProperty());
   }catch{
     toast.error("Invalid commission value");
     return;
@@ -445,11 +453,11 @@ const handleCommissionChange = async(id, value) => {
           data={PropertytatusData}
           height={300}
         />
-             <PieChartComponent
-                  title="Property Verification Distribution"
-                  data={PropertyVerifiction}
-                  height={300}
-                />
+        <PieChartComponent
+          title="Property Verification Distribution"
+          data={PropertyVerifiction}
+          height={300}
+        />
       </div>
 
       {/* Filters and Search */}
@@ -705,7 +713,8 @@ const handleCommissionChange = async(id, value) => {
                         <Eye className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDeleteUser(user.residencyId)}
+                        // onClick={() => handleDeleteUser(user.residencyId)}
+                        onClick={() => setDeleteUserId(user.residencyId)}
                         className="p-1 text-red-600 hover:bg-red-100 rounded"
                         title="Delete User"
                       >
@@ -734,7 +743,7 @@ const handleCommissionChange = async(id, value) => {
       {showAddModal && (
         <AddProperty
           onClose={() => setShowAddModal(false)}
-          onSuccess={() => fetchProperty()}
+          onSuccess={fetchPropertyList}
         />
       )}
 
@@ -759,6 +768,16 @@ const handleCommissionChange = async(id, value) => {
           onClose={() => setShowEditModal(false)}
         />
       )}
+      <ConfirmModal
+        open={!!deleteUserId}
+        title="Delete Property"
+        message="Are you sure you want to delete this property? This action cannot be undone."
+        onCancel={() => setDeleteUserId(null)}
+        onConfirm={async () => {
+          await handleDeleteUser(deleteUserId);
+          setDeleteUserId(null); // close modal
+        }}
+      />
     </div>
   );
 };

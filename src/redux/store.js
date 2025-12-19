@@ -24,6 +24,7 @@ const store = configureStore({
     images: addImageReducer,
     revenue: revenueReducer,
     amenities: amenitiesReducer,
+    propertyAmenities: propertyReducer,
   },
 });
 

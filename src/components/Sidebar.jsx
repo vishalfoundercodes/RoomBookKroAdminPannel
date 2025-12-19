@@ -23,9 +23,9 @@ import {
   IndianRupee,
 } from "lucide-react";
 import { Link, NavLink } from "react-router-dom";
-import { BiPhotoAlbum } from "react-icons/bi";
-import { MdOutlineHomeWork } from "react-icons/md";
-import { AiOutlineAppstore } from "react-icons/ai";
+import { BiPhotoAlbum, BiSliderAlt } from "react-icons/bi";
+import { MdOutlineAccountBalanceWallet, MdOutlineHomeWork, MdOutlineLocalAtm } from "react-icons/md";
+import { AiOutlineAppstore, AiOutlineBank } from "react-icons/ai";
 
 // Sidebar Component
 export const Sidebar = ({ isOpen, onClose }) => {
@@ -54,6 +54,18 @@ export const Sidebar = ({ isOpen, onClose }) => {
     // { icon: PieChart, label: "Revenue", to: "/revenue" },
     // { icon: IndianRupee, label: "Revenue", to: "/revenue" },
 
+    { icon: BiSliderAlt, label: "Options", to: "/options" },
+    {
+      icon: MdOutlineAccountBalanceWallet,
+      label: "Deposit History",
+      to: "/depositHistory",
+    },
+    {
+      icon: MdOutlineLocalAtm,
+      label: "Withdraw histroy",
+      to: "/withdrawHistory",
+    },
+    { icon: AiOutlineBank, label: "Bank details", to: "/bankDetails" },
     { icon: BiPhotoAlbum, label: "Add Images Page", to: "/addimagepage" },
     { icon: AiOutlineAppstore, label: "Facility", to: "/amenitiespage" },
     // // { icon: Star, label: "Extra Item 2", to: "#" },
