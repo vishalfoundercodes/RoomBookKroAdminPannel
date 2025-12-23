@@ -5,10 +5,9 @@ export default function CustomDropdown({ value, onChange }) {
   const [open, setOpen] = useState(false);
 
   const options = [
-    { value: "All", label: "All Roles" },
-    { value: "0", label: "Admin" },
-    { value: "1", label: "Vendor" },
-    { value: "2", label: "User" },
+    { value: "All", label: "All" },
+    { value: "1", label: "Verify" },
+    { value: "0", label: "Unverify" }
   ];
 
   const dropdownRef = useRef();

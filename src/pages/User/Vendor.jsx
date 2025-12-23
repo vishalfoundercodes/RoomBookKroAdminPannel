@@ -136,7 +136,7 @@ const VendorPage = () => {
     const matchesStatus =
       filterStatus === "All" || user.userStatus == filterStatus;
 
-    const matchesRole = filterRole === "All" || user.user_type == filterRole;
+    const matchesRole = filterRole === "All" || user.isVerified == filterRole;
 
     return matchesSearch && matchesStatus && matchesRole && matchesDOB;
   });
@@ -348,6 +348,9 @@ const VendorPage = () => {
       maritalStatus: formData.maritalStatus ?? selectedUser.maritalStatus,
       walletBalance: formData.walletBalance ?? selectedUser.walletBalance,
       occupation: formData.occupation ?? selectedUser.occupation,
+      adharNumber: formData.adharNumber ?? selectedUser.adharNumber,
+      panNumber: formData.panNumber ?? selectedUser.panNumber,
+      adminDue: formData.adminDue ?? selectedUser.adminDue,
     };
 
     // Only include userImage if it was changed
@@ -460,6 +463,7 @@ return (
       flex items-center justify-between 
       cursor-pointer
     "
+            onClick={() => setFilterRole("All")}
           >
             {/* LEFT SIDE CONTENT */}
             <div>
@@ -498,6 +502,7 @@ return (
     flex items-center justify-between 
     cursor-pointer
   `}
+            onClick={() => setFilterRole(1)}
           >
             <div>
               <p className="text-xs sm:text-sm opacity-80">Verified Vendors</p>
@@ -533,6 +538,7 @@ return (
     flex items-center justify-between 
     cursor-pointer
   `}
+            onClick={() => setFilterRole(0)}
           >
             <div>
               <p className="text-xs sm:text-sm opacity-80">
@@ -571,6 +577,7 @@ return (
     flex items-center justify-between 
     cursor-pointer
   `}
+            onClick={() => setFilterStatus(1)}
           >
             <div>
               <p className="text-xs sm:text-sm opacity-80">Active Vendors</p>
@@ -606,6 +613,7 @@ return (
     flex items-center justify-between 
     cursor-pointer
   `}
+            onClick={() => setFilterStatus(0)}
           >
             <div>
               <p className="text-xs sm:text-sm opacity-80">Inactive Vendors</p>
@@ -877,6 +885,7 @@ return (
                     <div className="flex items-center gap-1 justify-end">
                       <button
                         onClick={() => {
+                          console.log("user:", user);
                           setSelectedUser(user);
                           setShowViewModal(true);
                         }}

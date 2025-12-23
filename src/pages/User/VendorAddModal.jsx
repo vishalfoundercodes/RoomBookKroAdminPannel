@@ -120,11 +120,16 @@ const VendorAddModal = ({ show, onClose, onSubmit, newUser, setNewUser }) => {
                 type="tel"
                 required
                 value={newUser.phone}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, phone: e.target.value })
-                }
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, ""); // only digits
+                  if (value.length <= 10) {
+                    setNewUser({ ...newUser, phone: value });
+                  }
+                }}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/60 shadow-sm"
                 placeholder="Enter phone number"
+                maxLength={10}
+                inputMode="numeric"
               />
             </div>
 
@@ -163,10 +168,13 @@ const VendorAddModal = ({ show, onClose, onSubmit, newUser, setNewUser }) => {
                 type="tel"
                 required
                 value={newUser.adharNumber}
-                max={12}
-                onChange={(e) =>
-                  setNewUser({ ...newUser, adharNumber: e.target.value })
-                }
+                maxLength={12}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, ""); // only digits
+                  if (value.length <= 12) {
+                    setNewUser({ ...newUser, adharNumber: e.target.value });
+                  }
+                }}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/60 shadow-sm"
                 placeholder="Enter phone number"
               />
@@ -214,6 +222,7 @@ const VendorAddModal = ({ show, onClose, onSubmit, newUser, setNewUser }) => {
                 onChange={(e) =>
                   setNewUser({ ...newUser, panNumber: e.target.value })
                 }
+                
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/60 shadow-sm"
                 placeholder="Enter phone number"
               />

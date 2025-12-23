@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { fetchVendorRevenue } from "../../redux/slices/revenueSlice";
 import { FaUniversity } from "react-icons/fa";
+import defaultProfile from "../../assets/default-profile.png";
+
 
 const VendorViewModal = ({
   show,
@@ -18,6 +20,8 @@ const VendorViewModal = ({
   handleSubmit,
   selectedUser,
 }) => {
+
+  console.log("data:",formData)
   if (!show) return null;
 const [previewImage, setPreviewImage] = useState(null);
 
@@ -85,7 +89,8 @@ const handleSeeProperty = async () => {
                 src={
                   formData.userImagePreview ||
                   formData.userImage ||
-                  selectedUser.userImage
+                  selectedUser.userImage ||
+                  defaultProfile
                 }
                 alt="profile image"
                 className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-fill shadow-md"
@@ -165,7 +170,17 @@ const handleSeeProperty = async () => {
                       placeholder="Update contact"
                       className="border rounded px-2 py-1 w-full"
                       value={formData.contact}
-                      onChange={handleChange}
+                      // onChange={handleChange}
+                      onChange={(e) => {
+                        if (e.target.value.length <= 10) {
+                          handleChange(e);
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        if (["e", "E", "+", "-", "."].includes(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                     />
                   ) : (
                     <span>{selectedUser.phone || formData.contact}</span>
@@ -201,7 +216,7 @@ const handleSeeProperty = async () => {
                       className="border rounded px-2 py-1 w-full"
                     />
                   ) : (
-                    <span>{selectedUser.DOB || formData.DOB}</span>
+                    <span>DOB:- {selectedUser.DOB || formData.DOB}</span>
                   )}
                 </div>
 
@@ -210,16 +225,21 @@ const handleSeeProperty = async () => {
                   <Wallet className="text-gray-500 w-4 h-4" />
                   {isEditing ? (
                     <input
-                      type="number"
+                      type="Number"
                       name="walletBalance"
                       placeholder="Update Wallet"
                       className="border rounded px-2 py-1 w-full"
-                      value={formData.vendorRevenue}
+                      // value={formData.vendorRevenue}
+                      value={formData.walletBalance ?? ""}
                       onChange={handleChange}
                     />
                   ) : (
                     <span>
-                      ₹{selectedUser.vendorRevenue || formData.vendorRevenue}
+                      Wallet:- ₹
+                      {selectedUser.walletBalance ||
+                        formData.vendorRevenue ||
+                        formData.walletBalance ||
+                        0}
                     </span>
                   )}
                 </div>
@@ -238,15 +258,34 @@ const handleSeeProperty = async () => {
                 <div className="flex items-center gap-3">
                   <IdCard className="text-gray-500 w-4 h-4" />
                   {isEditing ? (
+                    // <input
+                    // type="Number"
+                    //   name="adharNumber"
+                    //   placeholder="Update adhar number"
+                    //   className="border rounded px-2 py-1 w-full"
+                    //   value={formData.adharNumber}
+                    //   onChange={handleChange}
+                    // />
                     <input
+                      type="number"
                       name="adharNumber"
-                      placeholder="Update adhar number"
+                      placeholder="Update Aadhaar number"
                       className="border rounded px-2 py-1 w-full"
                       value={formData.adharNumber}
-                      onChange={handleChange}
+                      onChange={(e) => {
+                        if (e.target.value.length <= 12) {
+                          handleChange(e);
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        if (["e", "E", "+", "-", "."].includes(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
                     />
                   ) : (
                     <span>
+                      Adhar No.:-{" "}
                       {selectedUser.adharNumber || formData.adharNumber}
                     </span>
                   )}
@@ -264,7 +303,9 @@ const handleSeeProperty = async () => {
                       onChange={handleChange}
                     />
                   ) : (
-                    <span>{selectedUser.panNumber || formData.panNumber}</span>
+                    <span>
+                      Pan No. :- {selectedUser.panNumber || formData.panNumber}
+                    </span>
                   )}
                 </div>
               </div>
@@ -364,7 +405,7 @@ const handleSeeProperty = async () => {
         </div>
 
         {/* Footer */}
-        <div className="flex flex-col sm:flex-row justify-end gap-3 p-5 border-t bg-gray-50">
+        <div className="grid grid-cols-2 sm:grid-cols-4 justify-end gap-3 p-5 border-t bg-gray-50">
           <button
             onClick={() => {
               setIsEditing(false);
@@ -402,7 +443,7 @@ const handleSeeProperty = async () => {
                   });
                   console.log("userImage", selectedUser.name);
                 }}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-sm flex items-center gap-2"
+                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-sm flex items-center gap-2 justify-center"
               >
                 <FaUniversity className="w-4 h-4" />
                 Bank Details

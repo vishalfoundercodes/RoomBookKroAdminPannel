@@ -4,12 +4,13 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { fetchUsers } from "./userSlice";
 
-const baseUrl = "https://root.roombookkro.com/api";
+const baseUrl = "http://localhost:3000/api";
 
 // ✅ Profile Update Thunk
 export const profileUpdate = createAsyncThunk(
   "profile/profileUpdate",
   async ({ userId, payload }, { rejectWithValue, dispatch }) => {
+    console.log("userId",userId)
     try {
       const res = await axios.post(`${baseUrl}/profile/${userId}`, payload, {
         // headers: { "Content-Type": "multipart/form-data" },
