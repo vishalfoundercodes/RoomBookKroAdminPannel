@@ -49,7 +49,15 @@ import Loader from '../Loader/Loader';
 import DOBDatePicker from './DOBDatePicker';
 import ConfirmModal from '../../reusable_components/ConfirmationModel';
 import { FaUniversity } from 'react-icons/fa';
+import BlurOverlayLoader from '../../reusable_components/BlurOverlayLoader';
+import defaultProfile from "../../assets/default-profile.png";
+import { Check } from "lucide-react";
+import { toast } from 'react-toastify';
+
 const UsersPage = () => {
+  const [tableLoading, setTableLoading] = useState(false);
+
+
     const navigate = useNavigate();
     const [dob, setDob] = useState("");
   const dispatch = useDispatch();
@@ -84,6 +92,9 @@ const UsersPage = () => {
     role: "2",
     location: "",
   });
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const isValidEmail = emailRegex.test(newUser.email);
 
   const formatDOB = (dob) => {
     if (!dob) return "";
@@ -196,10 +207,23 @@ const inActiveVendor = users.filter(
   };
 
 
-  // Role color helper
+const isValidPhone = (phone) => {
+  return /^\d{10}$/.test(phone);
+};
 
   // Handle user actions
   const handleAddUser = () => {
+    // ❌ STOP if email invalid
+    if (!isValidEmail) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    // ❌ STOP if phone invalid
+    if (!isValidPhone(newUser.phone)) {
+      toast.error("Phone number must be 10 digits");
+      return;
+    }
     // prepare payload as per API
     const payload = {
       action: "signup",
@@ -230,8 +254,15 @@ const inActiveVendor = users.filter(
   };
 
   const handleDeleteUser = (userId) => {
-    console.log(userId)
-    dispatch(profileDelete(userId));
+    try {
+      setTableLoading(true);
+          console.log(userId);
+          dispatch(profileDelete(userId));
+    } catch (error) {
+      console.error(error)
+    }finally{
+      setTableLoading(false);
+    }
   };
 
   const handleStatusChange = (userId, newStatus) => {
@@ -407,9 +438,9 @@ const birthMonthData = monthNames.map((m, i) => ({
 
 
 
-    if (usersLoading || loading) {
-      return <Loader />;
-    }
+    // if (usersLoading || loading) {
+    //   return <Loader />;
+    // }
 
   return (
     <div className="flex-1 p-2 overflow-x-hidden">
@@ -638,10 +669,14 @@ const birthMonthData = monthNames.map((m, i) => ({
         {/* Users Table */}
         <Card>
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-200">
-                  {/* <th className="text-left py-3 px-4">
+            <BlurOverlayLoader
+              loading={tableLoading}
+              text="Deleting customer..."
+            >
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-200">
+                    {/* <th className="text-left py-3 px-4">
                     <input
                       type="checkbox"
                       onChange={(e) => {
@@ -654,36 +689,36 @@ const birthMonthData = monthNames.map((m, i) => ({
                       className="rounded border-gray-300"
                     />
                   </th> */}
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">
-                    Customer Id
-                  </th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">
-                    Customer
-                  </th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">
-                    Contact
-                  </th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">
-                    notification
-                  </th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">
-                    Status
-                  </th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-700">
-                    DOB
-                  </th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-700">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredUsers.map((user) => (
-                  <tr
-                    key={user.id}
-                    className="border-b border-gray-100 hover:bg-gray-50"
-                  >
-                    {/* <td className="py-3 px-4">
+                    <th className="text-left py-3 px-4 font-medium text-gray-700">
+                      Customer Id
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-700">
+                      Customer
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-700">
+                      Contact
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-700">
+                      notification
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-700">
+                      Status
+                    </th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-700">
+                      DOB
+                    </th>
+                    <th className="text-right py-3 px-4 font-medium text-gray-700">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredUsers.map((user) => (
+                    <tr
+                      key={user.id}
+                      className="border-b border-gray-100 hover:bg-gray-50"
+                    >
+                      {/* <td className="py-3 px-4">
                       <input
                         type="checkbox"
                         checked={selectedUsers.includes(user.id)}
@@ -699,42 +734,42 @@ const birthMonthData = monthNames.map((m, i) => ({
                         className="rounded border-gray-300"
                       />
                     </td> */}
-                    <td className="py-3 px-4 text-sm text-gray-600">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3" />
-                        {user.userId}
-                      </div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-3">
-                        {/* <img
+                      <td className="py-3 px-4 text-sm text-gray-600">
+                        <div className="flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          {user.userId}
+                        </div>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-3">
+                          {/* <img
                         src={user.avatar}
                         alt={user.name}
                         className="w-8 h-8 rounded-full object-cover"
                       /> */}
-                        <div>
-                          <div className="font-medium text-gray-900">
-                            {user.name}
-                          </div>
-                          <div className="text-sm text-gray-500">
-                            {user.email}
+                          <div>
+                            <div className="font-medium text-gray-900">
+                              {user.name}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {user.email}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="text-sm">
-                        <div className="flex items-center gap-1 text-black">
-                          <Phone className="w-4 h-4 text-violet-800" />
-                          {user.phone}
-                        </div>
-                        {/* <div className="flex items-center gap-1 text-gray-500 mt-1">
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="text-sm">
+                          <div className="flex items-center gap-1 text-black">
+                            <Phone className="w-4 h-4 text-violet-800" />
+                            {user.phone}
+                          </div>
+                          {/* <div className="flex items-center gap-1 text-gray-500 mt-1">
                         <MapPin className="w-3 h-3" />
                         {user.location}
                       </div> */}
-                      </div>
-                    </td>
-                    {/* <td className="py-3 px-4 cursor-pointer">
+                        </div>
+                      </td>
+                      {/* <td className="py-3 px-4 cursor-pointer">
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${
                           getRoleData(user.user_type).color
@@ -743,36 +778,36 @@ const birthMonthData = monthNames.map((m, i) => ({
                         {getRoleData(user.user_type).label}
                       </span>
                     </td> */}
-                    <td>
-                      <div className="flex justify-center">
-                        <button
-                          onClick={() => handleSendNotification(user.userId)}
-                          className="flex items-center justify-center w-10 h-10 rounded-full 
+                      <td>
+                        <div className="flex justify-center">
+                          <button
+                            onClick={() => handleSendNotification(user.userId)}
+                            className="flex items-center justify-center w-10 h-10 rounded-full 
                  bg-green-400 backdrop-blur-sm text-white shadow-lg 
                  hover:bg-blue-500 hover:scale-110 hover:shadow-xl 
                  transition-all duration-200"
-                        >
-                          <Bell className="w-5 h-5" />
-                        </button>
-                      </div>
-                    </td>
+                          >
+                            <Bell className="w-5 h-5" />
+                          </button>
+                        </div>
+                      </td>
 
-                    <td className="py-3 px-4">
-                      <select
-                        value={user.userStatus}
-                        onChange={(e) =>
-                          handleStatusChange(user.userId, e.target.value)
-                        }
-                        className={`px-2 py-1 rounded text-xs font-medium border-0 cursor-pointer ${
-                          getStatusdata(user.userStatus).color
-                        }
+                      <td className="py-3 px-4">
+                        <select
+                          value={user.userStatus}
+                          onChange={(e) =>
+                            handleStatusChange(user.userId, e.target.value)
+                          }
+                          className={`px-2 py-1 rounded text-xs font-medium border-0 cursor-pointer ${
+                            getStatusdata(user.userStatus).color
+                          }
 `}
-                      >
-                        <option value="1">Active</option>
-                        <option value="0">Inactive</option>
-                      </select>
-                    </td>
-                    {/* <td className="py-3 px-4">
+                        >
+                          <option value="1">Active</option>
+                          <option value="0">Inactive</option>
+                        </select>
+                      </td>
+                      {/* <td className="py-3 px-4">
                       <select
                         disabled={user.user_type !== "1"}
                         value={user.isVerified}
@@ -793,25 +828,25 @@ const birthMonthData = monthNames.map((m, i) => ({
                         <option value="false">Not Veryfied</option>
                       </select>
                     </td> */}
-                    <td className="py-3 px-4 text-sm text-black">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4 text-cyan-400" />
-                        {user.DOB}
-                      </div>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex items-center gap-1 justify-end">
-                        <button
-                          onClick={() => {
-                            setSelectedUser(user);
-                            setShowViewModal(true);
-                          }}
-                          className="p-1 text-blue-600 hover:bg-blue-100 rounded"
-                          title="View User"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
-                        {/* <button
+                      <td className="py-3 px-4 text-sm text-black">
+                        <div className="flex items-center gap-1">
+                          <Calendar className="w-4 h-4 text-cyan-400" />
+                          {user.DOB}
+                        </div>
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-1 justify-end">
+                          <button
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setShowViewModal(true);
+                            }}
+                            className="p-1 text-blue-600 hover:bg-blue-100 rounded"
+                            title="View User"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          {/* <button
                         onClick={() => {
                           setSelectedUser(user);
                           setShowEditModal(true);
@@ -821,20 +856,21 @@ const birthMonthData = monthNames.map((m, i) => ({
                       >
                         <Edit className="w-4 h-4" />
                       </button> */}
-                        <button
-                          // onClick={() => handleDeleteUser(user.userId)}
-                          onClick={() => setDeleteCustomerId(user.userId)}
-                          className="p-1 text-red-600 hover:bg-red-100 rounded"
-                          title="Delete User"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                          <button
+                            // onClick={() => handleDeleteUser(user.userId)}
+                            onClick={() => setDeleteCustomerId(user.userId)}
+                            className="p-1 text-red-600 hover:bg-red-100 rounded"
+                            title="Delete User"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </BlurOverlayLoader>
           </div>
 
           {filteredUsers.length === 0 && (
@@ -885,7 +921,7 @@ const birthMonthData = monthNames.map((m, i) => ({
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Email
                     </label>
-                    <input
+                    {/* <input
                       type="email"
                       required
                       value={newUser.email}
@@ -894,9 +930,27 @@ const birthMonthData = monthNames.map((m, i) => ({
                       }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Enter email address"
+                    /> */}
+                    <input
+                      type="email"
+                      value={newUser.email}
+                      onChange={(e) =>
+                        setNewUser({ ...newUser, email: e.target.value })
+                      }
+                      className={`
+    w-full px-3 py-2 rounded-lg border
+    ${
+      isValidEmail
+        ? "border-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]"
+        : newUser.email
+        ? "border-red-500 shadow-[0_0_6px_rgba(239,68,68,0.6)]"
+        : "border-gray-300"
+    }
+  `}
+                      placeholder="Enter email address"
                     />
                   </div>
-                  <div>
+                  {/* <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Password
                     </label>
@@ -910,7 +964,7 @@ const birthMonthData = monthNames.map((m, i) => ({
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Enter password"
                     />
-                  </div>
+                  </div> */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Date of Birth
@@ -925,7 +979,7 @@ const birthMonthData = monthNames.map((m, i) => ({
                     />
                   </div>
 
-                  <div>
+                  {/* <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Phone
                     </label>
@@ -933,15 +987,35 @@ const birthMonthData = monthNames.map((m, i) => ({
                       type="tel"
                       required
                       value={newUser.phone}
+                      maxLength={10}
                       onChange={(e) =>
                         setNewUser({ ...newUser, phone: e.target.value })
                       }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Enter phone number"
                     />
-                  </div>
+                  </div> */}
+                  <input
+                    type="text"
+                    value={newUser.phone}
+                    maxLength={10}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, "");
+                      setNewUser({ ...newUser, phone: value });
+                    }}
+                    className={`w-full px-3 py-2 rounded-lg border
+    ${
+      newUser.phone.length === 10
+        ? "border-green-500"
+        : newUser.phone
+        ? "border-red-500"
+        : "border-gray-300"
+    }
+  `}
+                    placeholder="Enter 10 digit phone number"
+                  />
 
-                  <div className="hidden">
+                  {/* <div className="hidden">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Role
                     </label>
@@ -971,7 +1045,7 @@ const birthMonthData = monthNames.map((m, i) => ({
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       placeholder="Enter location"
                     />
-                  </div>
+                  </div> */}
                 </div>
 
                 <div className="flex gap-3 mt-6">
@@ -1023,7 +1097,8 @@ const birthMonthData = monthNames.map((m, i) => ({
                       src={
                         formData.userImagePreview ||
                         formData.userImage ||
-                        selectedUser.userImage
+                        selectedUser.userImage ||
+                        defaultProfile
                       }
                       alt={formData.name}
                       className="w-24 h-24 rounded-full object-cover border shadow"
