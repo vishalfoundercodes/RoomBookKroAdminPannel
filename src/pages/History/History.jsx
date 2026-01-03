@@ -18,6 +18,9 @@ import { fetchOrderHistory, updatePaymentStatus } from "../../redux/slices/histo
 import Loader from "../Loader/Loader";
 import { toast } from "react-toastify";
 import StatCard from "../../reusable_components/StatCard";
+import PlaceBookingModal from "./PlaceBookingModal";
+import { fetchUsers } from "../../redux/slices/userSlice";
+import { fetchProperty } from "../../redux/slices/propertySlice";
 
 export default function History() {
   const dispatch = useDispatch();
@@ -30,8 +33,17 @@ export default function History() {
   const [bookingSubTab, setBookingSubTab] = useState("currentStay");
   const [paymentSubTab, setPaymentSubTab] = useState("pending");
 const [filteredData, setFilteredData] = useState(null);
+const [openBookingModal, setOpenBookingModal] = useState(false);
 
 
+
+const { data: users } = useSelector((state) => state.users);
+
+const onlyTypeOneUsers = users?.filter((u) => u.user_type == 2) || [];
+  useEffect(() => {
+    dispatch(fetchUsers());
+    dispatch(fetchProperty());
+  }, [dispatch]);
 
   useEffect(() => {
     dispatch(fetchOrderHistory({ userId: "all" }));
@@ -271,16 +283,31 @@ const totalPayments =
     <div className="min-h-screen bg-gray-50 mt-4 rounded-xl">
       <div className=" px-4 py-8">
         {/* Header */}
-        <div className="mb-8">
+        {/* <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
             Booking History
           </h1>
           <p className="text-gray-600">View and manage all your bookings</p>
+        </div> */}
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+              Booking History
+            </h1>
+            <p className="text-gray-600">View and manage all your bookings</p>
+          </div>
+
+          <button
+            onClick={() => setOpenBookingModal(true)}
+            className="px-5 py-2.5 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
+          >
+            Do Booking
+          </button>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
           {/* Payment Status Wise */}
-          
+
           <StatCard
             title="Total Payments"
             value={totalPayments.toString()}
@@ -498,6 +525,12 @@ const totalPayments =
           </div>
         )}
       </div>
+      <PlaceBookingModal
+        open={openBookingModal}
+        onClose={() => setOpenBookingModal(false)}
+        users={onlyTypeOneUsers}
+        refreshHistory={() => dispatch(fetchOrderHistory({ userId: "all" }))}
+      />
     </div>
   );
 }

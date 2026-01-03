@@ -601,6 +601,7 @@ import { CheckCircle, XCircle, Star, ArrowLeft, Banknote } from "lucide-react";
 import Loader from "../Loader/Loader";
 import { toast } from "react-toastify";
 import ConfirmModal from "../../reusable_components/ConfirmationModel";
+import defaultProfile from "../../assets/default-profile.png";
 
 export default function UserBankDetails() {
   const navigate = useNavigate();
@@ -703,7 +704,7 @@ export default function UserBankDetails() {
           {/* User Info */}
           <div className="flex items-center gap-4">
             <img
-              src={userImage}
+              src={userImage || defaultProfile}
               alt="user"
               className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover shadow"
             />

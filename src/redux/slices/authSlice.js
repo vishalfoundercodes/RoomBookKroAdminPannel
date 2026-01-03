@@ -13,7 +13,6 @@ export const signupUser = createAsyncThunk(
       const res = await axios.post(`${baseUrl}/authentication`, payload);
       if (res?.data?.status === 200) {
         toast.success("User added successfully");
-        dispatch(fetchUsers());
       } else {
         console.error("User creation failed:", res);
         toast.error("User not created");

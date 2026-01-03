@@ -58,12 +58,13 @@ import DOBDatePicker from "./DOBDatePicker";
 import VendorViewModal from "./VendorViewModal";
 import VendorAddModal from "./VendorAddModal";
 import ConfirmModal from "../../reusable_components/ConfirmationModel";
+import BlurOverlayLoader from "../../reusable_components/BlurOverlayLoader";
 const VendorPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [submitting, setSubmitting] = useState(false);
   const [deleteVendorId, setDeleteVendorId] = useState(null);
-
+ const [tableLoading, setTableLoading] = useState(false);
 
   const { user, loading, error, success } = useSelector(
     (state) => state.profile
@@ -72,9 +73,7 @@ const VendorPage = () => {
     (state) => state.users
   );
 
-  useEffect(() => {
-    dispatch(fetchUsers());
-  }, [dispatch]);
+
 
   // State management
   const [searchTerm, setSearchTerm] = useState("");
@@ -147,11 +146,11 @@ const VendorPage = () => {
     (u) => u.user_type == "1" || u.user_type == "2"
   ).length;
   const activeUsers = users.filter(
-    (u) => u.user_type == "2" && u.userStatus == "1"
+    (u) => u.user_type == "1" && u.userStatus == 1
   ).length;
   const pendingUsers = users.filter((u) => u.userStatus === "Pending").length;
   const inactiveUsers = users.filter(
-    (u) => u.user_type == "2" && u.userStatus == "0"
+    (u) => u.user_type == "1" && u.userStatus == 0
   ).length;
   const veryfiedVendor = users.filter(
     (u) => u.user_type === "1" && u.isVerified == "1"
@@ -275,8 +274,15 @@ const VendorPage = () => {
   };
 
   const handleDeleteUser = (userId) => {
-    console.log(userId);
-    dispatch(profileDelete(userId));
+    try{
+      setTableLoading(true);
+       console.log(userId);
+       dispatch(profileDelete(userId));
+    }catch(error){
+      console.error(error)
+    }finally{
+      setTableLoading(false)
+    }
   };
 
   const handleStatusChange = (userId, newStatus) => {
@@ -367,19 +373,6 @@ const VendorPage = () => {
     setShowViewModal(false);
   };
 
-  useEffect(() => {
-    if (success) {
-      setFormData({}); // formData clear
-    }
-  }, [success]);
-
-  // Update the image display in your modal to use userImagePreview
-  // In your JSX:
-  // <img
-  //   src={formData.userImagePreview || formData.userImage || selectedUser.userImage}
-  //   alt={formData.name}
-  //   className="w-20 h-20 rounded-full object-cover"
-  // />
   const handleSendNotification = (user) => {
     // Navigate to Notification page with userId as param or state
     navigate(`/notification/${user}`); // Option 1: via URL param
@@ -401,7 +394,19 @@ const VendorPage = () => {
             }
           }, [location.state]);
 
-  if (usersLoading || loading || submitting) {
+              useEffect(() => {
+                dispatch(fetchUsers());
+              }, [dispatch]);
+              
+
+              useEffect(() => {
+                if (success) {
+                  setFormData({}); // formData clear
+                }
+              }, [success]);
+
+
+  if ( submitting) {
     return <Loader />;
   }
 
@@ -463,7 +468,12 @@ return (
       flex items-center justify-between 
       cursor-pointer
     "
-            onClick={() => setFilterRole("All")}
+            onClick={() => {
+              setFilterRole("All");
+              setFilterStatus("All"); // Other filters reset (optional)
+              setDob("");
+              setSearchTerm("");
+            }}
           >
             {/* LEFT SIDE CONTENT */}
             <div>
@@ -502,7 +512,10 @@ return (
     flex items-center justify-between 
     cursor-pointer
   `}
-            onClick={() => setFilterRole(1)}
+            onClick={() => {
+              setFilterRole("1"); // String me rakho for consistency
+              setFilterStatus("All");
+            }}
           >
             <div>
               <p className="text-xs sm:text-sm opacity-80">Verified Vendors</p>
@@ -538,7 +551,10 @@ return (
     flex items-center justify-between 
     cursor-pointer
   `}
-            onClick={() => setFilterRole(0)}
+            onClick={() => {
+              setFilterRole("0");
+              setFilterStatus("All");
+            }}
           >
             <div>
               <p className="text-xs sm:text-sm opacity-80">
@@ -577,7 +593,10 @@ return (
     flex items-center justify-between 
     cursor-pointer
   `}
-            onClick={() => setFilterStatus(1)}
+            onClick={() => {
+              setFilterStatus("1"); // ✅ String me
+              setFilterRole("All");
+            }}
           >
             <div>
               <p className="text-xs sm:text-sm opacity-80">Active Vendors</p>
@@ -613,7 +632,10 @@ return (
     flex items-center justify-between 
     cursor-pointer
   `}
-            onClick={() => setFilterStatus(0)}
+            onClick={() => {
+              setFilterStatus("0"); // ✅ String me
+              setFilterRole("All");
+            }}
           >
             <div>
               <p className="text-xs sm:text-sm opacity-80">Inactive Vendors</p>
@@ -693,10 +715,11 @@ return (
       {/* Users Table - MAIN FIX */}
       <Card>
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr className="border-b border-gray-200">
-                {/* <th className="text-left py-3 px-4 whitespace-nowrap">
+          <BlurOverlayLoader loading={tableLoading} text="Deleting vendor...">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr className="border-b border-gray-200">
+                  {/* <th className="text-left py-3 px-4 whitespace-nowrap">
                   <input
                     type="checkbox"
                     onChange={(e) => {
@@ -709,54 +732,54 @@ return (
                     className="rounded border-gray-300"
                   />
                 </th> */}
-                <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
-                  Vendor Id
-                </th>
-                <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
-                  Vendor
-                </th>
-                <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
-                  Contact
-                </th>
-                <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
-                  Notification
-                </th>
-                <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
-                  Adhar Number
-                </th>
-                <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
-                  Pan Number
-                </th>
-                <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
-                  Status
-                </th>
-                <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
-                  Verify Vendor
-                </th>
-                <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
-                  Vendor Revenue
-                </th>
-                <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
-                  Admin due
-                </th>
-                <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
-                  Vendor Wallet
-                </th>
-                <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
-                  DOB
-                </th>
-                <th className="text-right py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.map((user) => (
-                <tr
-                  key={user.id}
-                  className="border-b border-gray-100 hover:bg-gray-50"
-                >
-                  {/* <td className="py-3 px-4 whitespace-nowrap">
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
+                    Vendor Id
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
+                    Vendor
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
+                    Contact
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
+                    Notification
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
+                    Adhar Number
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
+                    Pan Number
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
+                    Status
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
+                    Verify Vendor
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
+                    Vendor Revenue
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
+                    Admin due
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
+                    Vendor Wallet
+                  </th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
+                    DOB
+                  </th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-700 whitespace-nowrap">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredUsers.map((user) => (
+                  <tr
+                    key={user.id}
+                    className="border-b border-gray-100 hover:bg-gray-50"
+                  >
+                    {/* <td className="py-3 px-4 whitespace-nowrap">
                     <input
                       type="checkbox"
                       checked={selectedUsers.includes(user.id)}
@@ -772,142 +795,143 @@ return (
                       className="rounded border-gray-300"
                     />
                   </td> */}
-                  <td className="py-3 px-4 text-sm text-gray-600 whitespace-nowrap">
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
-                      {user.userId}
-                    </div>
-                  </td>
-                  <td className="py-3 px-4 whitespace-nowrap">
-                    <div className="flex items-center gap-3">
-                      <div>
-                        <div className="font-medium text-gray-900">
-                          {user.name}
+                    <td className="py-3 px-4 text-sm text-gray-600 whitespace-nowrap">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {user.userId}
+                      </div>
+                    </td>
+                    <td className="py-3 px-4 whitespace-nowrap">
+                      <div className="flex items-center gap-3">
+                        <div>
+                          <div className="font-medium text-gray-900">
+                            {user.name}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {user.email}
+                          </div>
                         </div>
-                        <div className="text-sm text-gray-500">
-                          {user.email}
+                      </div>
+                    </td>
+                    <td className="py-3 px-4 whitespace-nowrap">
+                      <div className="text-sm">
+                        <div className="flex items-center gap-1 text-black">
+                          <Phone className="w-4 h-4 text-violet-800" />
+                          {user.phone}
                         </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="py-3 px-4 whitespace-nowrap">
-                    <div className="text-sm">
-                      <div className="flex items-center gap-1 text-black">
-                        <Phone className="w-4 h-4 text-violet-800" />
-                        {user.phone}
+                    </td>
+                    <td className="py-3 px-4 whitespace-nowrap">
+                      <div className="flex justify-center">
+                        <button
+                          onClick={() => handleSendNotification(user.userId)}
+                          className="flex items-center justify-center w-10 h-10 rounded-full bg-green-400 backdrop-blur-sm text-white shadow-lg hover:bg-blue-500 hover:scale-110 hover:shadow-xl transition-all duration-200"
+                        >
+                          <Bell className="w-5 h-5" />
+                        </button>
                       </div>
-                    </div>
-                  </td>
-                  <td className="py-3 px-4 whitespace-nowrap">
-                    <div className="flex justify-center">
-                      <button
-                        onClick={() => handleSendNotification(user.userId)}
-                        className="flex items-center justify-center w-10 h-10 rounded-full bg-green-400 backdrop-blur-sm text-white shadow-lg hover:bg-blue-500 hover:scale-110 hover:shadow-xl transition-all duration-200"
-                      >
-                        <Bell className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </td>
-                  <td className="py-3 px-4 whitespace-nowrap">
-                    <div className="text-sm">
-                      <div className="flex items-center gap-1 text-black">
-                        <IdCard className="w-5 h-5 text-blue-800" />
-                        {user.adharNumber}
+                    </td>
+                    <td className="py-3 px-4 whitespace-nowrap">
+                      <div className="text-sm">
+                        <div className="flex items-center gap-1 text-black">
+                          <IdCard className="w-5 h-5 text-blue-800" />
+                          {user.adharNumber}
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="py-3 px-4 whitespace-nowrap">
-                    <div className="text-sm">
-                      <div className="flex items-center gap-1 text-black">
-                        <BookUser className="w-5 h-5 text-orange-700" />
-                        {user.panNumber}
+                    </td>
+                    <td className="py-3 px-4 whitespace-nowrap">
+                      <div className="text-sm">
+                        <div className="flex items-center gap-1 text-black">
+                          <BookUser className="w-5 h-5 text-orange-700" />
+                          {user.panNumber}
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="py-3 px-4 whitespace-nowrap">
-                    <select
-                      value={user.userStatus}
-                      onChange={(e) =>
-                        handleStatusChange(user.userId, e.target.value)
-                      }
-                      className={`px-2 py-1 rounded text-xs font-medium border-0 cursor-pointer ${
-                        getStatusdata(user.userStatus).color
-                      }`}
-                    >
-                      <option value="1">Active</option>
-                      <option value="0">Inactive</option>
-                    </select>
-                  </td>
-                  <td className="py-3 px-4 whitespace-nowrap">
-                    <select
-                      disabled={user.user_type !== "1"}
-                      value={user.isVerified}
-                      onChange={(e) =>
-                        handleVerificationChange(user.userId, e.target.value)
-                      }
-                      className={`px-2 py-1 rounded text-xs font-medium border-0 cursor-pointer ${
-                        getVeryfydata(user.isVerified).color
-                      } ${
-                        user.user_type != "1"
-                          ? "cursor-not-allowed opacity-60"
-                          : "cursor-pointer"
-                      }`}
-                    >
-                      <option value="true">Verified</option>
-                      <option value="false">Not Verified</option>
-                    </select>
-                  </td>
-                  <td className="py-3 px-4 text-sm text-black whitespace-nowrap">
-                    <div className="flex items-center gap-1">
-                      <TrendingUp className="w-4 h-4 text-green-400" />
-                      {user.vendorRevenue}
-                    </div>
-                  </td>
-                  <td className="py-3 px-4 text-sm text-black whitespace-nowrap">
-                    <div className="flex items-center gap-1">
-                      <AlertCircle className="w-4 h-4 text-red-400" />
-                      {user.adminDue}
-                    </div>
-                  </td>
-                  <td className="py-3 px-4 text-sm text-black whitespace-nowrap">
-                    <div className="flex items-center gap-1">
-                      <IndianRupee className="w-4 h-4 text-green-800" />
-                      {user.walletBalance}
-                    </div>
-                  </td>
-                  <td className="py-3 px-4 text-sm text-black whitespace-nowrap">
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4 text-cyan-400" />
-                      {user.DOB}
-                    </div>
-                  </td>
-                  <td className="py-3 px-4 whitespace-nowrap">
-                    <div className="flex items-center gap-1 justify-end">
-                      <button
-                        onClick={() => {
-                          console.log("user:", user);
-                          setSelectedUser(user);
-                          setShowViewModal(true);
-                        }}
-                        className="p-1 text-blue-600 hover:bg-blue-100 rounded"
-                        title="View User"
+                    </td>
+                    <td className="py-3 px-4 whitespace-nowrap">
+                      <select
+                        value={user.userStatus}
+                        onChange={(e) =>
+                          handleStatusChange(user.userId, e.target.value)
+                        }
+                        className={`px-2 py-1 rounded text-xs font-medium border-0 cursor-pointer ${
+                          getStatusdata(user.userStatus).color
+                        }`}
                       >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      <button
-                        // onClick={() => handleDeleteUser(user.userId)}
-                        onClick={() => setDeleteVendorId(user.userId)}
-                        className="p-1 text-red-600 hover:bg-red-100 rounded"
-                        title="Delete User"
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
+                      </select>
+                    </td>
+                    <td className="py-3 px-4 whitespace-nowrap">
+                      <select
+                        disabled={user.user_type !== "1"}
+                        value={user.isVerified}
+                        onChange={(e) =>
+                          handleVerificationChange(user.userId, e.target.value)
+                        }
+                        className={`px-2 py-1 rounded text-xs font-medium border-0 cursor-pointer ${
+                          getVeryfydata(user.isVerified).color
+                        } ${
+                          user.user_type != "1"
+                            ? "cursor-not-allowed opacity-60"
+                            : "cursor-pointer"
+                        }`}
                       >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                        <option value="true">Verified</option>
+                        <option value="false">Not Verified</option>
+                      </select>
+                    </td>
+                    <td className="py-3 px-4 text-sm text-black whitespace-nowrap">
+                      <div className="flex items-center gap-1">
+                        <TrendingUp className="w-4 h-4 text-green-400" />
+                        {user.vendorRevenue}
+                      </div>
+                    </td>
+                    <td className="py-3 px-4 text-sm text-black whitespace-nowrap">
+                      <div className="flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4 text-red-400" />
+                        {user.adminDue}
+                      </div>
+                    </td>
+                    <td className="py-3 px-4 text-sm text-black whitespace-nowrap">
+                      <div className="flex items-center gap-1">
+                        <IndianRupee className="w-4 h-4 text-green-800" />
+                        {user.walletBalance}
+                      </div>
+                    </td>
+                    <td className="py-3 px-4 text-sm text-black whitespace-nowrap">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-4 h-4 text-cyan-400" />
+                        {user.DOB}
+                      </div>
+                    </td>
+                    <td className="py-3 px-4 whitespace-nowrap">
+                      <div className="flex items-center gap-1 justify-end">
+                        <button
+                          onClick={() => {
+                            console.log("user:", user);
+                            setSelectedUser(user);
+                            setShowViewModal(true);
+                          }}
+                          className="p-1 text-blue-600 hover:bg-blue-100 rounded"
+                          title="View User"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        <button
+                          // onClick={() => handleDeleteUser(user.userId)}
+                          onClick={() => setDeleteVendorId(user.userId)}
+                          className="p-1 text-red-600 hover:bg-red-100 rounded"
+                          title="Delete User"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </BlurOverlayLoader>
         </div>
 
         {filteredUsers.length === 0 && (

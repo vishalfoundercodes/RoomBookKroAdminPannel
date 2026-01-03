@@ -13,6 +13,8 @@ import { FaPlus, FaTimes } from "react-icons/fa";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import Loader from "../Loader/Loader";
+import {apis} from "../../redux/apis";
+import BlurOverlayLoader from "../../reusable_components/BlurOverlayLoader";
 
 
 const StatCard = ({ label, value, color }) => {
@@ -34,6 +36,7 @@ const StatCard = ({ label, value, color }) => {
 
 export default function Options() {
   const [loading, setLoading] = useState(false);
+  const [addloading,setAddLoading]=useState(false)
   const [updating, setUpdating] = useState(null);
   const [allEnums, setAllEnums] = useState({});
   const [showModal, setShowModal] = useState(false);
@@ -55,7 +58,7 @@ export default function Options() {
     }
 
     try {
-      setLoading(true);
+      setAddLoading(true);
 
       const payload = {
         category: selectedCategory,
@@ -65,7 +68,7 @@ export default function Options() {
       };
 
       await axios.post(
-        "https://root.roombookkro.com/api/addenumoption",
+        apis.addEnums,
         payload
       );
 
@@ -77,7 +80,7 @@ export default function Options() {
       console.error(err);
       toast.error("Failed to add option");
     } finally {
-      setLoading(false);
+      setAddLoading(false);
     }
   };
 
@@ -85,9 +88,7 @@ export default function Options() {
   const fetchOptions = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(
-        "https://root.roombookkro.com/api/getenum?null"
-      );
+      const res = await axios.get(apis.getEnum);
 
       if (res.data.status) {
         console.log("get enum:", res.data.data);
@@ -113,7 +114,7 @@ export default function Options() {
         isActive: !currentStatus,
       };
       // console.log(payload)
-      await axios.put("https://root.roombookkro.com/api/toggleenum", payload);
+      await axios.put(apis.toggleenum, payload);
 
       setAllEnums((prev) => {
         const updated = { ...prev };
@@ -186,10 +187,8 @@ useEffect(() => {
 }, [allEnums, activeCategory]);
 
 
-  if (loading) {
-    return (
-      <Loader />
-    );
+  if (addloading) {
+    return <Loader />;
   }
 
   return (
@@ -253,62 +252,62 @@ useEffect(() => {
         </div>
 
         {/* CATEGORY TABS */}
-        <div className="bg-white rounded-xl shadow mb-6 px-6">
-          <div className="relative flex gap-8 border-b">
-            {Object.entries(allEnums).map(([categoryLabel, category]) => (
-              <button
-                key={category.type}
-                onClick={() => setActiveCategory(category.type)}
-                className={`relative py-4 text-sm font-semibold transition-colors
+        <BlurOverlayLoader loading={loading} text="Changes preforming...">
+          <div className="bg-white rounded-xl shadow mb-6 px-6">
+            <div className="relative flex gap-8 border-b">
+              {Object.entries(allEnums).map(([categoryLabel, category]) => (
+                <button
+                  key={category.type}
+                  onClick={() => setActiveCategory(category.type)}
+                  className={`relative py-4 text-sm font-semibold transition-colors
           ${
             activeCategory === category.type
               ? "text-blue-600"
               : "text-gray-500 hover:text-gray-700"
           }
         `}
-              >
-                {categoryLabel}
+                >
+                  {categoryLabel}
 
-                {/* Animated Indicator */}
-                {activeCategory === category.type && (
-                  <span className="absolute left-0 -bottom-[1px] w-full h-[2px] bg-blue-600 transition-all duration-300" />
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* ENUM SECTIONS */}
-      </div>
-      {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white w-full max-w-md rounded-xl shadow-lg p-6 relative">
-            {/* HEADER */}
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold text-gray-800">
-                Add Option ({selectedCategory})
-              </h3>
-              <button onClick={() => setShowModal(false)}>
-                <FaTimes className="text-gray-500 hover:text-red-500" />
-              </button>
+                  {/* Animated Indicator */}
+                  {activeCategory === category.type && (
+                    <span className="absolute left-0 -bottom-[1px] w-full h-[2px] bg-blue-600 transition-all duration-300" />
+                  )}
+                </button>
+              ))}
             </div>
+          </div>
+          {showModal && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+              <div className="bg-white w-full max-w-md rounded-xl shadow-lg p-6 relative">
+                {/* HEADER */}
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-xl font-bold text-gray-800">
+                    Add Option ({selectedCategory})
+                  </h3>
+                  <button onClick={() => setShowModal(false)}>
+                    <FaTimes className="text-gray-500 hover:text-red-500" />
+                  </button>
+                </div>
 
-            {/* FORM */}
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Label</label>
-                <input
-                  type="text"
-                  value={formData.label}
-                  onChange={(e) =>
-                    setFormData({ ...formData, label: e.target.value })
-                  }
-                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
-                  placeholder="e.g. Building"
-                />
-              </div>
+                {/* FORM */}
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">
+                      Label
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.label}
+                      onChange={(e) =>
+                        setFormData({ ...formData, label: e.target.value })
+                      }
+                      className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                      placeholder="e.g. Building"
+                    />
+                  </div>
 
-              {/* <div>
+                  {/* <div>
                 <label className="block text-sm font-medium mb-1">Value</label>
                 <input
                   type="text"
@@ -321,127 +320,134 @@ useEffect(() => {
                 />
               </div> */}
 
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Status</span>
-                <button
-                  onClick={() =>
-                    setFormData({ ...formData, isActive: !formData.isActive })
-                  }
-                  className="text-3xl"
-                >
-                  {formData.isActive ? (
-                    <FaToggleOn className="text-green-500" />
-                  ) : (
-                    <FaToggleOff className="text-gray-400" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            {/* ACTIONS */}
-            <div className="flex justify-end gap-3 mt-6">
-              <button
-                onClick={() => setShowModal(false)}
-                className="px-4 py-2 border rounded-lg"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={addOption}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                Add
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {activeCategoryData && (
-        <div className="bg-white rounded-xl shadow p-3">
-          {/* HEADER */}
-          <div className="flex justify-between items-center mb-6 gap-1">
-            <h2 className="text-2xl font-bold flex items-center gap-1">
-              <FaLayerGroup />
-              {activeCategoryLabel}
-            </h2>
-
-            <button
-              onClick={() => {
-                setSelectedCategory(activeCategoryData.type);
-                setShowModal(true);
-              }}
-              className="flex items-center gap-1 px-2 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-            >
-              <FaPlus /> Add Option
-            </button>
-          </div>
-
-          {/* PRICE RANGE */}
-          {activeCategoryData.type === "priceRange" && (
-            <div className="flex items-center gap-3 mb-6">
-              <FaRupeeSign className="text-green-600 text-2xl" />
-              <span className="text-xl font-semibold">
-                ₹{activeCategoryData.range.min} – ₹
-                {activeCategoryData.range.max}
-              </span>
-            </div>
-          )}
-
-          {/* OPTIONS */}
-          {filteredOptions && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {filteredOptions.map((option) => (
-                <div
-                  key={option.id}
-                  className={`rounded-xl border-2 shadow bg-white
-              ${option.isActive ? "border-green-200" : "border-red-200"}
-            `}
-                >
-                  <div
-                    className={`h-2 rounded-t-xl
-                ${option.isActive ? "bg-green-500" : "bg-red-500"}
-              `}
-                  />
-
-                  <div className="p-5">
-                    <h3 className="text-lg font-bold">{option.label}</h3>
-                    <p className="text-sm text-gray-500 mb-3">
-                      Value: {option.value}
-                    </p>
-
-                    <div className="flex justify-between items-center">
-                      <span
-                        className={`text-sm font-medium
-                    ${option.isActive ? "text-green-600" : "text-red-600"}
-                  `}
-                      >
-                        {option.isActive ? "Active" : "Inactive"}
-                      </span>
-
-                      <button
-                        onClick={() =>
-                          toggleStatus(
-                            activeCategoryData.type,
-                            option.id,
-                            option.isActive
-                          )
-                        }
-                        className="text-3xl"
-                      >
-                        {option.isActive ? (
-                          <FaToggleOn className="text-green-500" />
-                        ) : (
-                          <FaToggleOff className="text-gray-400" />
-                        )}
-                      </button>
-                    </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Status</span>
+                    <button
+                      onClick={() =>
+                        setFormData({
+                          ...formData,
+                          isActive: !formData.isActive,
+                        })
+                      }
+                      className="text-3xl"
+                    >
+                      {formData.isActive ? (
+                        <FaToggleOn className="text-green-500" />
+                      ) : (
+                        <FaToggleOff className="text-gray-400" />
+                      )}
+                    </button>
                   </div>
                 </div>
-              ))}
+
+                {/* ACTIONS */}
+                <div className="flex justify-end gap-3 mt-6">
+                  <button
+                    onClick={() => setShowModal(false)}
+                    className="px-4 py-2 border rounded-lg"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={addOption}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
             </div>
           )}
-        </div>
-      )}
+          {activeCategoryData && (
+            <div className="bg-white rounded-xl shadow p-3">
+              {/* HEADER */}
+              <div className="flex justify-between items-center mb-6 gap-1">
+                <h2 className="text-2xl font-bold flex items-center gap-1">
+                  <FaLayerGroup />
+                  {activeCategoryLabel}
+                </h2>
+
+                <button
+                  onClick={() => {
+                    setSelectedCategory(activeCategoryData.type);
+                    setShowModal(true);
+                  }}
+                  className="flex items-center gap-1 px-2 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  <FaPlus /> Add Option
+                </button>
+              </div>
+
+              {/* PRICE RANGE */}
+              {activeCategoryData.type === "priceRange" && (
+                <div className="flex items-center gap-3 mb-6">
+                  <FaRupeeSign className="text-green-600 text-2xl" />
+                  <span className="text-xl font-semibold">
+                    ₹{activeCategoryData.range.min} – ₹
+                    {activeCategoryData.range.max}
+                  </span>
+                </div>
+              )}
+
+              {/* OPTIONS */}
+              {filteredOptions && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                  {filteredOptions.map((option) => (
+                    <div
+                      key={option.id}
+                      className={`rounded-xl border-2 shadow bg-white
+              ${option.isActive ? "border-green-200" : "border-red-200"}
+            `}
+                    >
+                      <div
+                        className={`h-2 rounded-t-xl
+                ${option.isActive ? "bg-green-500" : "bg-red-500"}
+              `}
+                      />
+
+                      <div className="p-5">
+                        <h3 className="text-lg font-bold">{option.label}</h3>
+                        <p className="text-sm text-gray-500 mb-3">
+                          Value: {option.value}
+                        </p>
+
+                        <div className="flex justify-between items-center">
+                          <span
+                            className={`text-sm font-medium
+                    ${option.isActive ? "text-green-600" : "text-red-600"}
+                  `}
+                          >
+                            {option.isActive ? "Active" : "Inactive"}
+                          </span>
+
+                          <button
+                            onClick={() =>
+                              toggleStatus(
+                                activeCategoryData.type,
+                                option.id,
+                                option.isActive
+                              )
+                            }
+                            className="text-3xl"
+                          >
+                            {option.isActive ? (
+                              <FaToggleOn className="text-green-500" />
+                            ) : (
+                              <FaToggleOff className="text-gray-400" />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </BlurOverlayLoader>
+
+        {/* ENUM SECTIONS */}
+      </div>
     </div>
   );
 }

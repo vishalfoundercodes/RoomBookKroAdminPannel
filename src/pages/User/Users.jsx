@@ -503,6 +503,7 @@ const birthMonthData = monthNames.map((m, i) => ({
       flex items-center justify-between 
       cursor-pointer
     "
+              onClick={() => setFilterStatus("All")}
             >
               <div>
                 <p className="text-xs sm:text-sm opacity-80">Total Customers</p>
@@ -540,6 +541,7 @@ const birthMonthData = monthNames.map((m, i) => ({
       flex items-center justify-between 
       cursor-pointer
     "
+              onClick={() => setFilterStatus(1)}
             >
               <div>
                 <p className="text-xs sm:text-sm opacity-80">
@@ -577,6 +579,7 @@ const birthMonthData = monthNames.map((m, i) => ({
       flex items-center justify-between 
       cursor-pointer
     "
+              onClick={() => setFilterStatus(0)}
             >
               <div>
                 <p className="text-xs sm:text-sm opacity-80">

@@ -39,6 +39,7 @@ import Loader from "../Loader/Loader";
 import { toast } from "react-toastify";
 import StatCard from "../../reusable_components/StatCard";
 import { useLocation, useNavigate } from "react-router-dom";
+import defaultProfile from "../../assets/default-profile.png";
 
 export default function CustomerWiseBooking() {
   const dispatch = useDispatch();
@@ -343,7 +344,7 @@ export default function CustomerWiseBooking() {
 
           {/* Profile Image */}
           <img
-            src={customerImage}
+            src={customerImage || defaultProfile}
             alt="profile image"
             className="
       w-20 h-20 

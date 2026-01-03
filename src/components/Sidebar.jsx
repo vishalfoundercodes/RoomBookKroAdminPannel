@@ -38,7 +38,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
     // { icon: BarChart, label: "Analytics", to: "analytics" },
     // { icon: FileText, label: "Reports", to: "reports" },
     { icon: BarChart3, label: "Revenue", to: "/revenue" },
-    { icon: HistoryIcon, label: "History ", to: "history" },
+    { icon: HistoryIcon, label: "Booking History ", to: "history" },
     { icon: CreditCard, label: "coupon ", to: "coupon" },
 
     // { icon: icons, label: "Subscription Plans", to: "subscription" },
