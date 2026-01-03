@@ -602,6 +602,7 @@ import Loader from "../Loader/Loader";
 import { toast } from "react-toastify";
 import ConfirmModal from "../../reusable_components/ConfirmationModel";
 import defaultProfile from "../../assets/default-profile.png";
+import { apis } from "../../redux/apis";
 
 export default function UserBankDetails() {
   const navigate = useNavigate();
@@ -620,9 +621,7 @@ export default function UserBankDetails() {
         try {
           setLoading(true);
            if (!userId) return;
-          const res = await axios.get(
-            `https://root.roombookkro.com/api/bankdetails/user/${userId}`
-          );
+          const res = await axios.get(`${apis.bankdetails_user}/${userId}`);
           setBankData(res.data.data);
         } catch (err) {
           toast.error("Failed to fetch bank details");
@@ -639,18 +638,15 @@ export default function UserBankDetails() {
     if (!editBank?.bankId) return;
 
     try {
-      await axios.put(
-        `https://root.roombookkro.com/api/bank/update/${editBank.bankId}`,
-        {
-          accountHolderName: editBank.accountHolderName,
-          accountNumber: editBank.accountNumber,
-          ifscCode: editBank.ifscCode,
-          bankName: editBank.bankName,
-          branchName: editBank.branchName,
-          accountType: editBank.accountType,
-          isDefault: editBank.isDefault,
-        }
-      );
+      await axios.put(`${apis.bank_update}/${editBank.bankId}`, {
+        accountHolderName: editBank.accountHolderName,
+        accountNumber: editBank.accountNumber,
+        ifscCode: editBank.ifscCode,
+        bankName: editBank.bankName,
+        branchName: editBank.branchName,
+        accountType: editBank.accountType,
+        isDefault: editBank.isDefault,
+      });
 
       toast.success("Bank details updated successfully");
       setEditBank(null);
@@ -666,9 +662,7 @@ export default function UserBankDetails() {
     if (!bankId) return;
 
     try {
-      await axios.delete(
-        `https://root.roombookkro.com/api/bank/delete/${bankId}`
-      );
+      await axios.delete(`${apis.bank_delete}/${bankId}`);
 
       toast.success("Bank deleted successfully");
       fetchBankDetails(); // 🔄 refresh

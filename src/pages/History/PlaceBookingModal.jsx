@@ -1,9 +1,12 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import axios from "axios";
 import { X } from "lucide-react";
 import { toast } from "react-toastify";
+import { apis } from "../../redux/apis";
+import { fetchProperty } from "../../redux/slices/propertySlice";
+import { useDispatch, useSelector } from "react-redux";
 
-const API_URL = "https://root.roombookkro.com/api/placeorder";
+const API_URL = apis.placeorder;
 
 export default function PlaceBookingModal({
   open,
@@ -11,6 +14,7 @@ export default function PlaceBookingModal({
   users,
   refreshHistory,
 }) {
+    const dispatch = useDispatch();
   const [form, setForm] = useState({
     userId: "",
     residencyId: "",
@@ -31,7 +35,7 @@ export default function PlaceBookingModal({
     description: "",
   });
 
-  if (!open) return null;
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -53,6 +57,19 @@ export default function PlaceBookingModal({
       toast.error("Failed to place booking");
     }
   };
+const {
+  data: properties,
+  loading,
+  error,
+} = useSelector((state) => state.property);
+
+  useEffect(()=>{
+     dispatch(fetchProperty());
+  },[])
+
+  console.log("properties:", properties);
+
+    if (!open) return null;
 
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
